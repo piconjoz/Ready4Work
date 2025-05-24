@@ -1,0 +1,79 @@
+# build outputs
+bin/
+obj/
+out/
+
+# user-specific files
+*.suo
+*.user
+*.userosscache
+*.sln.docstates
+
+# rider stuff (your ide files)
+.idea/
+*.sln.iml
+
+# visual studio stuff (for your friends)
+.vs/
+*.vscode/
+
+# nuget packages
+*.nupkg
+*.snupkg
+packages/
+!packages/build/
+
+# test results
+TestResults/
+*.trx
+*.coverage
+*.coveragexml
+
+# build results
+[Dd]ebug/
+[Dd]ebugPublic/
+[Rr]elease/
+[Rr]eleases/
+x64/
+x86/
+[Aa][Rr][Mm]/
+[Aa][Rr][Mm]64/
+bld/
+[Bb]in/
+[Oo]bj/
+
+# logs
+*.log
+logs/
+
+# runtime stuff
+*.dll
+*.exe
+*.pdb
+*.cache
+
+# temp files
+*.tmp
+*.temp
+*~
+
+# os generated files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# secrets and config that shouldn't be shared
+appsettings.Development.json
+appsettings.Local.json
+*.pfx
+*.p12
+connectionStrings.config
+
+# resharper (if anyone uses it)
+_ReSharper*/
+*.[Rr]e[Ss]harper
+*.DotSettings.user
