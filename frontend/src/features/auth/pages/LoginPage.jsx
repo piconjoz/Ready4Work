@@ -12,57 +12,95 @@ function LoginPage() {
       </div>
       {/* Right: Login Form */}
       <div className="lg:p-10 md:p-40 sm:p-20 p-8 w-full lg:w-2/5 bg-[#F8F9FD]">
-        <h1 className="text-2xl font-semibold mb-4 font-inter-tight">Welcome to Ready4Work.</h1>
+      <div class="sm:mx-start sm:w-full sm:max-w-sm">
+        <img class="mx-start h-25 w-auto" src="https://the-ice.org/wp-content/uploads/2020/02/SIT-logo.png" alt="Your Company"></img>
+      </div>
+        <h1 className="text-2xl font-semibold my-4 font-inter-tight">Welcome to Ready4Work</h1>
+
+        {/* Right: Notice */}
+        <div className="relative w-full mx-auto border border-[#D3D3D3] rounded-2xl bg-white px-6 py-5 mb-6">
+          <button
+            type="button"
+            aria-label="Close notice"
+            className="absolute top-4 right-4 p-1 rounded hover:bg-gray-100 transition"
+            // onClick={() => ...} // add handler if you want to dismiss
+          >
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              className="h-6 w-6 text-black"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+              strokeWidth={2}
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                d="M6 18L18 6M6 6l12 12"
+              />
+            </svg>
+          </button>
+          <h5 className="font-inter-tight font-medium text-lg text-black mb-2">
+            Notice
+          </h5>
+          <p className="font-inter-tight text-sm text-black">
+            Access to Ready4Work will be restricted from 10:00 PM to 6:00 AM on weekdays to support students’ well-being and promote a healthy work-life balance.
+          </p>
+        </div>
         <form action="#" method="POST">
           {/* Username Input */}
-          <div className="mb-4">
-            <label htmlFor="username" className="block text-gray-600">
+          <div className="relative bg-white rounded-lg border border-[#D3D3D3] focus-within:border-[#7a7a7a] px-3 py-3 font-inter-tight transition-colors group mb-4">
+            <label
+              htmlFor="username"
+              className="block text-xs font-normal text-[#B0B0B0] group-focus-within:text-[#7a7a7a]"
+            >
               Username
             </label>
             <input
               type="text"
-              id="username"
               name="username"
-              className="w-[95%] border border-gray-300 rounded-md py-2 px-3 focus:outline-none focus:border-blue-500"
-              autoComplete="off"
+              id="username"
+              className="w-full bg-transparent text-sm focus:outline-none font-inter-tight"
+              autoComplete="username"
             />
           </div>
+
           {/* Password Input */}
-          <div className="mb-4">
-            <label htmlFor="password" className="block text-gray-800">
+          <div className="relative bg-white rounded-lg border border-[#D3D3D3] focus-within:border-[#7a7a7a] px-3 py-3 font-inter-tight transition-colors group">
+            <label
+              htmlFor="password"
+              className="block text-xs font-normal text-[#B0B0B0] group-focus-within:text-[#7a7a7a]"
+            >
               Password
             </label>
             <input
               type="password"
-              id="password"
               name="password"
-              className="w-[95%] border border-gray-300 rounded-md py-2 px-3 focus:outline-none focus:border-blue-500"
-              autoComplete="off"
+              id="password"
+              className="w-full bg-transparent text-sm focus:outline-none font-inter-tight"
+              autoComplete="current-password"
             />
           </div>
-          {/* Remember Me Checkbox */}
-          <div className="mb-4 flex items-center">
-            <input
-              type="checkbox"
-              id="remember"
-              name="remember"
-              className="text-red-500"
-            />
-            <label htmlFor="remember" className="text-green-900 ml-2">
-              Remember Me
+
+          <div className="mt-8 mb-8 flex items-center justify-between font-inter-tight">
+            {/* Remember Me Checkbox */}
+            <label className="flex items-center gap-2">
+              <input
+                type="checkbox"
+                name="remember"
+                className="accent-black"
+              />
+              <span className="text-sm text-b0 font-inter-tight">Remember me</span>
             </label>
-          </div>
-          {/* Forgot Password Link */}
-          <div className="mb-6 text-blue-500">
-            <a href="#" className="hover:underline">
-              Forgot Password?
+
+            {/* Forgot Password Link */}  
+            <a className="text-sm font-medium underline text-[#E30613] transition" href="#">
+              Forgot password?
             </a>
           </div>
+          
           {/* Login Button */}
-          <button
-            type="submit"
-            className="bg-stone-950 text-white rounded-md py-2 px-4 w-full"
-          >
+          <button type="submit" className="bg-stone-950 text-white rounded-md py-3 px-4 w-full font-inter-tight">
             Login
           </button>
         </form>
