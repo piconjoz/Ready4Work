@@ -7,6 +7,18 @@ var builder = WebApplication.CreateBuilder(args);
 
 // add services to the container.
 builder.Services.AddControllers();
+
+// configure CORS
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("AllowReactApp", policy =>
+    {
+        policy.WithOrigins("http://localhost:5173")
+            .AllowAnyMethod()
+            .AllowAnyHeader();
+    });
+});
+
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
@@ -27,6 +39,7 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 
+app.UseCors("AllowReactApp");
 app.UseHttpsRedirection();
 app.UseAuthorization();
 app.MapControllers();

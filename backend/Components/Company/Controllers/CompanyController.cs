@@ -5,7 +5,7 @@ using backend.Components.Company.Models;
 using backend.Components.Company.Services;
 
 [ApiController]
-[Route("api/[controller]")]
+[Route("api/companies")]
 public class CompanyController : ControllerBase
 {
     private readonly ICompanyService _companyService;
