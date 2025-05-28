@@ -1,3 +1,25 @@
 @import "tailwindcss";
 
+@font-face {
+  font-family: 'InterTight';
+  src: url('./assets/fonts/InterTight-VariableFont_wght.ttf') format('truetype');
+  font-weight: 100 900; /* Variable font weight range */
+  font-style: normal;
+  font-display: swap;
+}
 
+@font-face {
+  font-family: 'InterTightItalic';
+  src: url('./assets/fonts/InterTight-Italic-VariableFont_wght.ttf') format('truetype');
+  font-weight: 100 900;
+  font-style: italic;
+  font-display: swap;
+}
+
+.font-inter-tight {
+  font-family: 'InterTight', sans-serif;
+}
+
+.font-inter-tight-italic {
+  font-family: 'InterTightItalic', sans-serif;
+}

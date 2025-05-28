@@ -77,3 +77,7 @@ connectionStrings.config
 _ReSharper*/
 *.[Rr]e[Ss]harper
 *.DotSettings.user
+frontend/package-lock.json
+backend/Properties/launchSettings.json
+backend/Properties/launchSettings.json
+frontend/package-lock.json
