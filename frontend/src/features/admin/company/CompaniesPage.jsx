@@ -1,6 +1,5 @@
 import { useEffect, useState } from "react";
 import { getCompanies } from "../../../services/companiesApi.js";
-import ExampleComponent from "./ExampleComponent.jsx";
 
 function CompaniesPage() {
   const [companies, setCompanies] = useState([]);
