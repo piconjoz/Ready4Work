@@ -5,6 +5,7 @@ import JobCard from '../../../components/JobCard';
 import ApplicantCard from '../../../components/ApplicantCard';  
 import ListingCard from '../../../components/ListingCard';
 import ProgressIndicator from '../../../components/ProgressIndicator';
+import SearchFilter from '../../../components/SearchFilter';
 
 function LoginPage() {
   return (
@@ -228,6 +229,12 @@ function LoginPage() {
               Established in 2009 and granted full university status in 2014, SIT integrates work and study through its Integrated Work Study Programme, enabling students to tackle real industry challenges. Spread across six campuses—including its Punggol Campus at 1 Punggol Coast Road—SIT collaborates with nine overseas universities such as Newcastle University and DigiPen co-deliver applied degrees, nurturing graduates who are job- and future-ready.
             </p>
           </div>
+
+          {/* Search Filter */}
+          <div className='flex justify-end w-full mb-4'>
+              <SearchFilter />
+          </div>
+ 
 
           {/* Job Card */}
           <JobCard />
