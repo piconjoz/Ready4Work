@@ -1,9 +1,11 @@
 import { useEffect, useState } from "react";
 import { getCompanies } from "../../../services/companiesApi.js";
+import ExampleComponent from "./ExampleComponent.jsx";
 
 function CompaniesPage() {
   const [companies, setCompanies] = useState([]);
   const [loading, setLoading] = useState(false);
+  const [count, setCount] = useState(0);
   const [error, setError] = useState(null);
 
   useEffect(() => {

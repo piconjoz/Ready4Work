@@ -1,3 +1,5 @@
+import ExampleComponent from "../../admin/company/ExampleComponent.jsx";
+
 function LoginPage() {
   return (
     <div>
