@@ -1,22 +1,32 @@
-export default function ApplicantCard() {
+export default function ListingCard({
+  title = "Listing Title",
+  publishedDate = "17/05/2025",
+  daysRemaining = 40,
+  visibility = "Public",
+  pending = 2,
+  applicants = 1,
+  maxApplicants = 10,
+}) {
   return (
     <div className="bg-white border border-[#e5e7eb] rounded-2xl p-6 mx-auto my-4">
-      {/* Top row: Name, time, actions */}
+      {/* Title and Metadata */}
       <div className="flex items-center justify-between mb-4">
-        {/* Name and applied date */}
         <div>
-          <div className="text-md font-medium">
-            Product Development Technologist
-          </div>
+          <div className="text-md font-medium">{title}</div>
           <div className="text-sm text-gray-500">
-            Published 17/05/2025 (40 Days Remaining) | Public
+            Published {publishedDate} ({daysRemaining} Days Remaining) | {visibility}
           </div>
         </div>
       </div>
+
       <hr className="border-t border-[#E5E5E5] mb-4" />
+
+      {/* Status Counts */}
       <div>
-        <div className="text-sm text-gray-500">Pending: 2</div>
-        <div className="text-sm text-gray-500">Applicant: 1/10</div>
+        <div className="text-sm text-gray-500">Pending: {pending}</div>
+        <div className="text-sm text-gray-500">
+          Applicant: {applicants}/{maxApplicants}
+        </div>
       </div>
     </div>
   );

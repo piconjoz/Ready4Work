@@ -1,4 +1,5 @@
 import { MdWarning } from 'react-icons/md';
+import NoticeBanner from '../../../components/NoticeBanner';
 import DescToggle from "../../../components/DescToggle";
 import Accordian from "../../../components/Accordian";
 import JobCard from '../../../components/JobCard';
@@ -6,9 +7,28 @@ import ApplicantCard from '../../../components/ApplicantCard';
 import ListingCard from '../../../components/ListingCard';
 import ProgressIndicator from '../../../components/ProgressIndicator';
 import SearchFilter from '../../../components/SearchFilter';
+import AlertNote from '../../../components/AlertNote';
+import StatusInputField from '../../../components/StatusInputField';
+import SelectField from '../../../components/SelectField';
+import { useState } from "react";
+import DisclaimerCheckbox from '../../../components/DisclaimerCheckbox';
+import DescSection from '../../../components/DescSection';  
+import SITLogo from "../../../assets/sit_com_ico.svg";
+import PrimaryButton from '../../../components/PrimaryButton';
+
 
 
 function LoginPage() {
+
+const [selected, setSelected] = useState("0000");
+
+const timeoutOptions = [
+  { value: "0000", label: "5 Min" },
+  { value: "0100", label: "10 Min" },
+  { value: "0200", label: "15 Min" },
+  { value: "0300", label: "1 Day" },
+  { value: "2300", label: "1 Month" },
+];
   return (
     <div className="bg-[#F8F9FD] flex items-stretch min-h-screen">
       {/* Left: Image */}
@@ -28,130 +48,58 @@ function LoginPage() {
         <h1 className="text-2xl font-semibold my-4 ">Welcome to Ready4Work</h1>
 
         {/* Right: Notice */}
-        <div className="relative w-full mx-auto border border-[#D3D3D3] rounded-2xl bg-white px-6 py-5 mb-6">
-          <button
-            type="button"
-            aria-label="Close notice"
-            className="absolute top-4 right-4 p-1 rounded hover:bg-gray-100 transition"
-            // onClick={() => ...} // add handler if you want to dismiss
-          >
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              className="h-6 w-6 text-black"
-              fill="none"
-              viewBox="0 0 24 24"
-              stroke="currentColor"
-              strokeWidth={2}
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                d="M6 18L18 6M6 6l12 12"
-              />
-            </svg>
-          </button>
-          <h5 className=" font-medium text-black mb-2">
-            Notice
-          </h5>
-          <p className=" text-sm text-black">
-            Access to Ready4Work will be restricted from 10:00 PM to 6:00 AM on weekdays to support students’ well-being and promote a healthy work-life balance.
-          </p>
-        </div>
+        <NoticeBanner
+          title="Notice"
+          message="The portal will be unavailable from 12:00 AM to 2:00 AM for scheduled maintenance."
+          onClose={() => setShowNotice(false)}
+        />
+    
 
         {/* Notifications Alert */}
-        <div className="bg-[#727272] rounded-2xl text-white px-6 py-5 my-4 flex items-start gap-4" role="alert">
-          {/* Icon */}
-          <span className="inline-flex items-center justify-center">
-            {/* Exclamation icon */}
-            <MdWarning size={25} color="white" />
-          </span>
-          {/* Text Content */}
-          <div>
-            <h5 className="font-medium mb-1">Note</h5>
-            <p className="text-sm">Please contact Registrar's Office if you wish to update the personal details</p>
-          </div>
-        </div>
+        <AlertNote 
+          title="Note"
+          message="Please contact Registrar's Office if you wish to update the personal details"
+        />
 
         <form action="#" method="POST">
 
           {/* Username Input */}
-          <div className="relative bg-white rounded-lg border border-[#D3D3D3] focus-within:border-[#7a7a7a] px-3 py-3  transition-colors group mb-4">
-            <label htmlFor="username" className="block text-xs font-normal text-[#B0B0B0] group-focus-within:text-[#7a7a7a]">
-              Username
-            </label>
-            <input
-              type="text"
-              name="username"
-              id="username"
-              className="w-full bg-transparent text-sm focus:outline-none "
-              autoComplete="username"
-            />
-          </div>
+          <StatusInputField
+            label="Username"
+            name="Username"
+            type="text"
+            status="default"
+            errorMessage=""
+          />  
 
           {/* Password Input */}
-          <div className="relative bg-white rounded-lg border border-[#D3D3D3] focus-within:border-[#7a7a7a] px-3 py-3  transition-colors group">
-            <label htmlFor="password" className="block text-xs font-normal text-[#B0B0B0] group-focus-within:text-[#7a7a7a]">
-              Password
-            </label>
-            <input
-              type="password"
-              name="password"
-              id="password"
-              className="w-full bg-transparent text-sm focus:outline-none "
-              autoComplete="current-password"
-            />
-          </div>
+          <StatusInputField
+            label="Password"
+            name="password"
+            type="password"
+            status="default"
+            errorMessage=""
+          />  
 
           {/* Error Input */}
-          <div className="relative bg-[#FFF9F7] rounded-lg border border-[#D54B21] px-3 py-3 transition-colors group mt-4">
-            <label
-              htmlFor="verify-password"
-              className="block text-xs font-normal text-[#D54B21]">
-              Verify Password
-            </label>
-            <input
-              type="password"
-              name="verify-password"
-              id="verify-password"
-              className="w-full bg-transparent text-sm focus:outline-none text-gray-700"
-              autoComplete="off"
-            />
-          </div>
-          {/* Error Message */}
-          <div className="flex flex-row-reverse gap-1 mt-2 mb-2 text-[#D54B21]">
-            {/* Exclamation icon */}
-            <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
-              <circle cx="12" cy="12" r="10" fill="#D54B21" />
-              <rect x="11" y="7" width="2" height="6" rx="1" fill="#fff" />
-              <circle cx="12" cy="16" r="1" fill="#fff" />
-            </svg>
-            <span className="text-sm underline cursor-pointer">Password does not match</span>
-          </div>
+          <StatusInputField
+            label="Verify Password"
+            name="verify-password"
+            type="password"
+            status="error"
+            errorMessage="Password does not match"
+          />
+        
 
           {/* Dropdown Input */}
-          <div className="relative bg-white rounded-lg border border-[#D3D3D3] focus-within:border-[#7a7a7a] px-3 py-3 transition-colors group my-4">
-            <label htmlFor="working-hours-end" className="block text-xs font-normal text-[#B0B0B0] group-focus-within:text-[#7a7a7a]">
-              Timeout Duration
-            </label>
-            <select
-              id="working-hours-end"
-              name="workingHoursEnd"
-              className="w-full bg-transparent text-lg focus:outline-none appearance-none pr-8"
-              defaultValue="0000">
-              {/* Add your time options here */}
-              <option value="0000">5 Min</option>
-              <option value="0100">10 Min</option>
-              <option value="0200">15 Min</option>
-              <option value="0300">1 Day</option>
-              <option value="2300">1 Month</option>
-            </select>
-            {/* Chevron icon (right side) */}
-            <span className="pointer-events-none absolute right-4 top-1/2 transform -translate-y-1/2 text-gray-500">
-              <svg width="20" height="20" fill="none" viewBox="0 0 24 24">
-                <path d="M7 10l5 5 5-5" stroke="#444" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
-              </svg>
-            </span>
-          </div>
+
+          <SelectField
+            label="Timeout Duration"
+            name="workingHoursEnd"
+            value={selected}
+            onChange={(e) => setSelected(e.target.value)}
+            options={timeoutOptions}
+          />
 
           {/* Remember Me and Forgot Password Section */}
           <div className="mt-8 mb-8 flex items-center justify-between">
@@ -168,27 +116,19 @@ function LoginPage() {
           </div>
 
           {/* Disclaimer Section */}
-          <div className="mt-10 mb-10 flex items-center justify-between">
-
-            {/* Informant Text */} 
-            <div className="pr-5">
-              <p className="text-md">
-              Student Account
-              </p>
-              <p className="text-sm text-[#5E5E5E]">
-                Create Ready4Work account with SIT Credentials 
-              </p>
-            </div>
-
-            {/* Remember Me Checkbox */}
-            <label className="flex items-center mr-2">
-              <input type="checkbox" name="remember" className="accent-black scale-150"/>
-            </label> 
-            
-          </div>
+          <DisclaimerCheckbox 
+            title="Student Account" 
+            description="Create Ready4Work account with SIT Credentials"
+            name="studentAccount"
+          />
+        
           
           {/* Description Toggle */}
-          <DescToggle />
+          <DescToggle
+            title="Redact Resume"
+            description="Share resume without personal info."
+            name="redactedResume"
+          />
 
           {/* Accordian */}
           <Accordian />
@@ -221,41 +161,60 @@ function LoginPage() {
             </div>
 
           {/* Info Section */}
-          <div className="bg-white border border-[#e5e7eb] rounded-2xl p-6 my-6">
-            <h2 className="text-xl xl:text-2xl font-semibold mb-3">About Company</h2>
-            <p className="text-md mb-4">
-              Singapore Institute of Technology (SIT) is Singapore’s University of Applied Learning, offering applied degree programmes across five clusters: Engineering; Food, Chemical & Biotechnology; Infocomm Technology; Health & Social Sciences; Business, Communication & Design.
-            </p>
-            <p className="text-md">
-              Established in 2009 and granted full university status in 2014, SIT integrates work and study through its Integrated Work Study Programme, enabling students to tackle real industry challenges. Spread across six campuses—including its Punggol Campus at 1 Punggol Coast Road—SIT collaborates with nine overseas universities such as Newcastle University and DigiPen co-deliver applied degrees, nurturing graduates who are job- and future-ready.
-            </p>
-          </div>
+        <DescSection
+          title="About Company"
+          paragraphs={[
+            "Singapore Institute of Technology (SIT) is Singapore’s University of Applied Learning, offering applied degree programmes across five clusters: Engineering; Food, Chemical & Biotechnology; Infocomm Technology; Health & Social Sciences; Business, Communication & Design.",
+            "Established in 2009 and granted full university status in 2014, SIT integrates work and study through its Integrated Work Study Programme, enabling students to tackle real industry challenges. Spread across six campuses—including its Punggol Campus at 1 Punggol Coast Road—SIT collaborates with nine overseas universities such as Newcastle University and DigiPen co-deliver applied degrees, nurturing graduates who are job- and future-ready.",
+          ]}
+        />
 
-          {/* Search Filter */}
-          <div className='flex justify-end w-full mb-4'>
-              <SearchFilter />
-          </div>
- 
-
-          {/* Job Card */}
-          <JobCard />
-
-          {/* Applicant Card */}
-          <ApplicantCard />
-
-          {/* Listing Card */}
-          <ListingCard />
-
-          {/* Progress Indicator */}
-          <ProgressIndicator />
-          
-          {/* Login Button */}
-          <button type="submit" className="bg-stone-950 text-white rounded-lg py-3 px-4 w-full ">
-            Login
-          </button>
-          
+        {/* Search Filter */}
+        <div className='flex justify-end w-full mb-4'>
+            <SearchFilter />
+        </div>
 
 
+        {/* Job Card */}
+        <JobCard
+          logo={SITLogo}
+          title="Student Standardised Patient (PTY1015 Musculoskeletal Physiotherapy 1 - AY24 Tri 3)"
+          employer="Singapore Institute Of Technology"
+          scheme="SIT Student Work Scheme"
+          daysRemaining={85}
+          badges={[
+            { label: "$19/Hour"},
+            { label: "10 Vacancies", color: "bg-[#F5F5F5] border-gray-300" },
+            { label: "01/09/2025" },
+          ]}
+          onClick={() => console.log("Clicked job card")}
+        />
+
+        {/* Applicant Card */}
+        <ApplicantCard
+          name="Natalie Goh"
+          appliedAt="20/05/25 09:42"
+          status="Pending"
+          statusColor="bg-green-600"
+          resumeDetails={{ name: "Natalie Goh" }} // Example prop for modal
+        />
+
+        {/* Listing Card */}
+        <ListingCard
+          title="QA Intern – Beverage R&D"
+          publishedDate="18/05/2025"
+          daysRemaining={25}
+          visibility="Private"
+          pending={3}
+          applicants={5}
+          maxApplicants={10}
+        />
+
+        {/* Progress Indicator */}
+        <ProgressIndicator />
+        
+        {/* Login Button */}
+        <PrimaryButton type="submit" label="Login" />
 
         </form>
       </div>

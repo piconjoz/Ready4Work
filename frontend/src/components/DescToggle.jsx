@@ -20,16 +20,15 @@ function Toggle({ checked, onChange }) {
   );
 }
 
-export default function DescToggle() {
-  const [checked, setChecked] = useState(true);
+export default function DescToggle({ title, description, name, defaultChecked = true }) {
+  const [checked, setChecked] = useState(defaultChecked);
+
   return (
     <div className="mt-10 mb-10 flex items-center justify-between">
-        <div>
-            <p className="text-md">Redacted Resume</p>
-            <p className="text-sm text-[#5E5E5E]">
-            Share resume without personal info.
-            </p>
-        </div>
+      <div>
+        <p className="text-md">{title}</p>
+        <p className="text-sm text-[#5E5E5E]">{description}</p>
+      </div>
       <Toggle checked={checked} onChange={() => setChecked((v) => !v)} />
     </div>
   );

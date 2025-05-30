@@ -1,19 +1,24 @@
 import React, { useState } from "react";
 import { MdCheck, MdClose, MdPerson } from "react-icons/md";
-import { FaAngleDown } from "react-icons/fa6";
-import ResumeModal from "./ResumeModal"; // adjust path if needed
+import ResumeModal from "./ResumeModal"; // Adjust if needed
 
-export default function ApplicantCard() {
+export default function ApplicantCard({
+  name = "Natalie Goh",
+  appliedAt = "18/05/25 13:59",
+  status = "Accepted",
+  statusColor = "bg-green-600",
+  resumeDetails = null,
+}) {
   const [showModal, setShowModal] = useState(false);
 
   return (
     <>
       <div className="bg-white border border-[#e5e7eb] rounded-2xl p-6 mx-auto my-4">
-        {/* Top row: Name, time, actions */}
+        {/* Top: Name and Action */}
         <div className="flex items-center justify-between mb-4">
           <div>
-            <div className="text-md font-medium">Natalie Goh</div>
-            <div className="text-sm text-gray-500">Applied 18/05/25 13:59</div>
+            <div className="text-md font-medium">{name}</div>
+            <div className="text-sm text-gray-500">Applied {appliedAt}</div>
           </div>
           <div className="flex gap-3">
             <button
@@ -32,9 +37,10 @@ export default function ApplicantCard() {
             </button>
           </div>
         </div>
+
         <hr className="border-t border-[#E5E5E5] mb-4" />
 
-        {/* Resume icon + Status */}
+        {/* Resume + Status */}
         <div className="flex flex-wrap gap-x-3 gap-y-2 mb-4">
           <button
             type="button"
@@ -43,14 +49,21 @@ export default function ApplicantCard() {
           >
             <MdPerson size={24} className="text-black" />
           </button>
-          <span className="inline-flex items-center rounded-full border border-gray-300 px-4 my-2 h-8 bg-green-600 text-xs text-white font-medium">
-            Accepted
+          <span
+            className={`inline-flex items-center rounded-full border border-gray-300 px-4 my-2 h-8 text-xs text-white font-medium ${statusColor}`}
+          >
+            {status}
           </span>
         </div>
       </div>
 
       {/* Resume Modal */}
-      {showModal && <ResumeModal onClose={() => setShowModal(false)} />}
+      {showModal && (
+        <ResumeModal
+          onClose={() => setShowModal(false)}
+          {...resumeDetails} // Pass in additional modal props if needed
+        />
+      )}
     </>
   );
 }
