@@ -7,6 +7,7 @@ import ListingCard from '../../../components/ListingCard';
 import ProgressIndicator from '../../../components/ProgressIndicator';
 import SearchFilter from '../../../components/SearchFilter';
 
+
 function LoginPage() {
   return (
     <div className="bg-[#F8F9FD] flex items-stretch min-h-screen">
