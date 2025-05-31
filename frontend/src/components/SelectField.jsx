@@ -14,15 +14,14 @@ export default function SelectField({ label, name, value, onChange, options = []
         name={name}
         value={value}
         onChange={onChange}
-        className="w-full bg-transparent text-lg focus:outline-none appearance-none pr-8"
-      >
+        className="w-full bg-transparent text-sm focus:outline-none appearance-none pr-8">
         {options.map((opt) => (
           <option key={opt.value} value={opt.value}>
             {opt.label}
           </option>
         ))}
       </select>
-      <span className="pointer-events-none absolute right-4 top-1/2 transform -translate-y-1/2 text-gray-500">
+      <span className="pointer-events-none absolute right-4 top-1/2 transform -translate-y-1/2 text-[#5E5E5E]">
         <svg width="20" height="20" fill="none" viewBox="0 0 24 24">
           <path
             d="M7 10l5 5 5-5"

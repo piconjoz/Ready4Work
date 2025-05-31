@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState, useRef, useEffect } from "react";
 
 export default function StatusInputField({
   label,
@@ -7,30 +7,77 @@ export default function StatusInputField({
   status = "default", // 'default' | 'error'
   errorMessage = "",
   autoComplete = "off",
+  value,
+  defaultValue = "",
+  onChange,
+  className = "",
 }) {
   const isError = status === "error";
 
+  // Internal state fallback if no value/onChange provided
+  const [internalValue, setInternalValue] = useState("");
+
+  const handleChange = (e) => {
+    if (onChange) {
+      onChange(e);
+    } else {
+      setInternalValue(e.target.value);
+    }
+  };
+
+  const textAreaRef = useRef(null);
+  // Decide what should populate the field initially
+  const initial = defaultValue !== undefined
+    ? defaultValue
+    : value !== undefined
+    ? value
+    : internalValue;
+  // Auto-resize effect for textarea
+  useEffect(() => {
+    if (type === "textarea" && textAreaRef.current) {
+      textAreaRef.current.style.height = "auto";
+      textAreaRef.current.style.height = `${textAreaRef.current.scrollHeight}px`;
+    }
+  }, [initial, type]);
+
   return (
     <>
-      <div className={`relative rounded-lg px-3 py-3 transition-colors group mt-4
-          ${isError ? "bg-[#FFF9F7] border-[#D54B21]" : "bg-white border-[#D3D3D3]"}
-          border`}>
+      <div
+        className={`relative rounded-lg px-3 py-3 transition-colors group mt-4 ${
+          isError ? "bg-[#FFF9F7] border-[#D54B21]" : "bg-white border-[#D3D3D3]"
+        } border ${className}`}>
         <label
           htmlFor={name}
           className={`block text-xs font-normal ${
-            isError ? "text-[#D54B21]" : "text-[#B0B0B0] group-focus-within:text-[#7a7a7a]"
+            isError
+              ? "text-[#D54B21]"
+              : "text-[#B0B0B0] group-focus-within:text-[#7a7a7a]"
           }`}>
           {label}
         </label>
-        <input
-          type={type}
-          name={name}
-          id={name}
-          className={`w-full bg-transparent text-sm focus:outline-none ${
-            isError ? "text-gray-700" : ""
-          }`}
-          autoComplete={autoComplete}
-        />
+        {type === "textarea" ? (
+          <textarea
+            ref={textAreaRef}
+            name={name}
+            id={name}
+            value={initial}
+            onChange={handleChange}
+            className="w-full bg-transparent text-sm focus:outline-none resize-none overflow-hidden"
+            autoComplete={autoComplete}
+          />
+        ) : (
+          <input
+            type={type}
+            name={name}
+            id={name}
+            defaultValue={initial}
+            onChange={handleChange}
+            className={`w-full bg-transparent text-sm focus:outline-none ${
+              isError ? "text-gray-700" : ""
+            }`}
+            autoComplete={autoComplete}
+          />
+        )}
       </div>
 
       {/* Error Message */}

@@ -8,14 +8,14 @@ export default function ListingCard({
   maxApplicants = 10,
 }) {
   return (
-    <div className="bg-white border border-[#e5e7eb] rounded-2xl p-6 mx-auto my-4">
+    <div className="bg-white border border-[#e5e7eb] rounded-2xl p-6">
       {/* Title and Metadata */}
-      <div className="flex items-center justify-between mb-4">
-        <div>
-          <div className="text-md font-medium">{title}</div>
-          <div className="text-sm text-gray-500">
-            Published {publishedDate} ({daysRemaining} Days Remaining) | {visibility}
-          </div>
+      <div className="mb-4">
+        <h3 className="text-md font-semibold mb-1 line-clamp-2 min-h-[3rem]">
+          {title}
+        </h3>
+        <div className="text-sm text-gray-500">
+          Published {publishedDate} ({daysRemaining} Days Remaining)
         </div>
       </div>
 
@@ -27,6 +27,7 @@ export default function ListingCard({
         <div className="text-sm text-gray-500">
           Applicant: {applicants}/{maxApplicants}
         </div>
+        <div className="text-sm text-gray-500">Visibility: {visibility}</div>
       </div>
     </div>
   );

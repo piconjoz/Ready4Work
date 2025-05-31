@@ -11,7 +11,7 @@ export default function JobSearchBar() {
   return (
     <form
       onSubmit={handleSubmit}
-      className="flex items-center justify-between border border-gray-300 bg-white rounded-full px-5 py-3 w-full shadow-sm cursor-pointer"
+      className="flex items-center justify-between border border-gray-300 bg-white rounded-full px-6 py-3 w-full shadow-sm cursor-pointer"
     >
       {/* Label and input section */}
       <div className="flex flex-col w-full">

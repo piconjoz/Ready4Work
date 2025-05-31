@@ -7,7 +7,7 @@ export default function MobileTab({ options = [], selected, onSelect }) {
   const selectedItem = options.find((opt) => opt.value === selected);
 
   return (
-    <div className="relative w-64">
+    <div className="relative w-full mt-5">
       <button
         onClick={() => setOpen(!open)}
         className="w-full flex items-center justify-between border border-gray-300 rounded-lg px-4 py-3 bg-white shadow-xs text-sm text-gray-800">

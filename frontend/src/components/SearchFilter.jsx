@@ -1,23 +1,12 @@
 // frontend/src/components/SearchFilter.jsx
-import React, { useState } from "react";
+import React from "react";
 
-export default function SearchFilter() {
-  const [open, setOpen] = useState(false);
-
+export default function SearchFilter({ open }) {
   return (
     <div className="relative inline-block w-full lg:w-auto text-left">
-      {/* Toggle Button */}
-      <button
-        type="button"
-        onClick={() => setOpen(!open)}
-        className="w-full lg:w-auto px-4 py-2 text-white bg-gray-800 rounded-lg hover:bg-gray-900 focus:ring-2 focus:ring-gray-500"
-      >
-        Filter
-      </button>
-
       {/* Drop-down Panel */}
       {open && (
-        <div className="absolute right-0 z-10 mt-2 w-full lg:w-80 bg-white rounded-lg shadow-lg p-6 space-y-6">
+        <div className="absolute right-0 z-10 mt-2 lg:mt-12 w-full lg:w-80 max-h-[65vh] overflow-y-auto bg-white rounded-lg shadow-lg p-6 space-y-6">
           <h2 className="text-xl font-semibold text-gray-900">Filter By</h2>
 
           {/* Listing Date */}
