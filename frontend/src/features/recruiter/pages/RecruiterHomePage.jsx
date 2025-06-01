@@ -9,6 +9,7 @@ import { MdStream } from "react-icons/md";
 import JobCard from "../../../components/JobCard";
 import { FaUserCircle } from "react-icons/fa";
 import EmptyCard from "../../../components/EmptyCard";
+import { Link, useLocation } from "react-router-dom";
 
 
 
@@ -77,7 +78,9 @@ export default function RecruiterHomePage() {
         <h1 className="text-2xl font-semibold">Expiring Soon</h1>
          <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6 mt-4">
             {listings2.map((listing) => (
-              <JobCard {...listing} key={listing.title} onClick={() => console.log("Clicked job card")} />
+              <Link to="/listing/edit" key={listing.title}>
+                <JobCard {...listing} />
+              </Link>
             ))}
           </div>
       </div>

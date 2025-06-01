@@ -11,7 +11,8 @@ import CompaniesPage from "./features/admin/company/CompaniesPage.jsx";
 import BasePage from "./features/applicant/pages/BasePage.jsx";
 
 // Admin Pages
-import AdminHomePage from "./features/admin/pages/AdminHomePage.jsx";
+import AdminUsersPage from "./features/admin/pages/AdminUsersPage.jsx";
+import AdminListingsPage from "./features/admin/pages/AdminListingsPage.jsx";
 
 
 // Applicant Pages
@@ -54,7 +55,8 @@ function AppRoutes() {
 
       <Route path="admin">
         <Route path="companies" element={<CompaniesPage />} />
-        <Route path="home" element={<AdminHomePage />} />
+        <Route path="users" element={<AdminUsersPage />} />
+        <Route path="listings" element={<AdminListingsPage />} />
       </Route>
 
       <Route path="applicant">
@@ -69,7 +71,7 @@ function AppRoutes() {
       <Route path="recruiter">
         <Route path="home" element={<RecruiterHomePage />} />
         <Route path="onboard" element={<RecruiterOnboardingPage />} />
-        <Route path="listing" element={<RecruiterListingPage />} />
+        <Route path="listings" element={<RecruiterListingPage />} />
         <Route path="settings" element={<RecruiterSettingPage />} />
       </Route>
 

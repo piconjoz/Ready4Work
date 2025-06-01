@@ -3,6 +3,7 @@ import SearchBar from '../../../components/SearchBar';
 import JobCard from "../../../components/JobCard";
 import Header from "../../../components/Header";
 import SITLogo from "../../../assets/sit_com_ico.svg";
+import { Link } from "react-router-dom";
 
 
 
@@ -131,7 +132,9 @@ export default function ApplicantHomePage() {
         <h1 className="text-2xl font-semibold">Recommended For You</h1>
         <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6 mt-4">
           {listings2.map((listing) => (
-            <JobCard {...listing} key={listing.title} onClick={() => console.log("Clicked job card")} />
+            <Link to="/listing/info" key={listing.title}>
+              <JobCard {...listing} />
+            </Link>
           ))}
         </div>
       </div>
@@ -141,7 +144,9 @@ export default function ApplicantHomePage() {
         <h1 className="text-2xl font-semibold">New Listings</h1>
         <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6 mt-4">
           {listings.map((listing) => (
-            <JobCard {...listing} key={listing.title} onClick={() => console.log("Clicked job card")} />
+            <Link to="/listing/info" key={listing.title}>
+              <JobCard {...listing} />
+            </Link>
           ))}
         </div>
       </div>
