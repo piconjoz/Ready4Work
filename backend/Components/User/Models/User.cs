@@ -36,6 +36,10 @@ namespace backend.User.Models
         [Column("gender")] 
         [StringLength(10)] // its 2025 broskis, you can be a helicopter if you want to
         private string? Gender { get; set; }
+        
+        [Column("profile_picture_path")]
+        [StringLength(255)]
+        private string? ProfilePicturePath { get; set; } = null;
 
         [Column("is_active")]
         private bool IsActive { get; set; } = true;
@@ -94,6 +98,7 @@ namespace backend.User.Models
         internal DateTime GetUpdatedAt() => UpdatedAt;
         internal bool GetIsVerified() => IsVerified;
         internal int GetUserType() => UserType;
+        internal string? GetProfilePicturePath() => ProfilePicturePath;
 
         // password methods - only for password service
         internal string GetSalt() => Salt;
@@ -110,5 +115,6 @@ namespace backend.User.Models
         internal void SetIsVerified(bool isVerified) => IsVerified = isVerified;
         internal void SetSalt(string salt) => Salt = salt;
         internal void SetPasswordHash(string passwordHash) => PasswordHash = passwordHash;
+        internal void SetProfilePicturePath(string? profilePicturePath) => ProfilePicturePath = profilePicturePath;
     }
 }

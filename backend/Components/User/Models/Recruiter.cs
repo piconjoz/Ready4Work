@@ -1,4 +1,4 @@
-namespace backend.Users.Models;
+namespace backend.User.Models;
 
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
