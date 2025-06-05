@@ -1,15 +1,15 @@
-import { MdWarning } from 'react-icons/md';
+import { MdWarning } from "react-icons/md";
 import { MdLogin, MdAppRegistration } from "react-icons/md";
-import NoticeBanner from '../../../components/NoticeBanner';
-import StatusInputField from '../../../components/StatusInputField';
+import NoticeBanner from "../../../components/NoticeBanner";
+import StatusInputField from "../../../components/StatusInputField";
 import { useState } from "react";
-import PrimaryButton from '../../../components/PrimaryButton';
-import LoginForm from './components/LoginForm';
-import SignupForm from './components/SignupForm'; 
+import PrimaryButton from "../../../components/PrimaryButton";
+import LoginForm from "./components/LoginForm";
+import SignupForm from "./components/SignupForm";
 
 function LoginPage() {
-
   const [activeTab, setActiveTab] = useState("login");
+  const [showNotice, setShowNotice] = useState(true);
 
   return (
     <div className="bg-[#F8F9FD] flex items-stretch min-h-screen">
@@ -25,16 +25,22 @@ function LoginPage() {
       {/* Right: Login Form */}
       <div className="lg:p-10 md:p-40 sm:p-20 p-8 w-full lg:w-2/5 bg-[#F8F9FD]">
         <div className="sm:mx-start sm:w-full sm:max-w-sm">
-          <img className="mx-start h-25 w-auto" src="https://the-ice.org/wp-content/uploads/2020/02/SIT-logo.png" alt="Your Company" />
+          <img
+            className="h-25 w-auto"
+            src="https://the-ice.org/wp-content/uploads/2020/02/SIT-logo.png"
+            alt="SIT Logo"
+          />
         </div>
         <h1 className="text-2xl font-semibold my-4 ">Welcome to Ready4Work</h1>
 
         {/* Notice */}
-        <NoticeBanner
-          title="Notice"
-          message="The portal will be unavailable from 12:00 AM to 2:00 AM for scheduled maintenance."
-          onClose={() => setShowNotice(false)}
-        />
+        {showNotice && (
+          <NoticeBanner
+            title="Notice"
+            message="The portal will be unavailable from 12:00 AM to 2:00 AM for scheduled maintenance."
+            onClose={() => setShowNotice(false)}
+          />
+        )}
 
         {/* Tab Switcher */}
         <div className="mb-6">
@@ -71,12 +77,8 @@ function LoginPage() {
         </div>
 
         {/* Form Content */}
-        <div className="w-full max-w-md">
-          {activeTab === "login" ? (
-            <LoginForm />
-          ) : (
-            <SignupForm />
-          )}
+        <div className="w-full">
+          {activeTab === "login" ? <LoginForm /> : <SignupForm />}
         </div>
       </div>
     </div>
