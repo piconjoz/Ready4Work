@@ -8,11 +8,12 @@ import { PiFrameCornersFill } from "react-icons/pi";
 import Applicant from "./components/Applicant";
 import ApplicationInfo from "./components/ApplicantionInfo";
 import JobInfo from "./components/JobInfo";
+import DateStatusInputField from "../../../components/DateStatusInputField";
 
 export default function ListingEditPage() {
   // Track which top-level tab is selected
   const [selected, setSelected] = useState("applicants");
-
+  const [selectedDeadline, setSelectedDeadline] = useState(); 
   return (
     <div className="min-h-screen bg-[#F8F9FD] px-6 md:px-10">
       <RecruiterHeader active="" />
@@ -35,13 +36,9 @@ export default function ListingEditPage() {
               />
               {/* Three-column row */}
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                <StatusInputField
-                  label="Deadline"
-                  name="deadline"
-                  type="text"
-                  status="default"
-                  defaultValue="16/05/2025"
-                  readOnly={false}
+                <DateStatusInputField
+                  value={selectedDeadline}
+                  onChange={(newDateString) => setSelectedDeadline(newDateString)}
                 />
                 <StatusInputField
                   label="Maximum Vacancies"
