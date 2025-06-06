@@ -2,6 +2,7 @@ namespace backend.Data;
 
 using Microsoft.EntityFrameworkCore;
 using backend.Components.Company.Models;
+using backend.User.Models;
 
 public class ApplicationDbContext : DbContext
 {
@@ -11,10 +12,13 @@ public class ApplicationDbContext : DbContext
     
     // this represents the companies table
     public DbSet<Company> Companies { get; set; }
+    public DbSet<User> Users { get; set; }
+    public DbSet<Admin> Admins { get; set; }
+    public DbSet<Applicant> Applicants { get; set; }
+    public DbSet<Recruiter> Recruiters { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
-        // conf company table
         modelBuilder.Entity<Company>(entity =>
         {
             entity.HasKey(e => e.CompanyId);

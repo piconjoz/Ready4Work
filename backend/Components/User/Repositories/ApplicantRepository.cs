@@ -3,6 +3,7 @@ namespace backend.User.Repositories;
 using backend.User.Models;
 using backend.User.Repositories.Interfaces;
 using Microsoft.EntityFrameworkCore;
+using backend.Data;
 
 public class ApplicantRepository : IApplicantRepository
 {
