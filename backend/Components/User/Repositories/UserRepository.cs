@@ -16,17 +16,20 @@ public class UserRepository : IUserRepository
 
     public async Task<User?> GetByIdAsync(int userId)
     {
-        return await _context.Users.FirstOrDefaultAsync(u => u.GetUserId() == userId);
+        // use ef.property instead of u.GetUserId()
+        return await _context.Users.FirstOrDefaultAsync(u => EF.Property<int>(u, "UserId") == userId);
     }
 
     public async Task<User?> GetByEmailAsync(string email)
     {
-        return await _context.Users.FirstOrDefaultAsync(u => u.GetEmail() == email);
+        // use ef.property instead of u.GetEmail()
+        return await _context.Users.FirstOrDefaultAsync(u => EF.Property<string>(u, "Email") == email);
     }
 
     public async Task<User?> GetByNricAsync(string nric)
     {
-        return await _context.Users.FirstOrDefaultAsync(u => u.GetNRIC() == nric);
+        // use ef.property instead of u.GetNRIC()
+        return await _context.Users.FirstOrDefaultAsync(u => EF.Property<string>(u, "NRIC") == nric);
     }
 
     public async Task<User> CreateAsync(User user)
@@ -56,21 +59,21 @@ public class UserRepository : IUserRepository
 
     public async Task<bool> ExistsByEmailAsync(string email)
     {
-        return await _context.Users.AnyAsync(u => u.GetEmail() == email);
+        return await _context.Users.AnyAsync(u => EF.Property<string>(u, "Email") == email);
     }
 
     public async Task<bool> ExistsByNricAsync(string nric)
     {
-        return await _context.Users.AnyAsync(u => u.GetNRIC() == nric);
+        return await _context.Users.AnyAsync(u => EF.Property<string>(u, "NRIC") == nric);
     }
 
     public async Task<List<User>> GetActiveUsersAsync()
     {
-        return await _context.Users.Where(u => u.GetIsActive()).ToListAsync();
+        return await _context.Users.Where(u => EF.Property<bool>(u, "IsActive") == true).ToListAsync();
     }
 
     public async Task<List<User>> GetUsersByTypeAsync(int userType)
     {
-        return await _context.Users.Where(u => u.GetUserType() == userType).ToListAsync();
+        return await _context.Users.Where(u => EF.Property<int>(u, "UserType") == userType).ToListAsync();
     }
 }

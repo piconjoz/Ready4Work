@@ -30,5 +30,5 @@ public interface IUserService
     Task<bool> NricExistsAsync(string nric);
     
     // dto conversion
-    UserResponseDto ConvertToResponseDto(User user);
+    UserResponseDTO ConvertToResponseDTO(User user);
 }

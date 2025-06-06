@@ -16,12 +16,14 @@ public class ApplicantRepository : IApplicantRepository
 
     public async Task<Applicant?> GetByIdAsync(int applicantId)
     {
-        return await _context.Applicants.FirstOrDefaultAsync(a => a.GetApplicantId() == applicantId);
+        // use ef.property instead of a.GetApplicantId()
+        return await _context.Applicants.FirstOrDefaultAsync(a => EF.Property<int>(a, "ApplicantId") == applicantId);
     }
 
     public async Task<Applicant?> GetByUserIdAsync(int userId)
     {
-        return await _context.Applicants.FirstOrDefaultAsync(a => a.GetUserId() == userId);
+        // use ef.property instead of a.GetUserId()
+        return await _context.Applicants.FirstOrDefaultAsync(a => EF.Property<int>(a, "UserId") == userId);
     }
 
     public async Task<Applicant> CreateAsync(Applicant applicant)
@@ -51,16 +53,16 @@ public class ApplicantRepository : IApplicantRepository
 
     public async Task<bool> ExistsByUserIdAsync(int userId)
     {
-        return await _context.Applicants.AnyAsync(a => a.GetUserId() == userId);
+        return await _context.Applicants.AnyAsync(a => EF.Property<int>(a, "UserId") == userId);
     }
 
     public async Task<List<Applicant>> GetByProgrammeIdAsync(int programmeId)
     {
-        return await _context.Applicants.Where(a => a.GetProgrammeId() == programmeId).ToListAsync();
+        return await _context.Applicants.Where(a => EF.Property<int>(a, "ProgrammeId") == programmeId).ToListAsync();
     }
 
     public async Task<List<Applicant>> GetByAdmitYearAsync(int admitYear)
     {
-        return await _context.Applicants.Where(a => a.GetAdmitYear() == admitYear).ToListAsync();
+        return await _context.Applicants.Where(a => EF.Property<int>(a, "AdmitYear") == admitYear).ToListAsync();
     }
 }

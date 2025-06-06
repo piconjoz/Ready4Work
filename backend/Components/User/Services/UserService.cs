@@ -168,9 +168,9 @@ public class UserService : IUserService
         return await _userRepository.ExistsByNricAsync(nric);
     }
 
-    public UserResponseDto ConvertToResponseDto(User user)
+    public UserResponseDTO ConvertToResponseDTO(User user)
     {
-        return new UserResponseDto
+        return new UserResponseDTO
         {
             UserId = user.GetUserId(),
             NRIC = user.GetNRIC(),
