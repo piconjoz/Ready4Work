@@ -9,7 +9,7 @@ using System.ComponentModel.DataAnnotations;
 
 
 [ApiController]
-[Route("api/[controller]")]
+[Route("api/users")]
 [Authorize] // all endpoints require authentication
 public class UserController : ControllerBase
 {
