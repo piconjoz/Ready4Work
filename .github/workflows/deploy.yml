@@ -97,7 +97,7 @@ jobs:
       # DEPLOY TO CLOUD SERVER
       - name: Upload frontend using RSYNC
         run: |
-          rsync -avz -e "ssh -i ~/.ssh/id_rsa" ./frontend/build dev@52.229.206.52:/home/dev/ready4work/development/frontend/
+          rsync -avz -e "ssh -i ~/.ssh/id_rsa" ./frontend/dist dev@52.229.206.52:/home/dev/ready4work/development/frontend/
       #     rsync -avz -e "ssh -i ~/.ssh/id_rsa" ./frontend/build ${{ secrets.CLOUD_USER }}@${{ secrets.CLOUD_HOST }}:/home/dev/development/frontend/
 
       # # Copy backend image to server using SCP
