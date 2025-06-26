@@ -119,4 +119,4 @@ jobs:
           password: YEStu=rIT5LTreq1Swu7
           script: |
             docker load < /home/dev/ready4work/development/backend/backend.tar
-            docker compose -f /home/dev/development/nginx-compose.yml up -d backend
+            docker compose -f /home/dev/ready4work/development/docker-compose.yml up -d dev_backend
