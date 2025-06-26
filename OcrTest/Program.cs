@@ -1,58 +1,65 @@
-﻿using System;
+﻿using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.Http;
+using Microsoft.Extensions.FileProviders;
 using System.Diagnostics;
-using System.IO;
 
-class Program
+var builder = WebApplication.CreateBuilder(args);
+builder.WebHost.UseUrls("http://*:80");
+var app = builder.Build();
+
+// Serve the upload form at "/"
+app.MapGet("/", () =>
 {
-    static void Main(string[] args)
+    const string html = @"<!DOCTYPE html>
+<html>
+<head><title>OCR Demo</title></head>
+<body>
+  <h1>Upload PDF or Image for OCR</h1>
+  <form method='post' action='/upload' enctype='multipart/form-data'>
+    <input type='file' name='file' accept='image/*,.pdf' required /><br/>
+    <input type='text' name='lang' value='eng' /><br/>
+    <button type='submit'>Extract Text</button>
+  </form>
+</body>
+</html>";
+    return Results.Content(html, "text/html");
+});
+
+// Handle the uploaded file
+app.MapPost("/upload", async (HttpRequest req) =>
+{
+    var form = await req.ReadFormAsync();
+    var file = form.Files.GetFile("file");
+    var lang = form["lang"].ToString() ?? "eng";
+    if (file == null || file.Length == 0)
+        return Results.BadRequest("No file uploaded");
+
+    var uploads = Path.Combine(Directory.GetCurrentDirectory(), "uploads");
+    Directory.CreateDirectory(uploads);
+    var filePath = Path.Combine(uploads, file.FileName);
+    await using var fs = System.IO.File.Create(filePath);
+    await file.CopyToAsync(fs);
+
+    var inputPath = filePath;
+    var tempImage = Path.Combine(uploads, "tmp.png");
+    if (file.ContentType == "application/pdf" || file.FileName.EndsWith(".pdf"))
     {
-        Console.WriteLine("Enter language(s) code (e.g., eng, chi_sim, chi_tra, jpn, or combos like eng+chi_sim):");
-        string lang = Console.ReadLine();
-        if (string.IsNullOrWhiteSpace(lang)) lang = "eng"; // default
-
-        Console.WriteLine("Enter image or PDF file name (e.g., Taiwan.png or doc.pdf):");
-        string inputFile = Console.ReadLine();
-        if (string.IsNullOrWhiteSpace(inputFile)) inputFile = "Taiwan.png";
-
-        string inputPath = Path.Combine("images", inputFile);
-        string tempImagePath = Path.Combine("images", "converted_temp.png");
-
-        // If it's a PDF, convert to PNG first
-        if (inputFile.EndsWith(".pdf", StringComparison.OrdinalIgnoreCase))
-        {
-            Console.WriteLine("Detected PDF. Converting first page to image...");
-            var convertProc = new Process();
-            convertProc.StartInfo.FileName = "convert";
-            convertProc.StartInfo.Arguments = $"\"{inputPath}[0]\" \"{tempImagePath}\""; // Convert first page
-            convertProc.StartInfo.UseShellExecute = false;
-            convertProc.StartInfo.RedirectStandardOutput = true;
-            convertProc.StartInfo.RedirectStandardError = true;
-            convertProc.Start();
-            string convertOutput = convertProc.StandardOutput.ReadToEnd();
-            string convertError = convertProc.StandardError.ReadToEnd();
-            convertProc.WaitForExit();
-
-            if (convertProc.ExitCode != 0)
-            {
-                Console.WriteLine("Error converting PDF to image:");
-                Console.WriteLine(convertError);
-                return;
-            }
-
-            inputPath = tempImagePath;
-        }
-
-        var process = new Process();
-        process.StartInfo.FileName = "tesseract";
-        process.StartInfo.Arguments = $"{inputPath} stdout -l {lang} --tessdata-dir ./tessdata";
-        process.StartInfo.RedirectStandardOutput = true;
-        process.StartInfo.UseShellExecute = false;
-        process.Start();
-
-        string output = process.StandardOutput.ReadToEnd();
-        process.WaitForExit();
-
-        Console.WriteLine("Text detected:");
-        Console.WriteLine(output);
+        var p = Process.Start("convert", $"\"{inputPath}[0]\" \"{tempImage}\"");
+        p.WaitForExit();
+        inputPath = tempImage;
     }
-}
+
+    var proc = Process.Start(new ProcessStartInfo
+    {
+        FileName = "tesseract",
+        Arguments = $"\"{inputPath}\" stdout -l {lang} --tessdata-dir \"{Path.Combine(Directory.GetCurrentDirectory(), "tessdata")}\"",
+        RedirectStandardOutput = true,
+        UseShellExecute = false
+    });
+    string text = await proc.StandardOutput.ReadToEndAsync();
+    proc.WaitForExit();
+
+    return Results.Text(text);
+});
+
+app.Run();
