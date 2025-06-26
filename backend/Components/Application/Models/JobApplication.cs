@@ -1,0 +1,48 @@
+namespace backend.Components.Application.Models;
+
+using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
+
+public class JobApplication
+{
+    [Key]
+    [Column("application_id")]
+    public int ApplicationId { get; set; }
+    
+    [Required]
+    [Column("applicant_id")]
+    public int ApplicantId { get; set; }
+    
+    [Required]
+    [Column("job_listing_id")]
+    public int JobListingId { get; set; }
+    
+    [Required]
+    [Column("cover_letter")]
+    public string CoverLetter { get; set; } = string.Empty;
+    
+    [Required]
+    [Column("status")]
+    [StringLength(50)]
+    public string Status { get; set; } = "pending";
+    
+    [Column("applied_date")]
+    public DateTime AppliedDate { get; set; } = DateTime.UtcNow;
+    
+    [Column("updated_at")]
+    public DateTime UpdatedAt { get; set; } = DateTime.UtcNow;
+
+    // Default constructor for EF Core
+    public JobApplication() { }
+
+    // Constructor for services
+    public JobApplication(int applicantId, int jobListingId, string coverLetter, string status)
+    {
+        ApplicantId = applicantId;
+        JobListingId = jobListingId;
+        CoverLetter = coverLetter;
+        Status = status;
+        AppliedDate = DateTime.UtcNow;
+        UpdatedAt = DateTime.UtcNow;
+    }
+}

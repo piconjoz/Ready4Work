@@ -2,6 +2,7 @@ namespace backend.Data;
 
 using Microsoft.EntityFrameworkCore;
 using backend.Components.Company.Models;
+using backend.Components.Application.Models;
 using backend.User.Models;
 
 public class ApplicationDbContext : DbContext
@@ -15,6 +16,7 @@ public class ApplicationDbContext : DbContext
     public DbSet<Admin> Admins { get; set; }
     public DbSet<Applicant> Applicants { get; set; }
     public DbSet<Recruiter> Recruiters { get; set; }
+    public DbSet<JobApplication> JobApplications { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -48,11 +50,11 @@ public class ApplicationDbContext : DbContext
             entity.Property("Salt").IsRequired().HasMaxLength(255).HasColumnName("salt");
             entity.Property("PasswordHash").IsRequired().HasMaxLength(255).HasColumnName("password_hash");
             entity.Property("UserType").IsRequired().HasColumnName("user_type");
-            
+
             entity.HasIndex("Email").IsUnique();
             entity.HasIndex("NRIC").IsUnique();
         });
-        
+
         modelBuilder.Entity<Applicant>(entity =>
         {
             entity.HasKey("ApplicantId");
@@ -61,16 +63,16 @@ public class ApplicationDbContext : DbContext
             entity.Property("AdmitYear").IsRequired().HasColumnName("admit_year");
             entity.Property("CreatedAt").HasColumnName("created_at");
             entity.Property("UpdatedAt").HasColumnName("updated_at");
-            
+
             entity.HasOne<User>()
                   .WithMany()
                   .HasForeignKey("UserId")
                   .OnDelete(DeleteBehavior.Cascade);
-                  
-            
-            entity.HasIndex("UserId").IsUnique(); 
+
+
+            entity.HasIndex("UserId").IsUnique();
         });
-        
+
         modelBuilder.Entity<Recruiter>(entity =>
         {
             entity.HasKey("RecruiterId");
@@ -80,18 +82,18 @@ public class ApplicationDbContext : DbContext
             entity.Property("Department").HasMaxLength(100).HasColumnName("department");
             entity.Property("CreatedAt").HasColumnName("created_at");
             entity.Property("UpdatedAt").HasColumnName("updated_at");
-            
+
             entity.HasOne<User>()
                   .WithMany()
                   .HasForeignKey("UserId")
                   .OnDelete(DeleteBehavior.Cascade);
-                  
+
             entity.HasOne<Company>()
                   .WithMany()
                   .HasForeignKey("CompanyId")
                   .OnDelete(DeleteBehavior.Restrict);
-                  
-            entity.HasIndex("UserId").IsUnique(); 
+
+            entity.HasIndex("UserId").IsUnique();
             entity.HasIndex("CompanyId");
         });
 
@@ -101,13 +103,31 @@ public class ApplicationDbContext : DbContext
             entity.Property("UserId").IsRequired().HasColumnName("user_id");
             entity.Property("CreatedAt").HasColumnName("created_at");
             entity.Property("UpdatedAt").HasColumnName("updated_at");
-            
+
             entity.HasOne<User>()
                   .WithMany()
                   .HasForeignKey("UserId")
                   .OnDelete(DeleteBehavior.Cascade);
-                  
-            entity.HasIndex("UserId").IsUnique(); 
+
+            entity.HasIndex("UserId").IsUnique();
+        });
+
+        modelBuilder.Entity<JobApplication>(entity =>
+        {
+            entity.HasKey("ApplicationId");
+            entity.Property("ApplicantId").IsRequired().HasColumnName("applicant_id");
+            entity.Property("JobListingId").IsRequired().HasColumnName("job_listing_id");
+            entity.Property("CoverLetter").IsRequired().HasColumnName("cover_letter");
+            entity.Property("Status").IsRequired().HasMaxLength(50).HasColumnName("status");
+            entity.Property("AppliedDate").HasColumnName("applied_date");
+            entity.Property("UpdatedAt").HasColumnName("updated_at");
+
+            entity.HasOne<Applicant>()
+                  .WithMany()
+                  .HasForeignKey("ApplicantId")
+                  .OnDelete(DeleteBehavior.Cascade);
+
+            entity.HasIndex("ApplicantId", "JobListingId").IsUnique(); // Prevent duplicate applications
         });
     }
 }

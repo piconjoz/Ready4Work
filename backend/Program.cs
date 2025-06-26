@@ -2,6 +2,15 @@ using Microsoft.EntityFrameworkCore;
 using backend.Data;
 using backend.Components.Company.Repository;
 using backend.Components.Company.Services;
+using backend.Components.AI.Services;               
+using backend.Components.Application.Services;           
+using backend.Components.Application.Repository;        
+using backend.User.Services.Interfaces;                  
+using backend.User.Services;                            
+using backend.User.Repositories.Interfaces;             
+using backend.User.Repositories;                         
+
+DotNetEnv.Env.Load();
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -29,6 +38,19 @@ builder.Services.AddDbContext<ApplicationDbContext>(options =>
 // register dependency injection for repositories and services
 builder.Services.AddScoped<ICompanyRepository, CompanyRepository>();
 builder.Services.AddScoped<ICompanyService, CompanyService>();
+
+// HTTP Client for AI services
+builder.Services.AddHttpClient<IAIService, AIService>();
+
+// AI and Application services
+builder.Services.AddScoped<IAIService, AIService>();
+builder.Services.AddScoped<IApplicationService, ApplicationService>();
+builder.Services.AddScoped<IApplicationRepository, ApplicationRepository>();
+
+// User services (if not already registered)
+builder.Services.AddScoped<IUserService, UserService>();
+builder.Services.AddScoped<IUserRepository, UserRepository>();
+builder.Services.AddScoped<IPasswordService, PasswordService>();
 
 var app = builder.Build();
 

@@ -1,3 +1,4 @@
+// frontend/src/routes.jsx
 import { Routes, Route, Navigate } from "react-router";
 
 // Authentication Pages
@@ -14,7 +15,6 @@ import BasePage from "./features/applicant/pages/BasePage.jsx";
 import AdminUsersPage from "./features/admin/pages/AdminUsersPage.jsx";
 import AdminListingsPage from "./features/admin/pages/AdminListingsPage.jsx";
 
-
 // Applicant Pages
 import ApplicantOnboardingPage from "./features/applicant/pages/ApplicantOnboardingPage.jsx";
 import ApplicantHomePage from "./features/applicant/pages/ApplicantHomePage.jsx";
@@ -29,16 +29,14 @@ import RecruiterOnboardingPage from "./features/recruiter/pages/RecruiterOnboard
 import RecruiterListingPage from "./features/recruiter/pages/ListingPage.jsx";
 import RecruiterSettingPage from "./features/recruiter/pages/SettingPage.jsx";
 
-
-// Listing Pages
+// Listing Pages - Using existing ListingPage.jsx (now enhanced with AI functionality)
 import ListingPage from "./features/listing/pages/ListingPage.jsx";
 import ListingEditPage from "./features/listing/pages/ListingEditPage.jsx";
-
 
 function AppRoutes() {
   return (
     <Routes>
-      <Route path="/" element={<div>Page needs to be removed haha lol cool</div>} />
+      <Route path="/" element={<Navigate to="/applicant/home" />} />
 
       <Route path="base" element={<BasePage />} />
 
@@ -47,7 +45,6 @@ function AppRoutes() {
         {/* To be removed */}
         <Route path="login_demo" element={<LoginPageDemo />} />
         <Route path="logout_demo" element={<LogoutPageDemo />} />
-
 
         <Route path="login" element={<LoginPage />} />
         <Route path="logout" element={<LogoutPage />} />
@@ -75,8 +72,8 @@ function AppRoutes() {
         <Route path="settings" element={<RecruiterSettingPage />} />
       </Route>
 
-
       <Route path="listing">
+        {/* Using existing ListingPage.jsx (now enhanced with AI cover letter functionality) */}
         <Route path="info" element={<ListingPage />} />
         <Route path="edit" element={<ListingEditPage />} />
       </Route>
