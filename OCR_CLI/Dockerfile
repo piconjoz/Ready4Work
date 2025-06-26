@@ -23,4 +23,4 @@ COPY tessdata ./tessdata
 # Declare images folder mount point for runtime input
 VOLUME ["/app/images"]
 
-ENTRYPOINT ["dotnet", "OcrTest.dll"]
+ENTRYPOINT ["dotnet", "OcrCLI.dll"]

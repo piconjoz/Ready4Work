@@ -1,8 +1,14 @@
-# build stage
+# ---------- build stage ----------
 FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
-WORKDIR /app
-COPY . ./
-RUN dotnet publish -c Release -o /out
+WORKDIR /src
+
+# copy project file and restore first
+COPY OcrWEB.csproj .
+RUN dotnet restore OcrWEB.csproj
+
+# copy the remaining source
+COPY . .
+RUN dotnet publish OcrWEB.csproj -c Release -o /out
 
 # runtime stage
 FROM mcr.microsoft.com/dotnet/aspnet:8.0
@@ -23,4 +29,4 @@ COPY tessdata ./tessdata
 # Expose HTTP port
 EXPOSE 80
 
-ENTRYPOINT ["dotnet", "OcrTest.dll"]
+ENTRYPOINT ["dotnet", "OcrWEB.dll"]

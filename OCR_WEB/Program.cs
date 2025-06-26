@@ -44,15 +44,24 @@ app.MapPost("/upload", async (HttpRequest req) =>
     var tempImage = Path.Combine(uploads, "tmp.png");
     if (file.ContentType == "application/pdf" || file.FileName.EndsWith(".pdf"))
     {
-        var p = Process.Start("convert", $"\"{inputPath}[0]\" \"{tempImage}\"");
+        Console.WriteLine("Detected PDF. Converting first page to high-resolution image...");
+        var p = Process.Start("convert",
+            $"-density 300 \"{inputPath}[0]\" " +
+            "-colorspace RGB -normalize -deskew 40% -sharpen 0x1 " +
+            $"\"{tempImage}\"");
         p.WaitForExit();
+        if (p.ExitCode != 0)
+        {
+            Console.WriteLine("Error converting PDF to image.");
+            return Results.Text("Error converting PDF to image.");
+        }
         inputPath = tempImage;
     }
 
     var proc = Process.Start(new ProcessStartInfo
     {
         FileName = "tesseract",
-        Arguments = $"\"{inputPath}\" stdout -l {lang} --tessdata-dir \"{Path.Combine(Directory.GetCurrentDirectory(), "tessdata")}\"",
+        Arguments = $"\"{inputPath}\" stdout -l {lang} --oem 1 --psm 6 --tessdata-dir \"{Path.Combine(Directory.GetCurrentDirectory(), "tessdata")}\"",
         RedirectStandardOutput = true,
         UseShellExecute = false
     });
