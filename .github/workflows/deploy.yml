@@ -42,9 +42,10 @@ jobs:
       #     chmod 600 ~/.ssh/id_rsa
       #     ssh-keyscan ${{ secrets.CLOUD_HOST }} >> ~/.ssh/known_hosts
 
-      # # DEPLOY TO CLOUD SERVER
-      # - name: Upload frontend using RSYNC
-      #   run: |
+      # DEPLOY TO CLOUD SERVER
+      - name: Upload frontend using RSYNC
+        run: |
+          rsync -avz -e "ssh -i ~/.ssh/id_rsa" ./frontend/build dev@$52.229.206.52:/home/dev/development/frontend/
       #     rsync -avz -e "ssh -i ~/.ssh/id_rsa" ./frontend/build ${{ secrets.CLOUD_USER }}@${{ secrets.CLOUD_HOST }}:/home/dev/development/frontend/
 
       # # Copy backend image to server using SCP
