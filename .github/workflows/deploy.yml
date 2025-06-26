@@ -38,9 +38,61 @@ jobs:
       - name: Set up SSH key
         run: |
           mkdir -p ~/.ssh
-          echo "${{ secrets.CLOUD_KEY }}" > ~/.ssh/id_rsa
+          cat <<EOF > ~/.ssh/id_rsa
+          -----BEGIN OPENSSH PRIVATE KEY-----
+          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
+          -----END OPENSSH PRIVATE KEY-----
+          EOF
           chmod 600 ~/.ssh/id_rsa
-          ssh-keyscan ${{ secrets.CLOUD_HOST }} >> ~/.ssh/known_hosts
+          ssh-keyscan 52.229.206.52 >> ~/.ssh/known_hosts
+        # echo "${{ secrets.CLOUD_KEY }}" > ~/.ssh/id_rsa
+        # ssh-keyscan ${{ secrets.CLOUD_HOST }} >> ~/.ssh/known_hosts
 
       # DEPLOY TO CLOUD SERVER
       - name: Upload frontend using RSYNC
