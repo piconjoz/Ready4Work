@@ -12,9 +12,12 @@ WORKDIR /app
 
 # Install dependencies and Tesseract
 RUN apt-get update && \
-    apt-get install -y tesseract-ocr && \
+    apt-get install -y tesseract-ocr imagemagick && \
     apt-get clean && \
     rm -rf /var/lib/apt/lists/*
+
+# Allow ImageMagick to process PDFs
+RUN sed -i 's/rights="none" pattern="PDF"/rights="read|write" pattern="PDF"/' /etc/ImageMagick-6/policy.xml
 
 # Copy the build output
 COPY --from=build /out .
