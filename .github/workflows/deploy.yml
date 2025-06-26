@@ -34,13 +34,13 @@ jobs:
           chmod 644 backend.tar
           ls -l backend.tar
 
-      # # SET UP SSH KEY FOR RSYNC
-      # - name: Set up SSH key
-      #   run: |
-      #     mkdir -p ~/.ssh
-      #     echo "${{ secrets.CLOUD_KEY }}" > ~/.ssh/id_rsa
-      #     chmod 600 ~/.ssh/id_rsa
-      #     ssh-keyscan ${{ secrets.CLOUD_HOST }} >> ~/.ssh/known_hosts
+      # SET UP SSH KEY FOR RSYNC
+      - name: Set up SSH key
+        run: |
+          mkdir -p ~/.ssh
+          echo "${{ secrets.CLOUD_KEY }}" > ~/.ssh/id_rsa
+          chmod 600 ~/.ssh/id_rsa
+          ssh-keyscan ${{ secrets.CLOUD_HOST }} >> ~/.ssh/known_hosts
 
       # DEPLOY TO CLOUD SERVER
       - name: Upload frontend using RSYNC
