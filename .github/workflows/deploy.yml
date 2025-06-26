@@ -29,8 +29,8 @@ jobs:
       # BACKEND BUILD
       - name: Build backend Docker image
         run: |
-          docker build -t backend-image:latest -f ./backend/Dockerfile ./backend
-          docker save -o backend.tar backend-image:latest
+          docker build -t dev-backend-image:latest -f ./backend/Dockerfile ./backend
+          docker save -o backend.tar dev-backend-image:latest
           chmod 644 backend.tar
           ls -l backend.tar
 
@@ -119,4 +119,4 @@ jobs:
           password: YEStu=rIT5LTreq1Swu7
           script: |
             docker load < /home/dev/ready4work/development/backend/backend.tar
-            docker compose -f /home/dev/ready4work/development/docker-compose.yml up -d backend
+            docker compose -f /home/dev/ready4work/development/docker-compose.yml up -d dev_backend
