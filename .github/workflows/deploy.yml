@@ -15,7 +15,7 @@ jobs:
       - name: Set up Node.jobs
         uses: actions/setup-node@v4
         with:
-          node-version: "21.1.0"
+          node-version: "22"
 
       # FRONTEND BUILD
       - name: Install dependencies
@@ -110,13 +110,13 @@ jobs:
           source: "backend.tar"
           target: "/home/dev/ready4work/development/backend"
 
-      # # Restart backend docker container
-      # - name: Restart backend docker container
-      #   uses: appleboy/ssh-action@v1
-      #   with:
-      #     host: ${{ secrets.CLOUD_HOST }}
-      #     username: ${{ secrets.CLOUD_USER }}
-      #     key: ${{ secrets.CLOUD_KEY }}
-      #     script: |
-      #       docker load < /home/dev/ready4work/development/backend/backend.tar
-      #       docker compose -f /home/dev/development/nginx-compose.yml up -d backend
+      # Restart backend docker container
+      - name: Restart backend docker container
+        uses: appleboy/ssh-action@v1
+        with:
+          host: 52.229.206.52
+          username: dev
+          password: YEStu=rIT5LTreq1Swu7
+          script: |
+            docker load < /home/dev/ready4work/development/backend/backend.tar
+            docker compose -f /home/dev/development/nginx-compose.yml up -d backend
