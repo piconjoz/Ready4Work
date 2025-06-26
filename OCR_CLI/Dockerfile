@@ -5,7 +5,7 @@ COPY . ./
 RUN dotnet publish -c Release -o /out
 
 # runtime stage
-FROM mcr.microsoft.com/dotnet/aspnet:8.0
+FROM mcr.microsoft.com/dotnet/runtime:8.0
 WORKDIR /app
 
 # Install Tesseract and ImageMagick
@@ -20,7 +20,7 @@ COPY --from=build /out ./
 # Copy Tesseract language data
 COPY tessdata ./tessdata
 
-# Expose HTTP port
-EXPOSE 80
+# Declare images folder mount point for runtime input
+VOLUME ["/app/images"]
 
 ENTRYPOINT ["dotnet", "OcrTest.dll"]
