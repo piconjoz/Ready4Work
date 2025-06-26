@@ -11,7 +11,8 @@ class Program
 
         Console.WriteLine("Enter image file name (e.g., Taiwan.png):");
         string imageFile = Console.ReadLine();
-        if (string.IsNullOrWhiteSpace(imageFile)) imageFile = "Taiwan.png";
+        imageFile = Path.Combine("images", imageFile);
+        if (string.IsNullOrWhiteSpace(imageFile)) imageFile = Path.Combine("images", "Taiwan.png");
 
         var process = new Process();
         process.StartInfo.FileName = "tesseract";

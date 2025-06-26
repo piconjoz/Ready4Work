@@ -22,6 +22,7 @@ COPY --from=build /out .
 # Copy tessdata and images
 COPY tessdata ./tessdata
 COPY *.png ./
+VOLUME ["/app/images"]
 
 # Set the entrypoint
 ENTRYPOINT ["dotnet", "OcrTest.dll"]
