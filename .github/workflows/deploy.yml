@@ -40,22 +40,19 @@ jobs:
           mkdir -p ~/.ssh
           echo "${{ secrets.CLOUD_KEY }}" > ~/.ssh/id_rsa
           chmod 600 ~/.ssh/id_rsa
-          echo "Cloud host is: ${{ secrets.CLOUD_HOST }}"
-          echo "Cloud key is: ${{ secrets.CLOUD_KEY }}"
-          echo "Cloud user is: ${{ secrets.CLOUD_USER }}"
-          ssh-keyscan ${{ secrets.CLOUD_HOST }} >> ~/.ssh/known_hosts
+          ssh-keyscan ${{ vars.CLOUD_HOST }} >> ~/.ssh/known_hosts
 
       # DEPLOY TO CLOUD SERVER
       - name: Upload frontend using RSYNC
         run: |
-          rsync -avz -e "ssh -i ~/.ssh/id_rsa" ./frontend/dist ${{ secrets.CLOUD_USER }}@${{ secrets.CLOUD_HOST }}:/home/dev/ready4work/development/frontend/
+          rsync -avz -e "ssh -i ~/.ssh/id_rsa" ./frontend/dist ${{ vars.CLOUD_USER }}@${{ vars.CLOUD_HOST }}:/home/dev/ready4work/development/frontend/
 
       # Copy backend image to server using SCP
       - name: Copy backend image to server
         uses: appleboy/scp-action@v0.1.6
         with:
-          host: ${{ secrets.CLOUD_HOST }}
-          username: ${{ secrets.CLOUD_USER }}
+          host: ${{ vars.CLOUD_HOST }}
+          username: ${{ vars.CLOUD_USER }}
           key: ${{ secrets.CLOUD_KEY }}
           source: "backend.tar"
           target: "/home/dev/ready4work/development/backend"
@@ -64,8 +61,8 @@ jobs:
       - name: Restart backend docker container
         uses: appleboy/ssh-action@v1
         with:
-          host: ${{ secrets.CLOUD_HOST }}
-          username: ${{ secrets.CLOUD_USER }}
+          host: ${{ vars.CLOUD_HOST }}
+          username: ${{ vars.CLOUD_USER }}
           key: ${{ secrets.CLOUD_KEY }}
           script: |
             docker load < /home/dev/ready4work/development/backend/backend.tar
