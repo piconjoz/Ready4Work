@@ -41,6 +41,8 @@ jobs:
           echo "${{ secrets.CLOUD_KEY }}" > ~/.ssh/id_rsa
           chmod 600 ~/.ssh/id_rsa
           echo "Cloud host is: ${{ secrets.CLOUD_HOST }}"
+          echo "Cloud key is: ${{ secrets.CLOUD_KEY }}"
+          echo "Cloud user is: ${{ secrets.CLOUD_USER }}"
           ssh-keyscan ${{ secrets.CLOUD_HOST }} >> ~/.ssh/known_hosts
 
       # DEPLOY TO CLOUD SERVER
