@@ -1,7 +1,7 @@
 services:
-  nginx:
+  dev_nginx:
     image: nginx:latest
-    container_name: nginx-proxy
+    container_name: dev_nginx_proxy
     restart: unless-stopped
     ports:
       - "80:80"  # Required for certbot HTTP challenge
@@ -11,54 +11,51 @@ services:
       - ./certbot/www:/var/www/certbot  # Certbot challenges directory
       - ./certbot/conf:/etc/letsencrypt  # SSL certs storage
       - ./frontend/dist:/var/www/html/:ro
+      - ./frontend:/var/www/html:ro
     networks:
-      lab-webproxy:
-        ipv4_address: 10.11.0.6
+      dev-webproxy:
+        ipv4_address: 10.12.0.6
 
-  # --- Will set up HTTPS later ---
-  # certbot:
-  #   image: certbot/certbot
-  #   container_name: certbot
-  #   volumes:
-  #     - ./certbot/www:/var/www/certbot
-  #     - ./certbot/conf:/etc/letsencrypt
-  #   networks:
-  #     lab-webproxy:
-  #       ipv4_address: 10.11.0.7
-  #   entrypoint: sh -c "certbot certonly --webroot -w /var/www/certbot --email test@test.com --agree-tos --no-eff-email --rsa-key-size 4096 --expand --force-renewal -d domain.com -d www.domain.com"
+  dev_certbot:
+    image: certbot/certbot
+    container_name: dev_certbot
+    volumes:
+      - ./certbot/www:/var/www/certbot
+      - ./certbot/conf:/etc/letsencrypt
+    networks:
+      dev-webproxy:
+        ipv4_address: 10.12.0.7
+    entrypoint: sh -c "certbot certonly --webroot -w /var/www/certbot --email dev@ready4work.com --agree-tos --no-eff-email --rsa-key-size 4096 --expand --force-renewal -d ready4work.duckdns.org -d www.ready4work.duckdns.org"
 
-  backend:
-    image: backend-image:latest            # Use the same name as `docker build -t`
+  dev_backend:
+    image: dev-backend-image:latest            # Use the same name as `docker build -t`
     container_name: backend-server
     restart: unless-stopped
     environment:
-      - ConnectionStrings__DefaultConnection=server=database;port=3306;database=user_account;user=dev;password=password
+      - ConnectionStrings__DefaultConnection=server=database;port=3306;database=ready4work;user=dev;password=s*xuspUtrlVOzukati0e
     networks:
-      lab-webproxy:
-        ipv4_address: 10.11.0.8
+      dev-webproxy:
+        ipv4_address: 10.12.0.8
 
   database:
     container_name: mysql_database
     image: mysql:8.0
     restart: unless-stopped
     environment:
-      MYSQL_ROOT_PASSWORD: password
-      MYSQL_DATABASE: user_account
+      MYSQL_ROOT_PASSWORD: gajubRlhabi9iW?jldex
+      MYSQL_DATABASE: ready4work
       MYSQL_USER: dev
-      MYSQL_PASSWORD: password
+      MYSQL_PASSWORD: s*xuspUtrlVOzukati0e
     volumes:
       - mysql_data:/var/lib/mysql
-    networks:
-      lab-webproxy:
-        ipv4_address: 10.11.0.9
 
 networks:
-  lab-webproxy:
+  dev-webproxy:
     driver: bridge
     ipam:
       config:
-        - subnet: 10.11.0.0/16
-          gateway: 10.11.0.1
+        - subnet: 10.12.0.0/16
+          gateway: 10.12.0.1
 
 volumes:
   mysql_data:
