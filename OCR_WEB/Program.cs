@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.FileProviders;
 using System.Diagnostics;
+using System.Text.RegularExpressions;
 
 var builder = WebApplication.CreateBuilder(args);
 builder.WebHost.UseUrls("http://*:80");
@@ -41,34 +42,71 @@ app.MapPost("/upload", async (HttpRequest req) =>
     await file.CopyToAsync(fs);
 
     var inputPath = filePath;
-    var tempImage = Path.Combine(uploads, "tmp.png");
-    if (file.ContentType == "application/pdf" || file.FileName.EndsWith(".pdf"))
+
+    var tessdataDir = Path.Combine(Directory.GetCurrentDirectory(), "tessdata");
+
+    // ---------------- PDF handling (one page at a time) ----------------
+    if (file.ContentType == "application/pdf" || file.FileName.EndsWith(".pdf", StringComparison.OrdinalIgnoreCase))
     {
-        Console.WriteLine("Detected PDF. Converting first page to high-resolution image...");
-        var p = Process.Start("convert",
-            $"-density 300 \"{inputPath}[0]\" " +
-            "-colorspace RGB -normalize -deskew 40% -sharpen 0x1 " +
-            $"\"{tempImage}\"");
-        p.WaitForExit();
-        if (p.ExitCode != 0)
+        Console.WriteLine("Detected PDF. Rendering pages one-by-one at 300 DPI...");
+
+        // Determine number of pages via pdfinfo
+        var infoProc = Process.Start(new ProcessStartInfo
         {
-            Console.WriteLine("Error converting PDF to image.");
-            return Results.Text("Error converting PDF to image.");
+            FileName = "pdfinfo",
+            Arguments = $"\"{inputPath}\"",
+            RedirectStandardOutput = true,
+            UseShellExecute = false
+        });
+        string info = await infoProc.StandardOutput.ReadToEndAsync();
+        infoProc.WaitForExit();
+
+        var match = Regex.Match(info, @"Pages:\s+(\d+)", RegexOptions.IgnoreCase);
+        int pageCount = match.Success ? int.Parse(match.Groups[1].Value) : 1;
+
+        var sb = new System.Text.StringBuilder();
+
+        for (int p = 1; p <= pageCount; p++)
+        {
+            var baseName = Path.Combine(uploads, $"page-{p:D3}");
+            // Render single page
+            var pageProc = Process.Start("pdftoppm",
+                $"-png -r 300 -f {p} -l {p} -singlefile \"{inputPath}\" \"{baseName}\"");
+            pageProc.WaitForExit();
+
+            var imgFile = baseName + ".png";
+            if (!File.Exists(imgFile))
+                continue;
+
+            // OCR this page
+            var tessProc = Process.Start(new ProcessStartInfo
+            {
+                FileName = "tesseract",
+                Arguments = $"\"{imgFile}\" stdout -l {lang} --oem 1 --psm 6 --tessdata-dir \"{tessdataDir}\"",
+                RedirectStandardOutput = true,
+                UseShellExecute = false
+            });
+            sb.AppendLine(await tessProc.StandardOutput.ReadToEndAsync());
+            tessProc.WaitForExit();
+            sb.AppendLine("\n--- End of page ---\n");
         }
-        inputPath = tempImage;
+
+        return Results.Text(sb.ToString());
     }
 
-    var proc = Process.Start(new ProcessStartInfo
+    // ---------------- Single-image fallback ----------------
     {
-        FileName = "tesseract",
-        Arguments = $"\"{inputPath}\" stdout -l {lang} --oem 1 --psm 6 --tessdata-dir \"{Path.Combine(Directory.GetCurrentDirectory(), "tessdata")}\"",
-        RedirectStandardOutput = true,
-        UseShellExecute = false
-    });
-    string text = await proc.StandardOutput.ReadToEndAsync();
-    proc.WaitForExit();
-
-    return Results.Text(text);
+        var tessProc = Process.Start(new ProcessStartInfo
+        {
+            FileName = "tesseract",
+            Arguments = $"\"{inputPath}\" stdout -l {lang} --oem 1 --psm 6 --tessdata-dir \"{tessdataDir}\"",
+            RedirectStandardOutput = true,
+            UseShellExecute = false
+        });
+        string imgText = await tessProc.StandardOutput.ReadToEndAsync();
+        tessProc.WaitForExit();
+        return Results.Text(imgText);
+    }
 });
 
 app.Run();

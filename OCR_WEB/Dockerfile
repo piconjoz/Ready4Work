@@ -14,9 +14,9 @@ RUN dotnet publish OcrWEB.csproj -c Release -o /out
 FROM mcr.microsoft.com/dotnet/aspnet:8.0
 WORKDIR /app
 
-# Install Tesseract and ImageMagick
+# Install Tesseract, ImageMagick, and Poppler (pdftoppm)
 RUN apt-get update && \
-    apt-get install -y tesseract-ocr imagemagick && \
+    apt-get install -y tesseract-ocr imagemagick poppler-utils && \
     sed -i 's/rights="none" pattern="PDF"/rights="read|write" pattern="PDF"/' /etc/ImageMagick-6/policy.xml && \
     rm -rf /var/lib/apt/lists/*
 
