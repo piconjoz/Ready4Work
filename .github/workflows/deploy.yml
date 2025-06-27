@@ -40,6 +40,7 @@ jobs:
           mkdir -p ~/.ssh
           echo "${{ secrets.CLOUD_KEY }}" > ~/.ssh/id_rsa
           chmod 600 ~/.ssh/id_rsa
+          echo "Cloud host is: ${{ secrets.CLOUD_HOST }}"
           ssh-keyscan ${{ secrets.CLOUD_HOST }} >> ~/.ssh/known_hosts
 
       # DEPLOY TO CLOUD SERVER
