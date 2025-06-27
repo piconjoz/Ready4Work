@@ -4,6 +4,7 @@ using Microsoft.EntityFrameworkCore;
 using backend.Components.Company.Models;
 using backend.Components.Application.Models;
 using backend.User.Models;
+using backend.Components.Resume.Models;
 
 public class ApplicationDbContext : DbContext
 {
@@ -17,6 +18,7 @@ public class ApplicationDbContext : DbContext
     public DbSet<Applicant> Applicants { get; set; }
     public DbSet<Recruiter> Recruiters { get; set; }
     public DbSet<JobApplication> JobApplications { get; set; }
+    public DbSet<Resume> Resumes { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -112,7 +114,7 @@ public class ApplicationDbContext : DbContext
             entity.HasIndex("UserId").IsUnique();
         });
 
-        modelBuilder.Entity<JobApplication>(entity =>
+       modelBuilder.Entity<JobApplication>(entity =>
         {
             entity.HasKey("ApplicationId");
             entity.Property("ApplicantId").IsRequired().HasColumnName("applicant_id");
@@ -129,5 +131,23 @@ public class ApplicationDbContext : DbContext
 
             entity.HasIndex("ApplicantId", "JobListingId").IsUnique(); // Prevent duplicate applications
         });
+
+        modelBuilder.Entity<Resume>(entity =>
+        {
+            entity.HasKey(e => e.ResumeId);
+            entity.Property(e => e.ResumeId).HasColumnName("resume_id");
+            entity.Property(e => e.ApplicantId).IsRequired().HasColumnName("applicant_id");
+            entity.Property(e => e.ResumePath).IsRequired().HasMaxLength(1000).HasColumnName("resume_path");
+            entity.Property(e => e.ResumeText).IsRequired().HasColumnName("resume_text");
+            entity.Property(e => e.UploadedAt).IsRequired().HasColumnName("uploaded_at");
+
+            entity.HasOne<Applicant>()
+                  .WithMany()
+                  .HasForeignKey("ApplicantId")
+                  .OnDelete(DeleteBehavior.Cascade);
+
+            entity.HasIndex(e => e.ApplicantId);
+        });
+        
     }
 }

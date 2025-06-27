@@ -9,6 +9,8 @@ using backend.User.Services.Interfaces;
 using backend.User.Services;                            
 using backend.User.Repositories.Interfaces;             
 using backend.User.Repositories;                         
+using backend.Components.Resume.Repository;
+using backend.Components.Resume.Services;
 
 DotNetEnv.Env.Load();
 
@@ -57,6 +59,11 @@ builder.Services.AddScoped<IApplicationRepository, ApplicationRepository>();
 builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<IUserRepository, UserRepository>();
 builder.Services.AddScoped<IPasswordService, PasswordService>();
+
+
+// Register Resume components
+builder.Services.AddScoped<IResumeRepository, ResumeRepository>();
+builder.Services.AddScoped<IResumeService, ResumeService>();
 
 var app = builder.Build();
 
