@@ -16,12 +16,14 @@ public class RecruiterRepository : IRecruiterRepository
 
     public async Task<Recruiter?> GetByIdAsync(int recruiterId)
     {
-        return await _context.Recruiters.FirstOrDefaultAsync(r => r.GetRecruiterId() == recruiterId);
+        // use ef.property instead of r.GetRecruiterId()
+        return await _context.Recruiters.FirstOrDefaultAsync(r => EF.Property<int>(r, "RecruiterId") == recruiterId);
     }
 
     public async Task<Recruiter?> GetByUserIdAsync(int userId)
     {
-        return await _context.Recruiters.FirstOrDefaultAsync(r => r.GetUserId() == userId);
+        // use ef.property instead of r.GetUserId()
+        return await _context.Recruiters.FirstOrDefaultAsync(r => EF.Property<int>(r, "UserId") == userId);
     }
 
     public async Task<Recruiter> CreateAsync(Recruiter recruiter)
@@ -51,16 +53,16 @@ public class RecruiterRepository : IRecruiterRepository
 
     public async Task<bool> ExistsByUserIdAsync(int userId)
     {
-        return await _context.Recruiters.AnyAsync(r => r.GetUserId() == userId);
+        return await _context.Recruiters.AnyAsync(r => EF.Property<int>(r, "UserId") == userId);
     }
 
     public async Task<List<Recruiter>> GetByCompanyIdAsync(int companyId)
     {
-        return await _context.Recruiters.Where(r => r.GetCompanyId() == companyId).ToListAsync();
+        return await _context.Recruiters.Where(r => EF.Property<int>(r, "CompanyId") == companyId).ToListAsync();
     }
 
     public async Task<List<Recruiter>> GetByDepartmentAsync(string department)
     {
-        return await _context.Recruiters.Where(r => r.GetDepartment() == department).ToListAsync();
+        return await _context.Recruiters.Where(r => EF.Property<string>(r, "Department") == department).ToListAsync();
     }
 }

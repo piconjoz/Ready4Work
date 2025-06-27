@@ -1,10 +1,10 @@
 namespace backend.User.DTOs;
 
-public class AuthResponseDto
+public class AuthResponseDTO
 {
     public string Token { get; set; } = string.Empty;
     public DateTime ExpiresAt { get; set; }
-    public UserResponseDto User { get; set; } = new();
+    public UserResponseDTO User { get; set; } = new();
     
     // optional: refresh token for enhanced security
     public string? RefreshToken { get; set; }

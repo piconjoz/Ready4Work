@@ -2,7 +2,7 @@ namespace backend.User.DTOs;
 
 using System.ComponentModel.DataAnnotations;
 
-public class ApplicantSignupDto
+public class ApplicantSignupDTO
 {
     [Required(ErrorMessage = "nric is required")]
     [StringLength(20, ErrorMessage = "nric cannot exceed 20 characters")]

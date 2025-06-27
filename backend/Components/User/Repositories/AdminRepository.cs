@@ -16,12 +16,14 @@ public class AdminRepository : IAdminRepository
 
     public async Task<Admin?> GetByIdAsync(int adminId)
     {
-        return await _context.Admins.FirstOrDefaultAsync(a => a.GetAdminId() == adminId);
+        // use ef.property instead of a.GetAdminId()
+        return await _context.Admins.FirstOrDefaultAsync(a => EF.Property<int>(a, "AdminId") == adminId);
     }
 
     public async Task<Admin?> GetByUserIdAsync(int userId)
     {
-        return await _context.Admins.FirstOrDefaultAsync(a => a.GetUserId() == userId);
+        // use ef.property instead of a.GetUserId()
+        return await _context.Admins.FirstOrDefaultAsync(a => EF.Property<int>(a, "UserId") == userId);
     }
 
     public async Task<Admin> CreateAsync(Admin admin)
@@ -51,7 +53,7 @@ public class AdminRepository : IAdminRepository
 
     public async Task<bool> ExistsByUserIdAsync(int userId)
     {
-        return await _context.Admins.AnyAsync(a => a.GetUserId() == userId);
+        return await _context.Admins.AnyAsync(a => EF.Property<int>(a, "UserId") == userId);
     }
 
     public async Task<List<Admin>> GetAllAdminsAsync()
