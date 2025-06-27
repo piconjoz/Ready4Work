@@ -33,10 +33,10 @@ namespace backend.User.Models
         [StringLength(20)]
         private string? Phone { get; set; }
 
-        [Column("gender")] 
+        [Column("gender")]
         [StringLength(10)] // its 2025 broskis, you can be a helicopter if you want to
         private string? Gender { get; set; }
-        
+
         [Column("profile_picture_path")]
         [StringLength(255)]
         private string? ProfilePicturePath { get; set; } = null;
