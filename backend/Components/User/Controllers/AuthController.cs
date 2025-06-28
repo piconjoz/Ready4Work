@@ -190,10 +190,23 @@ public class AuthController : ControllerBase
             return BadRequest(ModelState);
         }
 
-        var result = await _authService.OnboardRecruiterAndCompanyAsync(dto);
-        if (result == null)
-            return StatusCode(500, "Onboarding failed.");
-        return Ok(result);
+        try
+        {
+            var result = await _authService.OnboardRecruiterAndCompanyAsync(dto);
+            if (result == null)
+                return StatusCode(500, "Onboarding failed.");
+            return Ok(result);
+        }
+        catch (InvalidOperationException ex)
+        {
+            // Known business errors (company/user already exists)
+            return Conflict(new { message = ex.Message });
+        }
+        catch (Exception ex)
+        {
+            // Unexpected errors
+            return StatusCode(500, ex.Message);
+        }
     }
 }
 

@@ -18,5 +18,5 @@ public interface IAuthService
     // user verification (for email verification workflow)
     Task<bool> VerifyUserAsync(int userId);
 
-    Task<string?> OnboardRecruiterAndCompanyAsync(RecruiterOnboardingDTO dto);
+    Task<RecruiterOnboardingResponseDTO?> OnboardRecruiterAndCompanyAsync(RecruiterOnboardingDTO dto);
 }

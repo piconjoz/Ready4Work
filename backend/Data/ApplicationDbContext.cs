@@ -37,11 +37,6 @@ public class ApplicationDbContext : DbContext
         {
             entity.HasKey("UserId");
 
-            entity.Property("NRIC")
-                .IsRequired()
-                .HasMaxLength(20)
-                .HasColumnName("nric");
-
             entity.Property("Email")
                 .IsRequired()
                 .HasMaxLength(255)
@@ -96,7 +91,6 @@ public class ApplicationDbContext : DbContext
                 .HasColumnName("user_type");
 
             entity.HasIndex("Email").IsUnique();
-            entity.HasIndex("NRIC").IsUnique();
         });
 
         // applicant entity

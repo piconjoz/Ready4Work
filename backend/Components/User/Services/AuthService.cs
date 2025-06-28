@@ -11,6 +11,7 @@ public class AuthService : IAuthService
     private readonly IRecruiterService _recruiterService;
     private readonly IJWTService _jwtService;
     private readonly ICompanyService _companyService;
+    private readonly IPasswordService _passwordService;
 
     // constructor injection - authservice needs ALL other services
     public AuthService(
@@ -18,7 +19,8 @@ public class AuthService : IAuthService
         IApplicantService applicantService,
         IRecruiterService recruiterService,
         IJWTService jwtService,
-        ICompanyService companyService
+        ICompanyService companyService,
+        IPasswordService passwordService
     )
     {
         _userService = userService;
@@ -26,6 +28,7 @@ public class AuthService : IAuthService
         _recruiterService = recruiterService;
         _jwtService = jwtService;
         _companyService = companyService;
+        _passwordService = passwordService;
     }
 
     // handles complete applicant signup flow
@@ -37,7 +40,6 @@ public class AuthService : IAuthService
 
         // step 1: create user record (usertype = 1 for applicant)
         var user = await _userService.CreateUserAsync(
-            signupDto.NRIC,
             signupDto.Email,
             signupDto.FirstName,
             signupDto.LastName,
@@ -75,7 +77,6 @@ public class AuthService : IAuthService
 
         // step 1: create user record (usertype = 2 for recruiter)
         var user = await _userService.CreateUserAsync(
-            signupDto.NRIC,
             signupDto.Email,
             signupDto.FirstName,
             signupDto.LastName,
@@ -195,57 +196,93 @@ public class AuthService : IAuthService
         }
     }
 
-    public async Task<string?> OnboardRecruiterAndCompanyAsync(RecruiterOnboardingDTO dto)
+    public async Task<RecruiterOnboardingResponseDTO?> OnboardRecruiterAndCompanyAsync(RecruiterOnboardingDTO dto)
     {
         try
         {
             // 1. Check if the company already exists by UEN
             var company = await _companyService.GetCompanyByUENAsync(dto.Company.UEN);
 
-            if (company == null)
+            if (company != null)
             {
-                // 2. If not, map the DTO to a new Company entity
-                var newCompany = new backend.Components.Company.Models.Company
-                {
-                    CompanyName = dto.Company.CompanyName,
-                    PreferredCompanyName = dto.Company.PreferredCompanyName,
-                    CompanyDescription = dto.Company.CompanyDescription,
-                    CountryOfBusinessRegistration = dto.Company.CountryOfBusinessRegistration,
-                    UEN = dto.Company.UEN,
-                    NumberOfEmployees = dto.Company.NumberOfEmployees,
-                    IndustryCluster = dto.Company.IndustryCluster,
-                    EntityType = dto.Company.EntityType,
-                    AuthorisedTrainingOrganisation = dto.Company.AuthorisedTrainingOrganisation,
-                    CompanyWebsite = dto.Company.CompanyWebsite,
-                    CompanyContact = dto.Company.CompanyContact,
-                    City = dto.Company.City,
-                    State = dto.Company.State,
-                    ZoneLocation = dto.Company.ZoneLocation,
-                    CountryCode = dto.Company.CountryCode,
-                    UnitNumber = dto.Company.UnitNumber,
-                    Floor = dto.Company.Floor,
-                    AreaCode = dto.Company.AreaCode,
-                    Block = dto.Company.Block,
-                    PostalCode = dto.Company.PostalCode,
-                    EmploymentType = dto.Company.EmploymentType
-                };
-
-                // 3. Create the company in the database
-                company = await _companyService.CreateCompanyAsync(newCompany);
+                // Company already exists, return error message
+                throw new InvalidOperationException("A company with this UEN already exists.");
             }
 
-            // At this point, 'company' is guaranteed to be non-null and can be used for the next steps
-            // (user creation, recruiter creation, etc.)
+            // 2. If not, map the DTO to a new Company entity
+            var newCompany = new backend.Components.Company.Models.Company
+            {
+                CompanyName = dto.Company.CompanyName,
+                PreferredCompanyName = dto.Company.PreferredCompanyName,
+                CompanyDescription = dto.Company.CompanyDescription,
+                CountryOfBusinessRegistration = dto.Company.CountryOfBusinessRegistration,
+                UEN = dto.Company.UEN,
+                NumberOfEmployees = dto.Company.NumberOfEmployees,
+                IndustryCluster = dto.Company.IndustryCluster,
+                EntityType = dto.Company.EntityType,
+                AuthorisedTrainingOrganisation = dto.Company.AuthorisedTrainingOrganisation,
+                CompanyWebsite = dto.Company.CompanyWebsite,
+                CompanyContact = dto.Company.CompanyContact,
+                City = dto.Company.City,
+                State = dto.Company.State,
+                ZoneLocation = dto.Company.ZoneLocation,
+                CountryCode = dto.Company.CountryCode,
+                UnitNumber = dto.Company.UnitNumber,
+                Floor = dto.Company.Floor,
+                AreaCode = dto.Company.AreaCode,
+                Block = dto.Company.Block,
+                PostalCode = dto.Company.PostalCode,
+                EmploymentType = dto.Company.EmploymentType
+            };
 
-            // For now, just return the company name to confirm this part works
-            return company.CompanyName;
+            // 3. Create the company in the database
+            company = await _companyService.CreateCompanyAsync(newCompany);
+
+            // 4. Check if user already exists by email
+            var existingUser = await _userService.GetUserByEmailAsync(dto.User.Email);
+            if (existingUser != null)
+            {
+                throw new InvalidOperationException("A user with this email already exists.");
+            }
+
+            // 5. Hash the password
+            var (salt, hashedPassword) = _passwordService.HashPassword(dto.User.Password);
+
+            // 6. Create the user
+            var user = await _userService.CreateUserAsync(
+                email: dto.User.Email,
+                firstName: dto.User.FirstName,
+                lastName: dto.User.LastName,
+                phone: dto.User.Phone,
+                gender: dto.User.Gender,
+                userType: dto.User.UserType,
+                password: dto.User.Password // This will be hashed again in UserService, but that's fine for now
+            );
+
+            // 7. Create the recruiter
+            var recruiter = await _recruiterService.CreateRecruiterAsync(
+                user.GetUserId(),
+                company.CompanyId,
+                dto.Recruiter.JobTitle,
+                dto.Recruiter.Department
+            );
+
+            // Return a structured response DTO
+            return new RecruiterOnboardingResponseDTO
+            {
+                Email = user.GetEmail()
+            };
+        }
+        catch (InvalidOperationException ex)
+        {
+            // Use InvalidOperationException for known business errors
+            throw;
         }
         catch (Exception ex)
         {
-            // Log the error
+            // Optionally log the error
             Console.WriteLine($"Error in OnboardRecruiterAndCompanyAsync: {ex.Message}");
             return null;
         }
     }
-
 }
