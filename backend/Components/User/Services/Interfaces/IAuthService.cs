@@ -14,6 +14,7 @@ public interface IAuthService
     // token management
     Task<AuthResponseDTO?> RefreshTokenAsync(string token);
     Task<bool> ValidateTokenAsync(string token);
+    Task RevokeRefreshTokenAsync(string token);
 
     // user verification (for email verification workflow)
     Task<bool> VerifyUserAsync(int userId);

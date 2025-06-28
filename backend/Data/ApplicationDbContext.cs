@@ -3,6 +3,7 @@ namespace backend.Data;
 using Microsoft.EntityFrameworkCore;
 using backend.Components.Company.Models;
 using backend.User.Models;
+using backend.Components.User.Models;
 
 public class ApplicationDbContext : DbContext
 {
@@ -15,6 +16,7 @@ public class ApplicationDbContext : DbContext
     public DbSet<Admin> Admins { get; set; }
     public DbSet<Applicant> Applicants { get; set; }
     public DbSet<Recruiter> Recruiters { get; set; }
+    public DbSet<RefreshToken> RefreshTokens { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -117,9 +119,9 @@ public class ApplicationDbContext : DbContext
                 .HasColumnName("updated_at");
 
             entity.HasOne<User>()
-                  .WithMany()
-                  .HasForeignKey("UserId")
-                  .OnDelete(DeleteBehavior.Cascade);
+                .WithMany()
+                .HasForeignKey("UserId")
+                .OnDelete(DeleteBehavior.Cascade);
 
             entity.HasIndex("UserId").IsUnique();
         });
@@ -153,14 +155,14 @@ public class ApplicationDbContext : DbContext
                 .HasColumnName("updated_at");
 
             entity.HasOne<User>()
-                  .WithMany()
-                  .HasForeignKey("UserId")
-                  .OnDelete(DeleteBehavior.Cascade);
+                .WithMany()
+                .HasForeignKey("UserId")
+                .OnDelete(DeleteBehavior.Cascade);
 
             entity.HasOne<Company>()
-                  .WithMany()
-                  .HasForeignKey("CompanyId")
-                  .OnDelete(DeleteBehavior.Restrict);
+                .WithMany()
+                .HasForeignKey("CompanyId")
+                .OnDelete(DeleteBehavior.Restrict);
 
             entity.HasIndex("UserId").IsUnique();
             entity.HasIndex("CompanyId");
@@ -182,11 +184,50 @@ public class ApplicationDbContext : DbContext
                 .HasColumnName("updated_at");
 
             entity.HasOne<User>()
-                  .WithMany()
-                  .HasForeignKey("UserId")
-                  .OnDelete(DeleteBehavior.Cascade);
+                .WithMany()
+                .HasForeignKey("UserId")
+                .OnDelete(DeleteBehavior.Cascade);
 
             entity.HasIndex("UserId").IsUnique();
+        });
+
+        // refresh token entity
+        modelBuilder.Entity<RefreshToken>(entity =>
+        {
+            entity.HasKey("RefreshTokenId");
+
+            entity.Property("UserId")
+                .IsRequired()
+                .HasColumnName("user_id");
+
+            entity.Property("Token")
+                .IsRequired()
+                .HasMaxLength(255)
+                .HasColumnName("token");
+
+            entity.Property("ExpiresAt")
+                .IsRequired()
+                .HasColumnName("expires_at");
+
+            entity.Property("CreatedAt")
+                .HasColumnName("created_at");
+
+            entity.Property("IsRevoked")
+                .HasColumnName("is_revoked");
+
+            entity.Property("RevokedAt")
+                .HasColumnName("revoked_at");
+
+            // Foreign key relationship to User
+            entity.HasOne<User>()
+                .WithMany()
+                .HasForeignKey("UserId")
+                .OnDelete(DeleteBehavior.Cascade);
+
+            // Indexes for performance
+            entity.HasIndex("UserId");
+            entity.HasIndex("Token").IsUnique();
+            entity.HasIndex("ExpiresAt");
         });
     }
 }

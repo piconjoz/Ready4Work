@@ -1,3 +1,5 @@
+using backend.Components.User.Services.Interfaces;
+
 namespace backend.User.Services;
 
 using backend.User.DTOs;
@@ -12,6 +14,7 @@ public class AuthService : IAuthService
     private readonly IJWTService _jwtService;
     private readonly ICompanyService _companyService;
     private readonly IPasswordService _passwordService;
+    private readonly IRefreshTokenService _refreshTokenService;
 
     // constructor injection - authservice needs ALL other services
     public AuthService(
@@ -20,7 +23,8 @@ public class AuthService : IAuthService
         IRecruiterService recruiterService,
         IJWTService jwtService,
         ICompanyService companyService,
-        IPasswordService passwordService
+        IPasswordService passwordService,
+        IRefreshTokenService refreshTokenService
     )
     {
         _userService = userService;
@@ -29,10 +33,11 @@ public class AuthService : IAuthService
         _jwtService = jwtService;
         _companyService = companyService;
         _passwordService = passwordService;
+        _refreshTokenService = refreshTokenService;
     }
 
     // handles complete applicant signup flow
-    // creates user + applicant profile + returns jwt token
+    // creates user + applicant profile + returns jwt token + refresh token
     public async Task<AuthResponseDTO> SignupApplicantAsync(ApplicantSignupDTO signupDto)
     {
         // validate input dto (additional business validation)
@@ -56,20 +61,25 @@ public class AuthService : IAuthService
             signupDto.AdmitYear
         );
 
-        // step 3: generate jwt token for immediate login
-        var token = _jwtService.GenerateToken(user.GetUserId(), user.GetUserType());
+        // step 3: revoke any existing tokens (safety measure for new users)
+        await _refreshTokenService.RevokeAllUserTokensAsync(user.GetUserId());
 
-        // step 4: return complete auth response
+        // step 4: generate both access and refresh tokens
+        var accessToken = _jwtService.GenerateToken(user.GetUserId(), user.GetUserType());
+        var refreshToken = await _refreshTokenService.GenerateRefreshTokenAsync(user.GetUserId());
+
+        // step 5: return complete auth response
         return new AuthResponseDTO
         {
-            Token = token,
-            ExpiresAt = DateTime.UtcNow.AddMinutes(60), // match jwt expiration
-            User = _userService.ConvertToResponseDTO(user)
+            Token = accessToken,
+            ExpiresAt = DateTime.UtcNow.AddMinutes(15), // reduced to 15 minutes
+            User = _userService.ConvertToResponseDTO(user),
+            RefreshToken = refreshToken
         };
     }
 
     // handles complete recruiter signup flow
-    // creates user + recruiter profile + returns jwt token
+    // creates user + recruiter profile + returns jwt token + refresh token
     public async Task<AuthResponseDTO> SignupRecruiterAsync(RecruiterSignupDTO signupDto)
     {
         // validate input dto
@@ -94,75 +104,110 @@ public class AuthService : IAuthService
             signupDto.Department
         );
 
-        // step 3: generate jwt token for immediate login
-        var token = _jwtService.GenerateToken(user.GetUserId(), user.GetUserType());
+        // step 3: revoke any existing tokens (safety measure for new users)
+        await _refreshTokenService.RevokeAllUserTokensAsync(user.GetUserId());
 
-        // step 4: return complete auth response
+        // step 4: generate both access and refresh tokens
+        var accessToken = _jwtService.GenerateToken(user.GetUserId(), user.GetUserType());
+        var refreshToken = await _refreshTokenService.GenerateRefreshTokenAsync(user.GetUserId());
+
+        // step 5: return complete auth response
         return new AuthResponseDTO
         {
-            Token = token,
-            ExpiresAt = DateTime.UtcNow.AddMinutes(60), // match jwt expiration
-            User = _userService.ConvertToResponseDTO(user)
+            Token = accessToken,
+            ExpiresAt = DateTime.UtcNow.AddMinutes(15), // reduced to 15 minutes
+            User = _userService.ConvertToResponseDTO(user),
+            RefreshToken = refreshToken
         };
     }
 
     // handles login for all user types (applicant, recruiter, admin)
-    // validates credentials and returns jwt token
+    // validates credentials and returns jwt token + refresh token
     public async Task<AuthResponseDTO> LoginAsync(LoginDTO loginDto)
     {
+        Console.WriteLine("DEBUG: Login method started");
+    
         // validate input dto
         if (loginDto == null) throw new ArgumentNullException(nameof(loginDto));
-
+    
+        Console.WriteLine($"DEBUG: Attempting to authenticate user: {loginDto.Email}");
+    
         // step 1: authenticate user credentials
         var user = await _userService.AuthenticateUserAsync(loginDto.Email, loginDto.Password);
         if (user == null)
         {
+            Console.WriteLine("DEBUG: User authentication failed");
             throw new UnauthorizedAccessException("Invalid email or password");
         }
-
+    
+        Console.WriteLine($"DEBUG: User authenticated successfully, UserID: {user.GetUserId()}");
+    
         // step 2: check if user account is active and verified
         if (!user.GetIsActive())
         {
+            Console.WriteLine("DEBUG: User account is not active");
             throw new UnauthorizedAccessException("Account is deactivated");
         }
-
-        // note: we could add email verification check here if needed
-        // if (!user.GetIsVerified()) throw new UnauthorizedAccessException("Email not verified");
-
-        // step 3: generate jwt token
-        var token = _jwtService.GenerateToken(user.GetUserId(), user.GetUserType());
-
-        // step 4: return auth response
+    
+        Console.WriteLine("DEBUG: About to revoke existing tokens");
+    
+        // step 3: revoke all existing refresh tokens for this user (single session enforcement)
+        await _refreshTokenService.RevokeAllUserTokensAsync(user.GetUserId());
+    
+        Console.WriteLine("DEBUG: Tokens revoked, generating new tokens");
+    
+        // step 4: generate both access and refresh tokens
+        var accessToken = _jwtService.GenerateToken(user.GetUserId(), user.GetUserType());
+        Console.WriteLine("DEBUG: Access token generated");
+    
+        var refreshToken = await _refreshTokenService.GenerateRefreshTokenAsync(user.GetUserId());
+        Console.WriteLine("DEBUG: Refresh token generated");
+    
+        Console.WriteLine("DEBUG: Login completed successfully");
+    
+        // step 5: return auth response with both tokens
         return new AuthResponseDTO
         {
-            Token = token,
-            ExpiresAt = DateTime.UtcNow.AddMinutes(60), // match jwt expiration
-            User = _userService.ConvertToResponseDTO(user)
+            Token = accessToken,
+            ExpiresAt = DateTime.UtcNow.AddMinutes(15),
+            User = _userService.ConvertToResponseDTO(user),
+            RefreshToken = refreshToken
         };
     }
 
-    // refreshes an expired token (optional feature for enhanced security)
-    public async Task<AuthResponseDTO?> RefreshTokenAsync(string token)
+    // refreshes an expired token using refresh token (enhanced security)
+    public async Task<AuthResponseDTO?> RefreshTokenAsync(string refreshToken)
     {
-        if (string.IsNullOrWhiteSpace(token)) return null;
+        if (string.IsNullOrWhiteSpace(refreshToken)) return null;
 
-        // get user id from the token (even if expired)
-        var userId = _jwtService.GetUserIdFromToken(token);
-        if (userId == null) return null;
-
-        // get user from database to ensure they still exist and are active
-        var user = await _userService.GetUserByIdAsync(userId.Value);
-        if (user == null || !user.GetIsActive()) return null;
-
-        // generate new token
-        var newToken = _jwtService.GenerateToken(user.GetUserId(), user.GetUserType());
-
-        return new AuthResponseDTO
+        try
         {
-            Token = newToken,
-            ExpiresAt = DateTime.UtcNow.AddMinutes(60),
-            User = _userService.ConvertToResponseDTO(user)
-        };
+            // step 1: rotate the refresh token (validates old one and creates new one)
+            var newRefreshToken = await _refreshTokenService.RotateRefreshTokenAsync(refreshToken);
+
+            // step 2: get user ID from the validated token
+            var userId = await _refreshTokenService.GetUserIdFromTokenAsync(newRefreshToken);
+            if (userId == null) return null;
+
+            // step 3: get user from database to ensure they still exist and are active
+            var user = await _userService.GetUserByIdAsync(userId.Value);
+            if (user == null || !user.GetIsActive()) return null;
+
+            // step 4: generate new access token
+            var newAccessToken = _jwtService.GenerateToken(user.GetUserId(), user.GetUserType());
+
+            return new AuthResponseDTO
+            {
+                Token = newAccessToken,
+                ExpiresAt = DateTime.UtcNow.AddMinutes(15),
+                User = _userService.ConvertToResponseDTO(user),
+                RefreshToken = newRefreshToken
+            };
+        }
+        catch
+        {
+            return null; // invalid refresh token
+        }
     }
 
     // validates if a token is still valid
@@ -182,6 +227,14 @@ public class AuthService : IAuthService
         return user != null && user.GetIsActive();
     }
 
+    // revokes a refresh token (for logout)
+    public async Task RevokeRefreshTokenAsync(string token)
+    {
+        if (string.IsNullOrWhiteSpace(token)) return;
+
+        await _refreshTokenService.RevokeRefreshTokenAsync(token);
+    }
+
     // verifies a user account (for email verification workflow)
     public async Task<bool> VerifyUserAsync(int userId)
     {
@@ -196,6 +249,7 @@ public class AuthService : IAuthService
         }
     }
 
+    // onboards recruiter and company in one step
     public async Task<RecruiterOnboardingResponseDTO?> OnboardRecruiterAndCompanyAsync(RecruiterOnboardingDTO dto)
     {
         try
@@ -245,10 +299,7 @@ public class AuthService : IAuthService
                 throw new InvalidOperationException("A user with this email already exists.");
             }
 
-            // 5. Hash the password
-            var (salt, hashedPassword) = _passwordService.HashPassword(dto.User.Password);
-
-            // 6. Create the user
+            // 5. Create the user
             var user = await _userService.CreateUserAsync(
                 email: dto.User.Email,
                 firstName: dto.User.FirstName,
@@ -256,10 +307,10 @@ public class AuthService : IAuthService
                 phone: dto.User.Phone,
                 gender: dto.User.Gender,
                 userType: dto.User.UserType,
-                password: dto.User.Password // This will be hashed again in UserService, but that's fine for now
+                password: dto.User.Password
             );
 
-            // 7. Create the recruiter
+            // 6. Create the recruiter
             var recruiter = await _recruiterService.CreateRecruiterAsync(
                 user.GetUserId(),
                 company.CompanyId,

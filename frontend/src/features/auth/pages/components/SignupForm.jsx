@@ -13,6 +13,7 @@ export default function SignupForm() {
   const [accountType, setAccountType] = useState(null);
   const [showNotice, setShowNotice] = useState(false);
   const [shouldShowDetection, setShouldShowDetection] = useState(false);
+  const [agreedToTerms, setAgreedToTerms] = useState(false);
 
   // Check email domain and set account type
   useEffect(() => {
@@ -39,7 +40,6 @@ export default function SignupForm() {
   };
 
   const handleEmailBlur = () => {
-    // Show detection when email field loses focus (if email has content and contains @)
     if (email.trim() && email.includes("@")) {
       setShouldShowDetection(true);
     }
@@ -48,7 +48,6 @@ export default function SignupForm() {
   const handleSubmit = (e) => {
     e.preventDefault();
 
-    // Store signup data and navigate based on account type
     const signupData = {
       email,
       password,
@@ -56,10 +55,9 @@ export default function SignupForm() {
       registrationDate: new Date().toISOString().split("T")[0],
     };
 
-    // Store in sessionStorage to persist during navigation
     sessionStorage.setItem("signupData", JSON.stringify(signupData));
 
-    // Navigate to appropriate onboarding
+    // Navigate to correct onboarding routes
     if (accountType === "employer") {
       navigate("/recruiter/onboard");
     } else {
@@ -137,6 +135,8 @@ export default function SignupForm() {
           name={
             accountType === "student" ? "studentAccount" : "employerAccount"
           }
+          checked={agreedToTerms}
+          onChange={(e) => setAgreedToTerms(e.target.checked)}
         />
       )}
 
@@ -149,7 +149,8 @@ export default function SignupForm() {
           !password ||
           !retypePassword ||
           password !== retypePassword ||
-          !accountType
+          !accountType ||
+          !agreedToTerms
         }
       />
     </form>

@@ -5,7 +5,6 @@ using backend.User.DTOs;
 using backend.User.Services.Interfaces;
 using System.ComponentModel.DataAnnotations;
 
-
 [ApiController]
 [Route("api/auth")]
 public class AuthController : ControllerBase
@@ -31,6 +30,16 @@ public class AuthController : ControllerBase
             }
 
             var result = await _authService.SignupApplicantAsync(signupDto);
+            
+            // Set refresh token in httpOnly cookie
+            if (!string.IsNullOrEmpty(result.RefreshToken))
+            {
+                SetRefreshTokenCookie(result.RefreshToken);
+            }
+            
+            // Don't send refresh token in response body
+            result.RefreshToken = null;
+            
             return Ok(result);
         }
         catch (ArgumentException ex)
@@ -63,6 +72,16 @@ public class AuthController : ControllerBase
             }
 
             var result = await _authService.SignupRecruiterAsync(signupDto);
+            
+            // Set refresh token in httpOnly cookie
+            if (!string.IsNullOrEmpty(result.RefreshToken))
+            {
+                SetRefreshTokenCookie(result.RefreshToken);
+            }
+            
+            // Don't send refresh token in response body
+            result.RefreshToken = null;
+            
             return Ok(result);
         }
         catch (ArgumentException ex)
@@ -92,6 +111,16 @@ public class AuthController : ControllerBase
             }
 
             var result = await _authService.LoginAsync(loginDto);
+            
+            // Set refresh token in httpOnly cookie
+            if (!string.IsNullOrEmpty(result.RefreshToken))
+            {
+                SetRefreshTokenCookie(result.RefreshToken);
+            }
+            
+            // Don't send refresh token in response body
+            result.RefreshToken = null;
+            
             return Ok(result);
         }
         catch (UnauthorizedAccessException ex)
@@ -110,28 +139,71 @@ public class AuthController : ControllerBase
     }
 
     // POST /api/auth/refresh
-    // refreshes expired tokens
+    // refreshes access token using refresh token from cookie
     [HttpPost("refresh")]
-    public async Task<ActionResult<AuthResponseDTO>> RefreshToken([FromBody] RefreshTokenRequest request)
+    public async Task<ActionResult<AuthResponseDTO>> RefreshToken()
     {
         try
         {
-            if (string.IsNullOrWhiteSpace(request.Token))
+            // Get refresh token from httpOnly cookie
+            var refreshToken = Request.Cookies["refreshToken"];
+
+            if (string.IsNullOrWhiteSpace(refreshToken))
             {
-                return BadRequest(new { message = "Token is required" });
+                return Unauthorized(new { message = "Refresh token not found" });
             }
 
-            var result = await _authService.RefreshTokenAsync(request.Token);
+            var result = await _authService.RefreshTokenAsync(refreshToken);
             if (result == null)
             {
-                return Unauthorized(new { message = "Invalid or expired token" });
+                return Unauthorized(new { message = "Invalid or expired refresh token" });
             }
 
-            return Ok(result);
+            // Set new refresh token in httpOnly cookie
+            if (!string.IsNullOrEmpty(result.RefreshToken))
+            {
+                SetRefreshTokenCookie(result.RefreshToken);
+            }
+
+            // Return new access token (don't include refresh token in response body)
+            return Ok(new AuthResponseDTO
+            {
+                Token = result.Token,
+                ExpiresAt = result.ExpiresAt,
+                User = result.User,
+                RefreshToken = null // Don't send refresh token in response body
+            });
         }
         catch (Exception ex)
         {
             return StatusCode(500, new { message = "An error occurred during token refresh" });
+        }
+    }
+
+    // POST /api/auth/logout
+    // revokes refresh token and clears cookies
+    [HttpPost("logout")]
+    public async Task<ActionResult> Logout()
+    {
+        try
+        {
+            // Get refresh token from cookie
+            var refreshToken = Request.Cookies["refreshToken"];
+
+            if (!string.IsNullOrWhiteSpace(refreshToken))
+            {
+                // Revoke the refresh token in database
+                await _authService.RevokeRefreshTokenAsync(refreshToken);
+            }
+
+            // Clear the refresh token cookie
+            Response.Cookies.Delete("refreshToken");
+
+            return Ok(new { message = "Logged out successfully" });
+        }
+        catch (Exception ex)
+        {
+            return StatusCode(500, new { message = "An error occurred during logout" });
         }
     }
 
@@ -182,6 +254,8 @@ public class AuthController : ControllerBase
         }
     }
 
+    // POST /api/auth/onboard/recruiter
+    // onboards recruiter and company in one step
     [HttpPost("onboard/recruiter")]
     public async Task<IActionResult> CompanyAndRecruiterRegistration([FromBody] RecruiterOnboardingDTO dto)
     {
@@ -207,6 +281,21 @@ public class AuthController : ControllerBase
             // Unexpected errors
             return StatusCode(500, ex.Message);
         }
+    }
+
+    // Helper method to set refresh token in httpOnly cookie
+    private void SetRefreshTokenCookie(string refreshToken)
+    {
+        var cookieOptions = new CookieOptions
+        {
+            HttpOnly = true,        // Prevents XSS attacks
+            Secure = false,         // Set to true in production with HTTPS
+            SameSite = SameSiteMode.Strict, // CSRF protection
+            Expires = DateTime.UtcNow.AddDays(30), // Match refresh token expiry
+            Path = "/"
+        };
+
+        Response.Cookies.Append("refreshToken", refreshToken, cookieOptions);
     }
 }
 
