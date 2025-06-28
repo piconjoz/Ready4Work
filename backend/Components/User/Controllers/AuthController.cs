@@ -181,6 +181,20 @@ public class AuthController : ControllerBase
             return StatusCode(500, new { message = "An error occurred during verification" });
         }
     }
+
+    [HttpPost("onboard/recruiter")]
+    public async Task<IActionResult> CompanyAndRecruiterRegistration([FromBody] RecruiterOnboardingDTO dto)
+    {
+        if (!ModelState.IsValid)
+        {
+            return BadRequest(ModelState);
+        }
+
+        var result = await _authService.OnboardRecruiterAndCompanyAsync(dto);
+        if (result == null)
+            return StatusCode(500, "Onboarding failed.");
+        return Ok(result);
+    }
 }
 
 // helper dto for token requests

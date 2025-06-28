@@ -5,6 +5,7 @@ using System.Text;
 using backend.Data;
 using backend.Components.Company.Repository;
 using backend.Components.Company.Services;
+using backend.Components.Company.Services.Interfaces;
 using backend.User.Repositories.Interfaces;
 using backend.User.Repositories;
 using backend.User.Services.Interfaces;

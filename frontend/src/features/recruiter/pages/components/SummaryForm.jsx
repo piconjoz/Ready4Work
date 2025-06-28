@@ -90,7 +90,7 @@ export default function SummaryForm({
       },
     };
 
-    console.log("📋 BACKEND API PAYLOAD:");
+    console.log("BACKEND API PAYLOAD:");
     console.log(submissionData);
   };
 
