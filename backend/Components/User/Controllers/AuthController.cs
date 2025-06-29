@@ -10,10 +10,17 @@ using System.ComponentModel.DataAnnotations;
 public class AuthController : ControllerBase
 {
     private readonly IAuthService _authService;
+    private readonly IJWTService _jwtService;
+    private readonly IUserService _userService;
 
-    public AuthController(IAuthService authService)
+    public AuthController(
+        IAuthService authService,
+        IJWTService jwtService,
+        IUserService userService)
     {
         _authService = authService;
+        _jwtService = jwtService;
+        _userService = userService;
     }
 
     // POST /api/auth/signup/applicant
@@ -210,7 +217,7 @@ public class AuthController : ControllerBase
     // POST /api/auth/validate
     // validates if token is still valid
     [HttpPost("validate")]
-    public async Task<ActionResult<bool>> ValidateToken([FromBody] RefreshTokenRequest request)
+    public async Task<ActionResult> ValidateToken([FromBody] RefreshTokenRequest request)
     {
         try
         {
@@ -220,7 +227,35 @@ public class AuthController : ControllerBase
             }
 
             var isValid = await _authService.ValidateTokenAsync(request.Token);
-            return Ok(new { isValid });
+        
+            if (!isValid)
+            {
+                return Ok(new { isValid = false });
+            }
+
+            // Get user info from token
+            var userId = _jwtService.GetUserIdFromToken(request.Token);
+            if (userId == null)
+            {
+                return Ok(new { isValid = false });
+            }
+
+            var user = await _userService.GetUserByIdAsync(userId.Value);
+            if (user == null || !user.GetIsActive())
+            {
+                return Ok(new { isValid = false });
+            }
+        
+            return Ok(new { 
+                isValid = true, 
+                userType = user.GetUserType(),
+                userId = user.GetUserId(),
+                email = user.GetEmail(),
+                firstName = user.GetFirstName(),
+                lastName = user.GetLastName(),
+                isActive = user.GetIsActive(),
+                isVerified = user.GetIsVerified()
+            });
         }
         catch (Exception ex)
         {

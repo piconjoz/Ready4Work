@@ -4,11 +4,13 @@ import StatusInputField from "../../../../components/StatusInputField";
 import PrimaryButton from "../../../../components/PrimaryButton";
 import NoticeBanner from "../../../../components/NoticeBanner";
 import DisclaimerCheckbox from "../../../../components/DisclaimerCheckbox";
-import { login } from "../../../../services/authAPI";
+import { useAuth } from "../../../../contexts/AuthContext.jsx";
 import toast from "react-hot-toast";
 
 export default function LoginForm() {
   const navigate = useNavigate();
+  const { login, isLoading: authLoading } = useAuth();
+
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [accountType, setAccountType] = useState(null);
@@ -49,29 +51,26 @@ export default function LoginForm() {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    if (isLoading) return;
+    if (isLoading || authLoading) return;
     setIsLoading(true);
 
     try {
       const loginData = {
-        username: username, // Gets mapped to email in authAPI
+        username: username,
         password: password,
       };
 
       console.log("Attempting login...");
 
-      // Call the login function from authAPI
+      // Use AuthContext login instead of direct API call
       const response = await login(loginData);
 
       console.log("Login successful!");
       console.log("User type:", response.user.userType);
-      console.log("Access token stored in localStorage");
-      console.log("Refresh token stored in httpOnly cookie");
 
-      // Show success message
       toast.success("Login successful!");
 
-      // Navigate based on user type from API response
+      // Navigate based on user type
       if (response.user.userType === 2) {
         console.log("Redirecting to recruiter home");
         navigate("/recruiter/home");
@@ -85,7 +84,6 @@ export default function LoginForm() {
     } catch (error) {
       console.error("Login error:", error);
 
-      // Handle specific error types
       if (error.response?.status === 401) {
         toast.error("Invalid email or password");
       } else if (error.response?.status === 400) {
@@ -113,7 +111,7 @@ export default function LoginForm() {
         value={username}
         onChange={handleUsernameChange}
         onBlur={handleUsernameBlur}
-        disabled={isLoading} // ← Disable during loading
+        disabled={isLoading || authLoading}
       />
       <StatusInputField
         label="Password"
@@ -123,10 +121,9 @@ export default function LoginForm() {
         errorMessage=""
         value={password}
         onChange={(e) => setPassword(e.target.value)}
-        disabled={isLoading} // ← Disable during loading
+        disabled={isLoading || authLoading}
       />
 
-      {/* Account Detection Banner */}
       {showNotice && accountType && shouldShowDetection && (
         <div className="mt-6">
           <NoticeBanner
@@ -145,7 +142,6 @@ export default function LoginForm() {
         </div>
       )}
 
-      {/* Account Type Checkbox */}
       {accountType && shouldShowDetection && (
         <DisclaimerCheckbox
           title={
@@ -161,18 +157,19 @@ export default function LoginForm() {
           }
           checked={agreedToTerms}
           onChange={(e) => setAgreedToTerms(e.target.checked)}
-          disabled={isLoading} // ← Disable during loading
+          disabled={isLoading || authLoading}
         />
       )}
 
       <PrimaryButton
         type="submit"
-        label={isLoading ? "Logging in..." : "Login"}
+        label={isLoading || authLoading ? "Logging in..." : "Login"}
         disabled={
           !username ||
           !password ||
           (accountType && shouldShowDetection && !agreedToTerms) ||
-          isLoading
+          isLoading ||
+          authLoading // ← Include authLoading
         }
       />
     </form>
