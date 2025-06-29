@@ -56,6 +56,8 @@ builder.Services.AddScoped<IJWTService, JWTService>();
 builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<IApplicantService, ApplicantService>();
 builder.Services.AddScoped<IRecruiterService, RecruiterService>();
+builder.Services.AddScoped<IAdminService, AdminService>();
+builder.Services.AddScoped<DatabaseSeedingService>();
 builder.Services.AddScoped<IRefreshTokenService, RefreshTokenService>();
 builder.Services.AddScoped<IAuthService, AuthService>();
 
@@ -95,6 +97,24 @@ if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
     app.UseSwaggerUI();
+}
+
+if (app.Environment.IsDevelopment())
+{
+    app.UseSwagger();
+    app.UseSwaggerUI();
+    
+    // ADD THIS BLOCK ↓
+    try
+    {
+        Console.WriteLine("🌱 Seeding admin accounts...");
+        await app.Services.SeedDatabaseAsync();
+        Console.WriteLine("✅ Admin seeding completed!");
+    }
+    catch (Exception ex)
+    {
+        Console.WriteLine($"❌ Admin seeding failed: {ex.Message}");
+    }
 }
 
 app.UseCors("AllowReactApp");
