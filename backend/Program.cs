@@ -1,10 +1,13 @@
+// backend/Program.cs
 using Microsoft.EntityFrameworkCore;
 using backend.Data;
 using backend.Components.Company.Repository;
 using backend.Components.Company.Services;
 using backend.Components.AI.Services;               
 using backend.Components.Application.Services;           
-using backend.Components.Application.Repository;        
+using backend.Components.Application.Repository;
+using backend.Components.CoverLetter.Services;           // Add CoverLetter services
+using backend.Components.CoverLetter.Repository;        // Add CoverLetter repository  
 using backend.User.Services.Interfaces;                  
 using backend.User.Services;                            
 using backend.User.Repositories.Interfaces;             
@@ -55,11 +58,14 @@ builder.Services.AddScoped<IAIService, AIService>();
 builder.Services.AddScoped<IApplicationService, ApplicationService>();
 builder.Services.AddScoped<IApplicationRepository, ApplicationRepository>();
 
+// CoverLetter services (NEW)
+builder.Services.AddScoped<ICoverLetterService, CoverLetterService>();
+builder.Services.AddScoped<ICoverLetterRepository, CoverLetterRepository>();
+
 // User services (if not already registered)
 builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<IUserRepository, UserRepository>();
 builder.Services.AddScoped<IPasswordService, PasswordService>();
-
 
 // Register Resume components
 builder.Services.AddScoped<IResumeRepository, ResumeRepository>();
