@@ -71,7 +71,7 @@ public class ApplicationController : ControllerBase
             {
                 ApplicationId = app.ApplicationId,
                 JobListingId = app.JobListingId,
-                CoverLetter = app.CoverLetter,
+                CoverLetter = app.CoverLetterId,
                 Status = app.Status,
                 AppliedDate = app.AppliedDate,
                 UpdatedAt = app.UpdatedAt
