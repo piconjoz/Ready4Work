@@ -22,10 +22,11 @@ namespace backend.Components.Bookmark.Repository
                 .ToListAsync();
         }
 
-        public async Task AddBookmarkAsync(BookmarkEntity bookmark)
+        public async Task<BookmarkEntity> AddBookmarkAsync(BookmarkEntity bookmark)
         {
             _context.Bookmarks.Add(bookmark);
             await _context.SaveChangesAsync();
+            return bookmark;
         }
 
         public async Task RemoveBookmarkAsync(int applicantId, int jobsId)

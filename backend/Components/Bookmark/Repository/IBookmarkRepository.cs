@@ -8,7 +8,7 @@ namespace backend.Components.Bookmark.Repository
     {
 
         Task<List<BookmarkEntity>> GetBookmarksAsync(int applicantId);
-        Task AddBookmarkAsync(BookmarkEntity bookmark);
+        Task<BookmarkEntity> AddBookmarkAsync(BookmarkEntity bookmark);
         Task RemoveBookmarkAsync(int applicantId, int jobsId);
         Task ClearBookmarksAsync(int applicantId);
         Task<bool> IsBookmarkedAsync(int applicantId, int jobsId);

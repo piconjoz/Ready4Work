@@ -4,7 +4,7 @@ namespace backend.Components.Bookmark.Services
 {
     public interface IBookmarkService
     {
-        Task BookmarkJobAsync(int applicantId, int jobsId);
+        Task<BookmarkEntity> BookmarkJobAsync(int applicantId, int jobsId);
         Task UnbookmarkJobAsync(int applicantId, int jobsId);
         Task ClearAllBookmarksAsync(int applicantId);
         Task<List<BookmarkEntity>> GetBookmarksAsync(int applicantId);

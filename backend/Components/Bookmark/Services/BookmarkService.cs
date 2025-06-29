@@ -1,6 +1,9 @@
 using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
 using backend.Components.Bookmark.Repository;
 using BookmarkEntity = backend.Components.Bookmark.Models.Bookmark;
+using System;
 
 namespace backend.Components.Bookmark.Services
 {
@@ -13,7 +16,7 @@ namespace backend.Components.Bookmark.Services
             _repo = repo;
         }
 
-        public async Task BookmarkJobAsync(int applicantId, int jobsId)
+        public async Task<BookmarkEntity> BookmarkJobAsync(int applicantId, int jobsId)
         {
             if (!await _repo.IsBookmarkedAsync(applicantId, jobsId))
             {
@@ -23,8 +26,16 @@ namespace backend.Components.Bookmark.Services
                     JobsId = jobsId,
                     CreatedAt = DateTime.UtcNow
                 };
-                await _repo.AddBookmarkAsync(bm);
+                return await _repo.AddBookmarkAsync(bm);
             }
+            // already bookmarked: fetch existing
+            var existing = (await _repo.GetBookmarksAsync(applicantId))
+                           .FirstOrDefault(b => b.JobsId == jobsId);
+            if (existing == null)
+            {
+                throw new InvalidOperationException("Bookmark not found for the given applicant and job.");
+            }
+            return existing;
         }
 
         public Task UnbookmarkJobAsync(int applicantId, int jobsId)
