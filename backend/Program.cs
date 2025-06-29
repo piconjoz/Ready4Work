@@ -14,6 +14,8 @@ using backend.User.Repositories.Interfaces;
 using backend.User.Repositories;                         
 using backend.Components.Resume.Repository;
 using backend.Components.Resume.Services;
+using backend.Components.Bookmark.Repository;
+using backend.Components.Bookmark.Services;
 
 DotNetEnv.Env.Load();
 
@@ -70,6 +72,10 @@ builder.Services.AddScoped<IPasswordService, PasswordService>();
 // Register Resume components
 builder.Services.AddScoped<IResumeRepository, ResumeRepository>();
 builder.Services.AddScoped<IResumeService, ResumeService>();
+
+// Register Bookmark components
+builder.Services.AddScoped<IBookmarkRepository, BookmarkRepository>();
+builder.Services.AddScoped<IBookmarkService, BookmarkService>();
 
 var app = builder.Build();
 

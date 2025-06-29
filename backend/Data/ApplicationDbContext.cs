@@ -7,6 +7,7 @@ using backend.Components.Application.Models;
 using backend.Components.CoverLetter.Models;
 using backend.User.Models;
 using backend.Components.Resume.Models;
+using backend.Components.Bookmark.Models;
 
 public class ApplicationDbContext : DbContext
 {
@@ -22,6 +23,7 @@ public class ApplicationDbContext : DbContext
     public DbSet<JobApplication> JobApplications { get; set; }
     public DbSet<CoverLetter> CoverLetters { get; set; }  // Add CoverLetter DbSet
     public DbSet<Resume> Resumes { get; set; }
+    public DbSet<Bookmark> Bookmarks { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -180,6 +182,17 @@ public class ApplicationDbContext : DbContext
                   .OnDelete(DeleteBehavior.Cascade);
 
             entity.HasIndex(e => e.ApplicantId);
+        });
+
+        // Configure Bookmark entity
+        modelBuilder.Entity<Bookmark>(entity =>
+        {
+            entity.HasKey(e => e.BookmarkId);
+            entity.Property(e => e.BookmarkId).HasColumnName("bookmark_id");
+            entity.Property(e => e.ApplicantId).IsRequired().HasColumnName("applicant_id");
+            entity.Property(e => e.JobsId).IsRequired().HasColumnName("jobs_id");
+            entity.Property(e => e.CreatedAt).HasColumnName("created_at");
+            entity.HasIndex(e => new { e.ApplicantId, e.JobsId }).IsUnique();
         });
     }
 }
