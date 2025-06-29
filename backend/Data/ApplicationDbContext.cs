@@ -1,12 +1,12 @@
-    namespace backend.Data;
+namespace backend.Data;
 
-    using Microsoft.EntityFrameworkCore;
-    using backend.Components.Company.Models;
-    using backend.User.Models;
-    using backend.Components.User.Models;
-    using backend.Components.JobListing.Models;
+using Microsoft.EntityFrameworkCore;
+using backend.Components.Company.Models;
+using backend.User.Models;
+using backend.Components.User.Models;
+using backend.Components.JobListing.Models;
 
-    public class ApplicationDbContext : DbContext
+public class ApplicationDbContext : DbContext
     {
         public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options) : base(options)
         {
@@ -21,6 +21,12 @@
         public DbSet<JobListing> JobListings { get; set; }
         public DbSet<RemunerationType> RemunerationTypes { get; set; }
         public DbSet<JobScheme> JobSchemes { get; set; }
+        public DbSet<Skill> Skills { get; set; }
+        public DbSet<Programme> Programmes { get; set; }
+        public DbSet<JobSkill> JobSkills { get; set; }
+        public DbSet<Qualification> Qualifications { get; set; }
+
+
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -306,13 +312,13 @@
                 
             entity.Property("Type")
                 .IsRequired()
-                .HasMaxLength(100)
+                .HasMaxLength(20)
                 .HasColumnName("type");
                 
             entity.HasIndex("Type").IsUnique();
         });
 
-        // Job Scheme
+        // Add JobScheme configuration
         modelBuilder.Entity<JobScheme>(entity =>
         {
             entity.HasKey("SchemeId");
@@ -322,10 +328,58 @@
                 
             entity.Property("SchemeName")
                 .IsRequired()
-                .HasMaxLength(100)
+                .HasMaxLength(50)
                 .HasColumnName("scheme_name");
                 
             entity.HasIndex("SchemeName").IsUnique();
+        });
+
+        modelBuilder.Entity<Skill>(entity =>
+        {
+            entity.HasKey("SkillId");
+            entity.Property("skill").HasColumnName("skill");
+        });
+
+        modelBuilder.Entity<Programme>(entity =>
+        {
+            entity.HasKey("ProgrammeId");
+            entity.Property("ProgrammeName").HasColumnName("programme_name");
+        });
+
+        // Job skills entity
+        modelBuilder.Entity<JobSkill>(entity =>
+        {
+            entity.HasKey("JobSkillId");
+            entity.Property("JobId").HasColumnName("job_id").IsRequired();
+            entity.Property("SkillId").HasColumnName("skill_id").IsRequired();
+
+            entity.HasOne<JobListing>()
+                .WithMany()
+                .HasForeignKey("JobId")
+                .OnDelete(DeleteBehavior.Cascade);
+
+            entity.HasOne<Skill>()
+                .WithMany()
+                .HasForeignKey("SkillId")
+                .OnDelete(DeleteBehavior.Cascade);
+        });
+
+        // Qualification entity
+        modelBuilder.Entity<Qualification>(entity =>
+        {
+            entity.HasKey("QualificationId");
+            entity.Property("ProgrammeId").HasColumnName("programme_id").IsRequired();
+            entity.Property("JobId").HasColumnName("job_id").IsRequired();
+
+            entity.HasOne<Programme>()
+                .WithMany()
+                .HasForeignKey("ProgrammeId")
+                .OnDelete(DeleteBehavior.Cascade);
+
+            entity.HasOne<JobListing>()
+                .WithMany()
+                .HasForeignKey("JobId")
+                .OnDelete(DeleteBehavior.Cascade);
         });
 
     }
