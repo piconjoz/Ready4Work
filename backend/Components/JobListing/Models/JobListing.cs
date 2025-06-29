@@ -106,23 +106,23 @@ namespace backend.Components.JobListing.Models
         internal DateTime GetUpdatedAt() => UpdatedAt;
 
         // setter
-        internal void GetJobId(int jobId) => JobId = jobId;
-        internal void GetRecruiterId(int recruiterId) => RecruiterId = recruiterId;
-        internal void GetJobRequirements(string jobRequirements) => JobRequirements = jobRequirements;
-        internal void GetJobDescription(string jobDesription) => JobDescription = jobDesription;
-        internal void GetListingName(string listingName) => ListingName = listingName;
-        internal void GetDeadline(DateTime deadline) => Deadline = deadline;
-        internal void GetMaxVacancies(int maxVacancies) => MaxVacancies = maxVacancies;
-        internal void GetIsVisible(bool isVisble) => IsVisible = isVisble;
-        internal void GetRenumerationType(string renumerationType) => RenumerationType = renumerationType;
-        internal void GetJobDuration(string jobDuration) => JobDuration = jobDuration;
-        internal void GetRate(float rate) => Rate = rate;
-        internal void GetWorkingHours(string workingHours) => WorkingHours = workingHours;
-        internal void GetJobScheme(string jobScheme) => JobScheme = jobScheme;
-        internal void GetPermittedQualifications(int permittedQualifications) => PermittedQualifications = permittedQualifications;
-        internal void GetSkillsets(int skillsets) => Skillsets =skillsets;
-        internal void GetJobStatus(string jobStatus) => JobStatus = jobStatus;
-        internal void GetCreatedAt(DateTime createdAt) => CreatedAt = createdAt;
-        internal void GetUpdatedAt(DateTime updatedAt) => UpdatedAt = updatedAt;
+        internal void SetJobId(int jobId) => JobId = jobId;
+        // internal void SetRecruiterId(int recruiterId) => RecruiterId = recruiterId;
+        internal void SetJobRequirements(string jobRequirements) => JobRequirements = jobRequirements;
+        internal void SetJobDescription(string jobDesription) => JobDescription = jobDesription;
+        internal void SetListingName(string listingName) => ListingName = listingName;
+        internal void SetDeadline(DateTime deadline) => Deadline = deadline;
+        internal void SetMaxVacancies(int maxVacancies) => MaxVacancies = maxVacancies;
+        internal void SetIsVisible(bool isVisble) => IsVisible = isVisble;
+        internal void SetRenumerationType(string renumerationType) => RenumerationType = renumerationType;
+        internal void SetJobDuration(string jobDuration) => JobDuration = jobDuration;
+        internal void SetRate(float rate) => Rate = rate;
+        internal void SetWorkingHours(string workingHours) => WorkingHours = workingHours;
+        internal void SetJobScheme(string jobScheme) => JobScheme = jobScheme;
+        internal void SetPermittedQualifications(int permittedQualifications) => PermittedQualifications = permittedQualifications;
+        internal void SetSkillsets(int skillsets) => Skillsets =skillsets;
+        internal void SetJobStatus(string jobStatus) => JobStatus = jobStatus;
+        internal void SetCreatedAt(DateTime createdAt) => CreatedAt = createdAt;
+        internal void SetUpdatedAt(DateTime updatedAt) => UpdatedAt = updatedAt;
     }
 }
