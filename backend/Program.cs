@@ -5,10 +5,15 @@ using System.Text;
 using backend.Data;
 using backend.Components.Company.Repository;
 using backend.Components.Company.Services;
+using backend.Components.Company.Services.Interfaces;
 using backend.User.Repositories.Interfaces;
 using backend.User.Repositories;
 using backend.User.Services.Interfaces;
 using backend.User.Services;
+using backend.Components.User.Repositories.Interfaces;
+using backend.Components.User.Repositories;
+using backend.Components.User.Services;
+using backend.Components.User.Services.Interfaces;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -22,7 +27,8 @@ builder.Services.AddCors(options =>
     {
         policy.WithOrigins("http://localhost:5173")
             .AllowAnyMethod()
-            .AllowAnyHeader();
+            .AllowAnyHeader()
+            .AllowCredentials();
     });
 });
 
@@ -42,6 +48,7 @@ builder.Services.AddScoped<IUserRepository, UserRepository>();
 builder.Services.AddScoped<IApplicantRepository, ApplicantRepository>();
 builder.Services.AddScoped<IRecruiterRepository, RecruiterRepository>();
 builder.Services.AddScoped<IAdminRepository, AdminRepository>();
+builder.Services.AddScoped<IRefreshTokenRepository, RefreshTokenRepository>();
 
 // register dependency injection for user services
 builder.Services.AddScoped<IPasswordService, PasswordService>();
@@ -49,6 +56,7 @@ builder.Services.AddScoped<IJWTService, JWTService>();
 builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<IApplicantService, ApplicantService>();
 builder.Services.AddScoped<IRecruiterService, RecruiterService>();
+builder.Services.AddScoped<IRefreshTokenService, RefreshTokenService>();
 builder.Services.AddScoped<IAuthService, AuthService>();
 
 // configure JWT authentication

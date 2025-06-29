@@ -16,6 +16,18 @@ public class Company
     public string EntityType { get; set; } = string.Empty;
     public bool AuthorisedTrainingOrganisation { get; set; }
     public string CompanyWebsite { get; set; } = string.Empty;
+    public string CompanyContact { get; set; } = string.Empty;
+    public string City { get; set; } = string.Empty;
+    public string State { get; set; } = string.Empty;
+    public string ZoneLocation { get; set; } = string.Empty;
+    public int CountryCode { get; set; }
+    public string UnitNumber { get; set; } = string.Empty;
+    public string Floor { get; set; } = string.Empty;
+    public int AreaCode { get; set; }
+    public string Block { get; set; } = string.Empty;
+    public int PostalCode { get; set; }
+    public string EmploymentType { get; set; } = string.Empty;
+
     public DateTime CreatedAt { get; set; } = DateTime.Now;
     public DateTime UpdatedAt { get; set; } = DateTime.Now;
 }

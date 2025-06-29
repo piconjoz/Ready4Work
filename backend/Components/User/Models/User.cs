@@ -10,11 +10,6 @@ namespace backend.User.Models
         private int UserId { get; set; }
 
         [Required]
-        [Column("nric")]
-        [StringLength(20)]
-        private string NRIC { get; set; } = string.Empty;
-
-        [Required]
         [Column("email")]
         [StringLength(255)]
         private string Email { get; set; } = string.Empty;
@@ -33,10 +28,10 @@ namespace backend.User.Models
         [StringLength(20)]
         private string? Phone { get; set; }
 
-        [Column("gender")] 
+        [Column("gender")]
         [StringLength(10)] // its 2025 broskis, you can be a helicopter if you want to
         private string? Gender { get; set; }
-        
+
         [Column("profile_picture_path")]
         [StringLength(255)]
         private string? ProfilePicturePath { get; set; } = null;
@@ -69,10 +64,9 @@ namespace backend.User.Models
         private User() { }
 
         // internal constructor - only services can create users
-        internal User(string nric, string email, string firstName, string lastName, string? phone, string? gender,
+        internal User(string email, string firstName, string lastName, string? phone, string? gender,
              int userType, string salt, string passwordHash)
         {
-            NRIC = nric;
             Email = email;
             FirstName = firstName;
             LastName = lastName;
@@ -87,7 +81,6 @@ namespace backend.User.Models
 
         // internal getter methods - only services can read data
         internal int GetUserId() => UserId;
-        internal string GetNRIC() => NRIC;
         internal string GetEmail() => Email;
         internal string GetFirstName() => FirstName;
         internal string GetLastName() => LastName;

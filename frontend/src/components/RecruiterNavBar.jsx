@@ -5,7 +5,6 @@ import NavSubMenu from "./NavSubMenu";
 import { FiSettings, FiLogOut } from "react-icons/fi";
 import { IoIosSettings } from "react-icons/io";
 
-
 export default function NavBar() {
   const { pathname } = useLocation();
   const routes = {
@@ -56,8 +55,12 @@ export default function NavBar() {
         <NavSubMenu
           avatarUrl="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQiZG8aaViLv7di4yE8HU162B8BNTsCMv7_7w&s"
           items={[
-            { label: "Settings", icon: IoIosSettings, to: "/recruiter/settings" },
-            { label: "Logout", icon: FiLogOut, onClick: () => console.log("Logout") }
+            {
+              label: "Settings",
+              icon: IoIosSettings,
+              to: "/recruiter/settings",
+            },
+            { label: "Logout", icon: FiLogOut }, // ← Removed onClick, handled in NavSubMenu now
           ]}
         />
       </div>

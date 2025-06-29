@@ -3,6 +3,7 @@ namespace backend.Components.Company.Controllers;
 using Microsoft.AspNetCore.Mvc;
 using backend.Components.Company.Models;
 using backend.Components.Company.Services;
+using backend.Components.Company.Services.Interfaces;
 
 [ApiController]
 [Route("api/companies")]
@@ -14,7 +15,7 @@ public class CompanyController : ControllerBase
     {
         _companyService = companyService;
     }
-    
+
     // get all companies
     [HttpGet]
     public async Task<ActionResult<List<Company>>> GetAllCompanies()
@@ -22,7 +23,7 @@ public class CompanyController : ControllerBase
         var companies = await _companyService.GetAllCompaniesAsync();
         return Ok(companies);
     }
-    
+
     // get company by id
     [HttpGet("{companyId}")]
     public async Task<ActionResult<Company?>> GetCompanyById(int companyId)
@@ -34,7 +35,7 @@ public class CompanyController : ControllerBase
         }
         return Ok(company);
     }
-    
+
     // create a new company
     [HttpPost]
     public async Task<ActionResult<Company>> CreateCompany(Company company)
@@ -42,7 +43,7 @@ public class CompanyController : ControllerBase
         var createdCompany = await _companyService.CreateCompanyAsync(company);
         return CreatedAtAction(nameof(GetCompanyById), new { companyId = createdCompany.CompanyId }, createdCompany);
     }
-    
+
     // update an existing company
     [HttpPut("{companyId}")]
     public async Task<ActionResult<Company>> UpdateCompany(int companyId, Company company)
@@ -55,7 +56,7 @@ public class CompanyController : ControllerBase
         var updatedCompany = await _companyService.UpdateCompanyAsync(company);
         return Ok(updatedCompany);
     }
-    
+
     // delete a company
     [HttpDelete("{companyId}")]
     public async Task<IActionResult> DeleteCompany(int companyId)

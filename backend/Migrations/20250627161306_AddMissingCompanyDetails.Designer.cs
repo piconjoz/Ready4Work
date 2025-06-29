@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using backend.Data;
 
@@ -10,9 +11,11 @@ using backend.Data;
 namespace backend.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250627161306_AddMissingCompanyDetails")]
+    partial class AddMissingCompanyDetails
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -124,51 +127,6 @@ namespace backend.Migrations
                         .IsUnique();
 
                     b.ToTable("Companies");
-                });
-
-            modelBuilder.Entity("backend.Components.User.Models.RefreshToken", b =>
-                {
-                    b.Property<int>("RefreshTokenId")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int")
-                        .HasColumnName("refresh_token_id");
-
-                    b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("datetime(6)")
-                        .HasColumnName("created_at");
-
-                    b.Property<DateTime>("ExpiresAt")
-                        .HasColumnType("datetime(6)")
-                        .HasColumnName("expires_at");
-
-                    b.Property<bool>("IsRevoked")
-                        .HasColumnType("tinyint(1)")
-                        .HasColumnName("is_revoked");
-
-                    b.Property<DateTime?>("RevokedAt")
-                        .HasColumnType("datetime(6)")
-                        .HasColumnName("revoked_at");
-
-                    b.Property<string>("Token")
-                        .IsRequired()
-                        .HasMaxLength(255)
-                        .HasColumnType("varchar(255)")
-                        .HasColumnName("token");
-
-                    b.Property<int>("UserId")
-                        .HasColumnType("int")
-                        .HasColumnName("user_id");
-
-                    b.HasKey("RefreshTokenId");
-
-                    b.HasIndex("ExpiresAt");
-
-                    b.HasIndex("Token")
-                        .IsUnique();
-
-                    b.HasIndex("UserId");
-
-                    b.ToTable("RefreshTokens");
                 });
 
             modelBuilder.Entity("backend.User.Models.Admin", b =>
@@ -319,6 +277,12 @@ namespace backend.Migrations
                         .HasColumnType("varchar(100)")
                         .HasColumnName("last_name");
 
+                    b.Property<string>("NRIC")
+                        .IsRequired()
+                        .HasMaxLength(20)
+                        .HasColumnType("varchar(20)")
+                        .HasColumnName("nric");
+
                     b.Property<string>("PasswordHash")
                         .IsRequired()
                         .HasMaxLength(255)
@@ -354,16 +318,10 @@ namespace backend.Migrations
                     b.HasIndex("Email")
                         .IsUnique();
 
-                    b.ToTable("Users");
-                });
+                    b.HasIndex("NRIC")
+                        .IsUnique();
 
-            modelBuilder.Entity("backend.Components.User.Models.RefreshToken", b =>
-                {
-                    b.HasOne("backend.User.Models.User", null)
-                        .WithMany()
-                        .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                    b.ToTable("Users");
                 });
 
             modelBuilder.Entity("backend.User.Models.Admin", b =>
