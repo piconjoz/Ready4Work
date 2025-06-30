@@ -1,6 +1,8 @@
 namespace backend.User.Controllers;
 
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Authorization;
+using System.Security.Claims;
 using backend.User.DTOs;
 using backend.User.Services.Interfaces;
 using System.ComponentModel.DataAnnotations;
@@ -37,16 +39,16 @@ public class AuthController : ControllerBase
             }
 
             var result = await _authService.SignupApplicantAsync(signupDto);
-            
+
             // Set refresh token in httpOnly cookie
             if (!string.IsNullOrEmpty(result.RefreshToken))
             {
                 SetRefreshTokenCookie(result.RefreshToken);
             }
-            
+
             // Don't send refresh token in response body
             result.RefreshToken = null;
-            
+
             return Ok(result);
         }
         catch (ArgumentException ex)
@@ -79,16 +81,16 @@ public class AuthController : ControllerBase
             }
 
             var result = await _authService.SignupRecruiterAsync(signupDto);
-            
+
             // Set refresh token in httpOnly cookie
             if (!string.IsNullOrEmpty(result.RefreshToken))
             {
                 SetRefreshTokenCookie(result.RefreshToken);
             }
-            
+
             // Don't send refresh token in response body
             result.RefreshToken = null;
-            
+
             return Ok(result);
         }
         catch (ArgumentException ex)
@@ -105,6 +107,102 @@ public class AuthController : ControllerBase
         }
     }
 
+    [HttpPost("signup/admin")]
+    [Authorize] // Require authentication
+    public async Task<ActionResult<AuthResponseDTO>> SignupAdmin([FromBody] AdminSignupDTO signupDto)
+    {
+        try
+        {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+
+            // SECURITY: Only existing admins can create new admins
+            var currentUserType = GetUserTypeFromToken();
+            if (currentUserType != 3)
+            {
+                return Forbid("Access denied: Only admins can create new admin accounts");
+            }
+
+            var result = await _authService.SignupAdminAsync(signupDto);
+
+            if (!string.IsNullOrEmpty(result.RefreshToken))
+            {
+                SetRefreshTokenCookie(result.RefreshToken);
+            }
+
+            result.RefreshToken = null;
+
+            return Ok(result);
+        }
+        catch (ArgumentException ex)
+        {
+            return BadRequest(new { message = ex.Message });
+        }
+        catch (InvalidOperationException ex)
+        {
+            return Conflict(new { message = ex.Message });
+        }
+        catch (Exception ex)
+        {
+            return StatusCode(500, new { message = "An error occurred during admin registration" });
+        }
+    }
+
+    // POST /api/auth/signup/admin/system
+    // SUPER RESTRICTED: Only for system initialization or super admins
+    [HttpPost("signup/admin/system")]
+    public async Task<ActionResult<AuthResponseDTO>> SignupSystemAdmin([FromBody] AdminSignupDTO signupDto)
+    {
+        try
+        {
+            // SECURITY: Add additional checks here
+            // In production, you might want to:
+            // 1. Check for a special system key
+            // 2. Only allow this during initial setup
+            // 3. Disable this endpoint entirely after initial setup
+
+            // For now, let's check if any admins exist
+            // If admins exist, this endpoint should be disabled
+            var adminService = HttpContext.RequestServices.GetRequiredService<IAdminService>();
+            var existingAdmins = await adminService.GetAllAdminsAsync();
+
+            if (existingAdmins.Any())
+            {
+                return Forbid("System admin creation is disabled. Admin accounts already exist.");
+            }
+
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+
+            var result = await _authService.SignupAdminAsync(signupDto);
+
+            if (!string.IsNullOrEmpty(result.RefreshToken))
+            {
+                SetRefreshTokenCookie(result.RefreshToken);
+            }
+
+            result.RefreshToken = null;
+
+            return Ok(result);
+        }
+        catch (ArgumentException ex)
+        {
+            return BadRequest(new { message = ex.Message });
+        }
+        catch (InvalidOperationException ex)
+        {
+            return Conflict(new { message = ex.Message });
+        }
+        catch (Exception ex)
+        {
+            return StatusCode(500, new { message = "An error occurred during system admin registration" });
+        }
+    }
+
     // POST /api/auth/login
     // unified login for all user types
     [HttpPost("login")]
@@ -118,16 +216,16 @@ public class AuthController : ControllerBase
             }
 
             var result = await _authService.LoginAsync(loginDto);
-            
+
             // Set refresh token in httpOnly cookie
             if (!string.IsNullOrEmpty(result.RefreshToken))
             {
                 SetRefreshTokenCookie(result.RefreshToken);
             }
-            
+
             // Don't send refresh token in response body
             result.RefreshToken = null;
-            
+
             return Ok(result);
         }
         catch (UnauthorizedAccessException ex)
@@ -227,7 +325,7 @@ public class AuthController : ControllerBase
             }
 
             var isValid = await _authService.ValidateTokenAsync(request.Token);
-        
+
             if (!isValid)
             {
                 return Ok(new { isValid = false });
@@ -245,9 +343,10 @@ public class AuthController : ControllerBase
             {
                 return Ok(new { isValid = false });
             }
-        
-            return Ok(new { 
-                isValid = true, 
+
+            return Ok(new
+            {
+                isValid = true,
                 userType = user.GetUserType(),
                 userId = user.GetUserId(),
                 email = user.GetEmail(),
@@ -318,6 +417,16 @@ public class AuthController : ControllerBase
         }
     }
 
+    private int? GetUserTypeFromToken()
+    {
+    var userTypeClaim = User.FindFirst("user_type");
+    if (userTypeClaim != null && int.TryParse(userTypeClaim.Value, out int userType))
+        {
+        return userType;
+        }
+    return null;
+    }
+
     // Helper method to set refresh token in httpOnly cookie
     private void SetRefreshTokenCookie(string refreshToken)
     {
@@ -333,6 +442,7 @@ public class AuthController : ControllerBase
         Response.Cookies.Append("refreshToken", refreshToken, cookieOptions);
     }
 }
+
 
 // helper dto for token requests
 public class RefreshTokenRequest

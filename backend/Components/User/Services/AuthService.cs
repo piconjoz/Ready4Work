@@ -11,6 +11,7 @@ public class AuthService : IAuthService
     private readonly IUserService _userService;
     private readonly IApplicantService _applicantService;
     private readonly IRecruiterService _recruiterService;
+    private readonly IAdminService _adminService; 
     private readonly IJWTService _jwtService;
     private readonly ICompanyService _companyService;
     private readonly IPasswordService _passwordService;
@@ -21,6 +22,7 @@ public class AuthService : IAuthService
         IUserService userService,
         IApplicantService applicantService,
         IRecruiterService recruiterService,
+        IAdminService adminService,
         IJWTService jwtService,
         ICompanyService companyService,
         IPasswordService passwordService,
@@ -30,6 +32,7 @@ public class AuthService : IAuthService
         _userService = userService;
         _applicantService = applicantService;
         _recruiterService = recruiterService;
+        _adminService = adminService;
         _jwtService = jwtService;
         _companyService = companyService;
         _passwordService = passwordService;
@@ -120,6 +123,41 @@ public class AuthService : IAuthService
             RefreshToken = refreshToken
         };
     }
+    
+    public async Task<AuthResponseDTO> SignupAdminAsync(AdminSignupDTO signupDto)
+    {
+        if (signupDto == null) throw new ArgumentNullException(nameof(signupDto));
+
+        // step 1: create user record (usertype = 3 for admin)
+        var user = await _userService.CreateUserAsync(
+            signupDto.Email,
+            signupDto.FirstName,
+            signupDto.LastName,
+            signupDto.Phone,
+            signupDto.Gender,
+            3, // admin user type
+            signupDto.Password
+        );
+
+        // step 2: create admin profile linked to user
+        var admin = await _adminService.CreateAdminAsync(user.GetUserId());
+
+        // step 3: revoke any existing tokens
+        await _refreshTokenService.RevokeAllUserTokensAsync(user.GetUserId());
+
+        // step 4: generate both access and refresh tokens
+        var accessToken = _jwtService.GenerateToken(user.GetUserId(), user.GetUserType());
+        var refreshToken = await _refreshTokenService.GenerateRefreshTokenAsync(user.GetUserId());
+
+        // step 5: return complete auth response
+        return new AuthResponseDTO
+        {
+            Token = accessToken,
+            ExpiresAt = DateTime.UtcNow.AddMinutes(15),
+            User = _userService.ConvertToResponseDTO(user),
+            RefreshToken = refreshToken
+        };
+    }
 
     // handles login for all user types (applicant, recruiter, admin)
     // validates credentials and returns jwt token + refresh token
@@ -127,12 +165,10 @@ public class AuthService : IAuthService
     {
         Console.WriteLine("DEBUG: Login method started");
     
-        // validate input dto
         if (loginDto == null) throw new ArgumentNullException(nameof(loginDto));
     
         Console.WriteLine($"DEBUG: Attempting to authenticate user: {loginDto.Email}");
     
-        // step 1: authenticate user credentials
         var user = await _userService.AuthenticateUserAsync(loginDto.Email, loginDto.Password);
         if (user == null)
         {
@@ -142,7 +178,6 @@ public class AuthService : IAuthService
     
         Console.WriteLine($"DEBUG: User authenticated successfully, UserID: {user.GetUserId()}");
     
-        // step 2: check if user account is active and verified
         if (!user.GetIsActive())
         {
             Console.WriteLine("DEBUG: User account is not active");
@@ -151,12 +186,10 @@ public class AuthService : IAuthService
     
         Console.WriteLine("DEBUG: About to revoke existing tokens");
     
-        // step 3: revoke all existing refresh tokens for this user (single session enforcement)
         await _refreshTokenService.RevokeAllUserTokensAsync(user.GetUserId());
     
         Console.WriteLine("DEBUG: Tokens revoked, generating new tokens");
     
-        // step 4: generate both access and refresh tokens
         var accessToken = _jwtService.GenerateToken(user.GetUserId(), user.GetUserType());
         Console.WriteLine("DEBUG: Access token generated");
     
@@ -165,7 +198,6 @@ public class AuthService : IAuthService
     
         Console.WriteLine("DEBUG: Login completed successfully");
     
-        // step 5: return auth response with both tokens
         return new AuthResponseDTO
         {
             Token = accessToken,

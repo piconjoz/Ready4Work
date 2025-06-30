@@ -7,6 +7,7 @@ public interface IAuthService
     // signup methods - separate endpoints for security
     Task<AuthResponseDTO> SignupApplicantAsync(ApplicantSignupDTO signupDto);
     Task<AuthResponseDTO> SignupRecruiterAsync(RecruiterSignupDTO signupDto);
+    Task<AuthResponseDTO> SignupAdminAsync(AdminSignupDTO signupDto); 
 
     // login method - unified for all user types
     Task<AuthResponseDTO> LoginAsync(LoginDTO loginDto);
