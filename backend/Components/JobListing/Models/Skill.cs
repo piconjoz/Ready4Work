@@ -14,9 +14,8 @@ namespace backend.Components.JobListing.Models
 
         private Skill() { }
 
-        internal Skill(int skillId, string skill_name)
+        internal Skill(string skill_name)
         {
-            SkillId = skillId;
             skill = skill_name;
         }
 
@@ -25,7 +24,7 @@ namespace backend.Components.JobListing.Models
         internal string GetSkill() => skill;
 
         // Setter
-        internal void SetSkillId(int skillId) => SkillId = skillId;
+        // internal void SetSkillId(int skillId) => SkillId = skillId;
         internal void SetSkill(string skill_name) => skill = skill_name;
 
     }

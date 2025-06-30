@@ -14,7 +14,7 @@ public class SkillRepository : ISkillRepository
         _context = context;
     }
 
-    public async Task<List<Skill>> GetAllSkillsListings()
+    public async Task<List<Skill>> GetAllSkillsAsync()
     {
         return await _context.Skills.ToListAsync();
     }
@@ -50,10 +50,10 @@ public class SkillRepository : ISkillRepository
         return true;
     }
 
-    public Task<List<Skill>> GetAllJobListingsAsync()
-    {
-        throw new NotImplementedException();
-    }
+    // public Task<List<Skill>> GetAllJobListingsAsync()
+    // {
+    //     throw new NotImplementedException();
+    // }
 
     // other related functions go here
 }
