@@ -19,9 +19,10 @@ namespace backend.Components.JobListing.Models
 
         private Qualification() { }
 
-        internal Qualification(int qualification_id)
+        internal Qualification(int programmeId, int jobId)
         {
-            QualificationId = qualification_id;
+            ProgrammeId = programmeId;
+            JobId = jobId;
         }
 
         // Getter

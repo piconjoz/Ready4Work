@@ -14,7 +14,7 @@ public class QualificationRepository : IQualificationRepository
         _context = context;
     }
 
-    public async Task<List<Qualification>> GetAllQualificationListings()
+    public async Task<List<Qualification>> GetAllQualificationsAsync()
     {
         return await _context.Qualifications.ToListAsync();
     }
@@ -49,11 +49,5 @@ public class QualificationRepository : IQualificationRepository
         await _context.SaveChangesAsync();
         return true;
     }
-
-    public Task<List<Qualification>> GetAllQualificationListingsAsync()
-    {
-        throw new NotImplementedException();
-    }
-
     // other related functions go here
 }

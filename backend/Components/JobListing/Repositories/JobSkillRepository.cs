@@ -14,7 +14,7 @@ public class JobSkillRepository : IJobSkillRepository
         _context = context;
     }
 
-    public async Task<List<JobSkill>> GetAllJobSkillsListings()
+    public async Task<List<JobSkill>> GetAllJobSkillsAsync()
     {
         return await _context.JobSkills.ToListAsync();
     }
@@ -49,11 +49,5 @@ public class JobSkillRepository : IJobSkillRepository
         await _context.SaveChangesAsync();
         return true;
     }
-
-    public Task<List<JobSkill>> GetAllJobListingsAsync()
-    {
-        throw new NotImplementedException();
-    }
-
     // other related functions go here
 }

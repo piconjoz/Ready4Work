@@ -14,7 +14,7 @@ public class ProgrammeRepository : IProgrammeRepository
         _context = context;
     }
 
-    public async Task<List<Programme>> GetAllProgrammesListings()
+    public async Task<List<Programme>> GetAllProgrammesAsync()
     {
         return await _context.Programmes.ToListAsync();
     }
@@ -49,11 +49,5 @@ public class ProgrammeRepository : IProgrammeRepository
         await _context.SaveChangesAsync();
         return true;
     }
-
-    public Task<List<Programme>> GetAllJobListingsAsync()
-    {
-        throw new NotImplementedException();
-    }
-
     // other related functions go here
 }

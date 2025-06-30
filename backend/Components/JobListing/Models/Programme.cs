@@ -14,9 +14,8 @@ namespace backend.Components.JobListing.Models
 
         private Programme() { }
 
-        internal Programme(int programme_id, string programme_name)
+        internal Programme(string programme_name)
         {
-            ProgrammeId = programme_id;
             ProgrammeName = programme_name;
         }
 

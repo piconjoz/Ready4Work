@@ -4,7 +4,7 @@ using backend.Components.JobListing.Models;
 
 public interface IQualificationRepository
 {
-    Task<List<Qualification>> GetAllQualificationListings();
+    Task<List<Qualification>> GetAllQualificationsAsync();
     Task<Qualification?> GetQualificationByIdAsync(int qualificationId);
     Task<Qualification> CreateAsync(Qualification qualification);
     Task<Qualification> UpdateAsync(Qualification qualification);
