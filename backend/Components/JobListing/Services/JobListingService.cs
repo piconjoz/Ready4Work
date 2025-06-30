@@ -34,6 +34,7 @@ public class JobListingService : IJobListingService
     // retrieve
     public async Task<JobListing?> GetJobListingByIdAsync(int jobId)
     {
+        // check if id is valild
         if (jobId <= 0) return null;
         return await _jobListingRepository.GetJobListingByIdAsync(jobId);
     }
@@ -72,6 +73,12 @@ public class JobListingService : IJobListingService
     {
         if (jobId <= 0) return false;
         return await _jobListingRepository.DeleteAsync(jobId);
+    }
+
+    // retrieve all
+    public async Task<List<JobListing>> GetAllJobListingAsync()
+    {
+        return await _jobListingRepository.GetAllJobListingsAsync();
     }
 
     // Other business logics handle here

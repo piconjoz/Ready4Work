@@ -45,6 +45,19 @@ public class SkillService //: ISkillService
         skill.SetSkill(skillName);
         return await _skillRepository.UpdateAsync(skill);
     }
+
     // delete
+    public async Task<bool> DeleteSkillByIdAsync(int skillId)
+    {
+        if (skillId <= 0) return false;
+        return await _skillRepository.DeleteAsync(skillId);
+    }
+
     // retrieve all
+    public async Task<List<Skill>> GetAllSkillsAsync()
+    {
+        return await _skillRepository.GetAllSkillsAsync();
+    }
+
+    // Other business logics handle here
 }

@@ -19,5 +19,5 @@ public class JobListingController : ControllerBase
     }
 
     // GET /api/jobListing/details
-    // 
+    // Get all job listing details to for admin
 }

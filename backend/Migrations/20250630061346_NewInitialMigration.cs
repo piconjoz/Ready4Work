@@ -7,7 +7,7 @@ using MySql.EntityFrameworkCore.Metadata;
 namespace backend.Migrations
 {
     /// <inheritdoc />
-    public partial class Initial : Migration
+    public partial class NewInitialMigration : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -48,6 +48,20 @@ namespace backend.Migrations
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_Companies", x => x.CompanyId);
+                })
+                .Annotation("MySQL:Charset", "utf8mb4");
+
+            migrationBuilder.CreateTable(
+                name: "JobSchemes",
+                columns: table => new
+                {
+                    scheme_id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("MySQL:ValueGenerationStrategy", MySQLValueGenerationStrategy.IdentityColumn),
+                    scheme_name = table.Column<string>(type: "varchar(50)", maxLength: 50, nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_JobSchemes", x => x.scheme_id);
                 })
                 .Annotation("MySQL:Charset", "utf8mb4");
 
@@ -321,6 +335,12 @@ namespace backend.Migrations
                 column: "recruiter_id");
 
             migrationBuilder.CreateIndex(
+                name: "IX_JobSchemes_scheme_name",
+                table: "JobSchemes",
+                column: "scheme_name",
+                unique: true);
+
+            migrationBuilder.CreateIndex(
                 name: "IX_JobSkills_job_id",
                 table: "JobSkills",
                 column: "job_id");
@@ -382,6 +402,9 @@ namespace backend.Migrations
 
             migrationBuilder.DropTable(
                 name: "Applicants");
+
+            migrationBuilder.DropTable(
+                name: "JobSchemes");
 
             migrationBuilder.DropTable(
                 name: "JobSkills");

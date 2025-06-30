@@ -104,8 +104,9 @@ public class JobListing
     internal DateTime GetCreatedAt() => CreatedAt;
     internal DateTime GetUpdatedAt() => UpdatedAt;
 
-    // setter
-    internal void SetJobId(int jobId) => JobId = jobId;
+    // setters
+    // for security cannot modify JobId and RecruiterId for access control
+    // internal void SetJobId(int jobId) => JobId = jobId;
     // internal void SetRecruiterId(int recruiterId) => RecruiterId = recruiterId;
     internal void SetJobRequirements(string jobRequirements) => JobRequirements = jobRequirements;
     internal void SetJobDescription(string jobDesription) => JobDescription = jobDesription;

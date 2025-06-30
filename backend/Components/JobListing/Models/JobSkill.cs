@@ -19,17 +19,18 @@ namespace backend.Components.JobListing.Models
 
         private JobSkill() { }
 
-        internal JobSkill(int skill_Id)
+        internal JobSkill(int skill_Id, int job_id)
         {
             SkillId = skill_Id;
+            JobId = job_id;
         }
 
-        // Setter
+        // Getter
         internal int GetJobSkillId() => JobSkillId;
         internal int GetJobId() => JobId;
         internal int GetSkillId() => SkillId;
 
-        // Getter 
+        // Setter
         internal void SetJobSkillId(int jobSkillId) => JobSkillId = jobSkillId;
     }
 }

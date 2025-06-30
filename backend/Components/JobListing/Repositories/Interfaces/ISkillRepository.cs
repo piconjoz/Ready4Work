@@ -4,7 +4,7 @@ using backend.Components.JobListing.Models;
 
 public interface ISkillRepository
 {
-    Task<List<Skill>> GetAllSkillsListings();
+    Task<List<Skill>> GetAllSkillsAsync();
     Task<Skill?> GetSkillByIdAsync(int skillId);
     Task<Skill> CreateAsync(Skill skill);
     Task<Skill> UpdateAsync(Skill skill);

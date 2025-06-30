@@ -300,12 +300,14 @@ public class ApplicationDbContext : DbContext
                 .OnDelete(DeleteBehavior.Cascade);
         });
 
+        // Skills entity
         modelBuilder.Entity<Skill>(entity =>
         {
             entity.HasKey("SkillId");
             entity.Property("skill").HasColumnName("skill");
         });
 
+        // Programme entity
         modelBuilder.Entity<Programme>(entity =>
         {
             entity.HasKey("ProgrammeId");
@@ -364,6 +366,6 @@ public class ApplicationDbContext : DbContext
             entity.HasIndex("SchemeName").IsUnique();
         });
         
-        
+
     }
 }
