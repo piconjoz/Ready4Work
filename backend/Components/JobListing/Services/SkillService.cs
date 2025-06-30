@@ -3,7 +3,7 @@ namespace backend.Components.JobListing.Services;
 using backend.Components.JobListing.Models;
 using backend.Components.JobListing.Repositories.Interfaces;
 
-public class SkillService //: ISkillService
+public class SkillService : ISkillService
 {
     private readonly ISkillRepository _skillRepository;
 
