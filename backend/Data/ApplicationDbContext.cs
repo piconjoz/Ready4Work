@@ -24,7 +24,7 @@ public class ApplicationDbContext : DbContext
         public DbSet<JobSkill> JobSkills { get; set; }
         public DbSet<Qualification> Qualifications { get; set; }
 
-
+        public DbSet<JobScheme> JobSchemes { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -348,5 +348,22 @@ public class ApplicationDbContext : DbContext
                 .OnDelete(DeleteBehavior.Cascade);
         });
 
+        // Add JobScheme configuration
+        modelBuilder.Entity<JobScheme>(entity =>
+        {
+            entity.HasKey("SchemeId");
+
+            entity.Property("SchemeId")
+                .HasColumnName("scheme_id");
+
+            entity.Property("SchemeName")
+                .IsRequired()
+                .HasMaxLength(50)
+                .HasColumnName("scheme_name");
+
+            entity.HasIndex("SchemeName").IsUnique();
+        });
+        
+        
     }
-    }
+}
