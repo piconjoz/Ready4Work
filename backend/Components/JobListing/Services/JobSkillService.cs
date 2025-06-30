@@ -2,8 +2,9 @@ namespace backend.Components.JobListing.Services;
 
 using backend.Components.JobListing.Models;
 using backend.Components.JobListing.Repositories.Interfaces;
+using backend.Components.JobListing.Services.Interfaces;
 
-public class JobSkillService //: IJobSkillService
+public class JobSkillService : IJobSkillService
 {
     private readonly IJobSkillRepository _jobSkillRepository;
     private readonly ISkillRepository _skillRepository;
@@ -61,6 +62,6 @@ public class JobSkillService //: IJobSkillService
     //retrieve all
     public async Task<List<JobSkill>> GetAllJobSkillAsync()
     {
-        return await _jobSkillRepository.GetAllJobSkillsListings();
+        return await _jobSkillRepository.GetAllJobSkillsAsync();
     }
 }
