@@ -16,8 +16,51 @@ namespace backend.Migrations
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "8.0.8")
+                .HasAnnotation("ProductVersion", "8.0.11")
                 .HasAnnotation("Relational:MaxIdentifierLength", 64);
+
+            modelBuilder.Entity("backend.Components.Application.Models.JobApplication", b =>
+                {
+                    b.Property<int>("ApplicationId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasColumnName("application_id");
+
+                    b.Property<int>("ApplicantId")
+                        .HasColumnType("int")
+                        .HasColumnName("applicant_id");
+
+                    b.Property<DateTime>("AppliedDate")
+                        .HasColumnType("datetime(6)")
+                        .HasColumnName("applied_date");
+
+                    b.Property<int>("CoverLetterId")
+                        .HasColumnType("int")
+                        .HasColumnName("cover_letter_id");
+
+                    b.Property<int>("JobListingId")
+                        .HasColumnType("int")
+                        .HasColumnName("job_listing_id");
+
+                    b.Property<string>("Status")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("varchar(50)")
+                        .HasColumnName("status");
+
+                    b.Property<DateTime>("UpdatedAt")
+                        .HasColumnType("datetime(6)")
+                        .HasColumnName("updated_at");
+
+                    b.HasKey("ApplicationId");
+
+                    b.HasIndex("CoverLetterId");
+
+                    b.HasIndex("ApplicantId", "JobListingId")
+                        .IsUnique();
+
+                    b.ToTable("JobApplications");
+                });
 
             modelBuilder.Entity("backend.Components.Company.Models.Company", b =>
                 {
@@ -124,6 +167,86 @@ namespace backend.Migrations
                         .IsUnique();
 
                     b.ToTable("Companies");
+                });
+
+            modelBuilder.Entity("backend.Components.CoverLetter.Models.CoverLetter", b =>
+                {
+                    b.Property<int>("CoverLetterId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasColumnName("cover_letter_id");
+
+                    b.Property<int>("ApplicantId")
+                        .HasColumnType("int")
+                        .HasColumnName("applicant_id");
+
+                    b.Property<string>("ContentType")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("varchar(50)")
+                        .HasColumnName("content_type");
+
+                    b.Property<string>("CoverLetterPath")
+                        .IsRequired()
+                        .HasMaxLength(1000)
+                        .HasColumnType("varchar(1000)")
+                        .HasColumnName("cover_letter_path");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime(6)")
+                        .HasColumnName("created_at");
+
+                    b.Property<long>("FileSize")
+                        .HasColumnType("bigint")
+                        .HasColumnName("file_size");
+
+                    b.Property<string>("OriginalText")
+                        .IsRequired()
+                        .HasColumnType("longtext")
+                        .HasColumnName("original_text");
+
+                    b.Property<DateTime>("UpdatedAt")
+                        .HasColumnType("datetime(6)")
+                        .HasColumnName("updated_at");
+
+                    b.HasKey("CoverLetterId");
+
+                    b.HasIndex("ApplicantId");
+
+                    b.ToTable("CoverLetters");
+                });
+
+            modelBuilder.Entity("backend.Components.Resume.Models.Resume", b =>
+                {
+                    b.Property<int>("ResumeId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasColumnName("resume_id");
+
+                    b.Property<int>("ApplicantId")
+                        .HasColumnType("int")
+                        .HasColumnName("applicant_id");
+
+                    b.Property<string>("ResumePath")
+                        .IsRequired()
+                        .HasMaxLength(1000)
+                        .HasColumnType("varchar(1000)")
+                        .HasColumnName("resume_path");
+
+                    b.Property<string>("ResumeText")
+                        .IsRequired()
+                        .HasColumnType("longtext")
+                        .HasColumnName("resume_text");
+
+                    b.Property<DateTime>("UploadedAt")
+                        .HasColumnType("datetime(6)")
+                        .HasColumnName("uploaded_at");
+
+                    b.HasKey("ResumeId");
+
+                    b.HasIndex("ApplicantId");
+
+                    b.ToTable("Resumes");
                 });
 
             modelBuilder.Entity("backend.Components.User.Models.RefreshToken", b =>
@@ -355,6 +478,43 @@ namespace backend.Migrations
                         .IsUnique();
 
                     b.ToTable("Users");
+                });
+
+            modelBuilder.Entity("backend.Components.Application.Models.JobApplication", b =>
+                {
+                    b.HasOne("backend.User.Models.Applicant", "Applicant")
+                        .WithMany()
+                        .HasForeignKey("ApplicantId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("backend.Components.CoverLetter.Models.CoverLetter", "CoverLetter")
+                        .WithMany()
+                        .HasForeignKey("CoverLetterId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("Applicant");
+
+                    b.Navigation("CoverLetter");
+                });
+
+            modelBuilder.Entity("backend.Components.CoverLetter.Models.CoverLetter", b =>
+                {
+                    b.HasOne("backend.User.Models.Applicant", null)
+                        .WithMany()
+                        .HasForeignKey("ApplicantId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("backend.Components.Resume.Models.Resume", b =>
+                {
+                    b.HasOne("backend.User.Models.Applicant", null)
+                        .WithMany()
+                        .HasForeignKey("ApplicantId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
                 });
 
             modelBuilder.Entity("backend.Components.User.Models.RefreshToken", b =>

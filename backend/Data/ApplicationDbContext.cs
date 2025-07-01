@@ -1,8 +1,13 @@
+// backend/Data/ApplicationDbContext.cs
 namespace backend.Data;
 
 using Microsoft.EntityFrameworkCore;
 using backend.Components.Company.Models;
+using backend.Components.Application.Models;
+using backend.Components.CoverLetter.Models;
 using backend.User.Models;
+using backend.Components.Resume.Models;
+using backend.Components.Bookmark.Models;
 using backend.Components.User.Models;
 
 public class ApplicationDbContext : DbContext
@@ -17,6 +22,10 @@ public class ApplicationDbContext : DbContext
     public DbSet<Applicant> Applicants { get; set; }
     public DbSet<Recruiter> Recruiters { get; set; }
     public DbSet<RefreshToken> RefreshTokens { get; set; }
+    public DbSet<JobApplication> JobApplications { get; set; }
+    public DbSet<CoverLetter> CoverLetters { get; set; }  // Add CoverLetter DbSet
+    public DbSet<Resume> Resumes { get; set; }
+    public DbSet<Bookmark> Bookmarks { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -228,6 +237,83 @@ public class ApplicationDbContext : DbContext
             entity.HasIndex("UserId");
             entity.HasIndex("Token").IsUnique();
             entity.HasIndex("ExpiresAt");
+        });
+
+        // Configure CoverLetter entity
+        modelBuilder.Entity<CoverLetter>(entity =>
+        {
+            entity.HasKey(e => e.CoverLetterId);
+            entity.Property(e => e.CoverLetterId).HasColumnName("cover_letter_id");
+            entity.Property(e => e.ApplicantId).IsRequired().HasColumnName("applicant_id");
+            entity.Property(e => e.CoverLetterPath).IsRequired().HasMaxLength(1000).HasColumnName("cover_letter_path");
+            entity.Property(e => e.OriginalText).HasColumnName("original_text");
+            entity.Property(e => e.FileSize).HasColumnName("file_size");
+            entity.Property(e => e.ContentType).HasMaxLength(50).HasColumnName("content_type");
+            entity.Property(e => e.CreatedAt).HasColumnName("created_at");
+            entity.Property(e => e.UpdatedAt).HasColumnName("updated_at");
+
+            // Foreign key to Applicant
+            entity.HasOne<Applicant>()
+                  .WithMany()
+                  .HasForeignKey("ApplicantId")
+                  .OnDelete(DeleteBehavior.Cascade);
+
+            entity.HasIndex(e => e.ApplicantId);
+        });
+
+        // Configure JobApplication entity with updated relationships
+        modelBuilder.Entity<JobApplication>(entity =>
+        {
+            entity.HasKey("ApplicationId");
+            entity.Property("ApplicantId").IsRequired().HasColumnName("applicant_id");
+            entity.Property("JobListingId").IsRequired().HasColumnName("job_listing_id");
+            entity.Property("CoverLetterId").IsRequired().HasColumnName("cover_letter_id");
+            entity.Property("Status").IsRequired().HasMaxLength(50).HasColumnName("status");
+            entity.Property("AppliedDate").HasColumnName("applied_date");
+            entity.Property("UpdatedAt").HasColumnName("updated_at");
+
+            // Foreign key to Applicant
+            entity.HasOne<Applicant>("Applicant")
+                  .WithMany()
+                  .HasForeignKey("ApplicantId")
+                  .OnDelete(DeleteBehavior.Cascade);
+
+            // Foreign key to CoverLetter
+            entity.HasOne<CoverLetter>("CoverLetter")
+                  .WithMany()
+                  .HasForeignKey("CoverLetterId")
+                  .OnDelete(DeleteBehavior.Restrict);  // Don't cascade delete cover letters
+
+            entity.HasIndex("ApplicantId", "JobListingId").IsUnique(); // Prevent duplicate applications
+            entity.HasIndex("CoverLetterId");
+        });
+
+        modelBuilder.Entity<Resume>(entity =>
+        {
+            entity.HasKey(e => e.ResumeId);
+            entity.Property(e => e.ResumeId).HasColumnName("resume_id");
+            entity.Property(e => e.ApplicantId).IsRequired().HasColumnName("applicant_id");
+            entity.Property(e => e.ResumePath).IsRequired().HasMaxLength(1000).HasColumnName("resume_path");
+            entity.Property(e => e.ResumeText).IsRequired().HasColumnName("resume_text");
+            entity.Property(e => e.UploadedAt).IsRequired().HasColumnName("uploaded_at");
+
+            entity.HasOne<Applicant>()
+                  .WithMany()
+                  .HasForeignKey("ApplicantId")
+                  .OnDelete(DeleteBehavior.Cascade);
+
+            entity.HasIndex(e => e.ApplicantId);
+        });
+
+        // Configure Bookmark entity
+        modelBuilder.Entity<Bookmark>(entity =>
+        {
+            entity.HasKey(e => e.BookmarkId);
+            entity.Property(e => e.BookmarkId).HasColumnName("bookmark_id");
+            entity.Property(e => e.ApplicantId).IsRequired().HasColumnName("applicant_id");
+            entity.Property(e => e.JobsId).IsRequired().HasColumnName("jobs_id");
+            entity.Property(e => e.CreatedAt).HasColumnName("created_at");
+            entity.HasIndex(e => new { e.ApplicantId, e.JobsId }).IsUnique();
         });
     }
 }
