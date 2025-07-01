@@ -8,8 +8,14 @@ using backend.Components.CoverLetter.Models;
 using backend.User.Models;
 using backend.Components.Resume.Models;
 using backend.Components.Bookmark.Models;
-using backend.Components.User.Models;
 using backend.Components.JobListing.Models;
+using backend.Components.User.Models;
+using backend.Components.Skill.Models;
+using backend.Components.JobScheme.Models;
+using backend.Components.RemunerationType.Models;
+using backend.Components.Programme.Models;
+using backend.Components.Qualification.Models;
+using backend.Components.JobSkill.Models;
 
 public class ApplicationDbContext : DbContext
     {
@@ -32,8 +38,8 @@ public class ApplicationDbContext : DbContext
         public DbSet<Programme> Programmes { get; set; }
         public DbSet<JobSkill> JobSkills { get; set; }
         public DbSet<Qualification> Qualifications { get; set; }
-
         public DbSet<JobScheme> JobSchemes { get; set; }
+        public DbSet<RemunerationType> RemunerationTypes { get; set;}
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -350,7 +356,7 @@ public class ApplicationDbContext : DbContext
             entity.Property("IsVisible")
                 .HasColumnName("is_visible");
 
-            entity.Property("RenumerationType")
+            entity.Property("RemunerationType")
                 .HasColumnName("renumeration_type");
 
             entity.Property("JobDuration")
@@ -451,7 +457,23 @@ public class ApplicationDbContext : DbContext
 
             entity.HasIndex("SchemeName").IsUnique();
         });
-        
+
+        // Add RemunerationType entity
+        modelBuilder.Entity<RemunerationType>(entity =>
+        {
+            entity.HasKey("RemunerationId");
+
+            entity.Property("RemunerationId")
+                .HasColumnName("remnmeration_id");
+
+            entity.Property("Type")
+                .IsRequired()
+                .HasMaxLength(20)
+                .HasColumnName("type");
+
+            entity.HasIndex("Type").IsUnique();
+        });
+
 
     }
 }
