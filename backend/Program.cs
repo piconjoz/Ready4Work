@@ -19,17 +19,17 @@ using backend.Components.Resume.Repository;
 using backend.Components.Resume.Services;
 using backend.Components.Bookmark.Repository;
 using backend.Components.Bookmark.Services;
-
-DotNetEnv.Env.Load();
 using backend.Components.Company.Services.Interfaces;
-using backend.User.Repositories.Interfaces;
-using backend.User.Repositories;
-using backend.User.Services.Interfaces;
-using backend.User.Services;
+// using backend.User.Repositories.Interfaces;
+// using backend.User.Repositories;
+// using backend.User.Services.Interfaces;
+// using backend.User.Services;
 using backend.Components.User.Repositories.Interfaces;
 using backend.Components.User.Repositories;
 using backend.Components.User.Services;
 using backend.Components.User.Services.Interfaces;
+
+DotNetEnv.Env.Load();
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -52,8 +52,20 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
 // BACK TO IN-MEMORY DATABASE FOR DEVELOPMENT
+// builder.Services.AddDbContext<ApplicationDbContext>(options =>
+//     options.UseInMemoryDatabase("Ready4WorkTestDB"));
+
+// under appsettings.json, please change the relevant Default connections
+//   "ConnectionStrings": {
+//     "DefaultConnection": "server=localhost(usually, unless using outside connection);port=3306;database=YourDatabase;user=yourMySqlUser;password=yourMySqlPassword;"
+//   }
+// if possible, use a development appsetting to ensure your fields are not exposed
+// i.e. appsettings.Development.json
+// before running your dotnet migrations and build, run the following:
+// SET ASPNETCORE_ENVIRONMENT=Development
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
-    options.UseInMemoryDatabase("Ready4WorkTestDB"));
+    options.UseMySQL(builder.Configuration.GetConnectionString("DefaultConnection")));
+
 
 // COMMENT OUT MYSQL (MIGRATIONS ARE GENERATED, DON'T NEED IT FOR NOW)
 /*

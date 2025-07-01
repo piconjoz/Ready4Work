@@ -7,12 +7,28 @@ using MySql.EntityFrameworkCore.Metadata;
 namespace backend.Migrations
 {
     /// <inheritdoc />
-    public partial class NewInitialMigration : Migration
+    public partial class MergeJobListingAndCoverLetter : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.AlterDatabase()
+                .Annotation("MySQL:Charset", "utf8mb4");
+
+            migrationBuilder.CreateTable(
+                name: "Bookmarks",
+                columns: table => new
+                {
+                    bookmark_id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("MySQL:ValueGenerationStrategy", MySQLValueGenerationStrategy.IdentityColumn),
+                    applicant_id = table.Column<int>(type: "int", nullable: false),
+                    jobs_id = table.Column<int>(type: "int", nullable: false),
+                    created_at = table.Column<DateTime>(type: "datetime(6)", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Bookmarks", x => x.bookmark_id);
+                })
                 .Annotation("MySQL:Charset", "utf8mb4");
 
             migrationBuilder.CreateTable(
@@ -76,6 +92,20 @@ namespace backend.Migrations
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_Programmes", x => x.programme_id);
+                })
+                .Annotation("MySQL:Charset", "utf8mb4");
+
+            migrationBuilder.CreateTable(
+                name: "RemunerationTypes",
+                columns: table => new
+                {
+                    remnmeration_id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("MySQL:ValueGenerationStrategy", MySQLValueGenerationStrategy.IdentityColumn),
+                    type = table.Column<string>(type: "varchar(20)", maxLength: 20, nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_RemunerationTypes", x => x.remnmeration_id);
                 })
                 .Annotation("MySQL:Charset", "utf8mb4");
 
@@ -222,6 +252,55 @@ namespace backend.Migrations
                 .Annotation("MySQL:Charset", "utf8mb4");
 
             migrationBuilder.CreateTable(
+                name: "CoverLetters",
+                columns: table => new
+                {
+                    cover_letter_id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("MySQL:ValueGenerationStrategy", MySQLValueGenerationStrategy.IdentityColumn),
+                    applicant_id = table.Column<int>(type: "int", nullable: false),
+                    cover_letter_path = table.Column<string>(type: "varchar(1000)", maxLength: 1000, nullable: false),
+                    original_text = table.Column<string>(type: "longtext", nullable: false),
+                    file_size = table.Column<long>(type: "bigint", nullable: false),
+                    content_type = table.Column<string>(type: "varchar(50)", maxLength: 50, nullable: false),
+                    created_at = table.Column<DateTime>(type: "datetime(6)", nullable: false),
+                    updated_at = table.Column<DateTime>(type: "datetime(6)", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_CoverLetters", x => x.cover_letter_id);
+                    table.ForeignKey(
+                        name: "FK_CoverLetters_Applicants_applicant_id",
+                        column: x => x.applicant_id,
+                        principalTable: "Applicants",
+                        principalColumn: "applicant_id",
+                        onDelete: ReferentialAction.Cascade);
+                })
+                .Annotation("MySQL:Charset", "utf8mb4");
+
+            migrationBuilder.CreateTable(
+                name: "Resumes",
+                columns: table => new
+                {
+                    resume_id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("MySQL:ValueGenerationStrategy", MySQLValueGenerationStrategy.IdentityColumn),
+                    applicant_id = table.Column<int>(type: "int", nullable: false),
+                    resume_path = table.Column<string>(type: "varchar(1000)", maxLength: 1000, nullable: false),
+                    resume_text = table.Column<string>(type: "longtext", nullable: false),
+                    uploaded_at = table.Column<DateTime>(type: "datetime(6)", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Resumes", x => x.resume_id);
+                    table.ForeignKey(
+                        name: "FK_Resumes_Applicants_applicant_id",
+                        column: x => x.applicant_id,
+                        principalTable: "Applicants",
+                        principalColumn: "applicant_id",
+                        onDelete: ReferentialAction.Cascade);
+                })
+                .Annotation("MySQL:Charset", "utf8mb4");
+
+            migrationBuilder.CreateTable(
                 name: "JobListings",
                 columns: table => new
                 {
@@ -254,6 +333,37 @@ namespace backend.Migrations
                         principalTable: "Recruiters",
                         principalColumn: "recruiter_id",
                         onDelete: ReferentialAction.Cascade);
+                })
+                .Annotation("MySQL:Charset", "utf8mb4");
+
+            migrationBuilder.CreateTable(
+                name: "JobApplications",
+                columns: table => new
+                {
+                    application_id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("MySQL:ValueGenerationStrategy", MySQLValueGenerationStrategy.IdentityColumn),
+                    applicant_id = table.Column<int>(type: "int", nullable: false),
+                    job_listing_id = table.Column<int>(type: "int", nullable: false),
+                    cover_letter_id = table.Column<int>(type: "int", nullable: false),
+                    status = table.Column<string>(type: "varchar(50)", maxLength: 50, nullable: false),
+                    applied_date = table.Column<DateTime>(type: "datetime(6)", nullable: false),
+                    updated_at = table.Column<DateTime>(type: "datetime(6)", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_JobApplications", x => x.application_id);
+                    table.ForeignKey(
+                        name: "FK_JobApplications_Applicants_applicant_id",
+                        column: x => x.applicant_id,
+                        principalTable: "Applicants",
+                        principalColumn: "applicant_id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_JobApplications_CoverLetters_cover_letter_id",
+                        column: x => x.cover_letter_id,
+                        principalTable: "CoverLetters",
+                        principalColumn: "cover_letter_id",
+                        onDelete: ReferentialAction.Restrict);
                 })
                 .Annotation("MySQL:Charset", "utf8mb4");
 
@@ -324,10 +434,32 @@ namespace backend.Migrations
                 unique: true);
 
             migrationBuilder.CreateIndex(
+                name: "IX_Bookmarks_applicant_id_jobs_id",
+                table: "Bookmarks",
+                columns: new[] { "applicant_id", "jobs_id" },
+                unique: true);
+
+            migrationBuilder.CreateIndex(
                 name: "IX_Companies_UEN",
                 table: "Companies",
                 column: "UEN",
                 unique: true);
+
+            migrationBuilder.CreateIndex(
+                name: "IX_CoverLetters_applicant_id",
+                table: "CoverLetters",
+                column: "applicant_id");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_JobApplications_applicant_id_job_listing_id",
+                table: "JobApplications",
+                columns: new[] { "applicant_id", "job_listing_id" },
+                unique: true);
+
+            migrationBuilder.CreateIndex(
+                name: "IX_JobApplications_cover_letter_id",
+                table: "JobApplications",
+                column: "cover_letter_id");
 
             migrationBuilder.CreateIndex(
                 name: "IX_JobListings_recruiter_id",
@@ -388,6 +520,17 @@ namespace backend.Migrations
                 column: "user_id");
 
             migrationBuilder.CreateIndex(
+                name: "IX_RemunerationTypes_type",
+                table: "RemunerationTypes",
+                column: "type",
+                unique: true);
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Resumes_applicant_id",
+                table: "Resumes",
+                column: "applicant_id");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_Users_email",
                 table: "Users",
                 column: "email",
@@ -401,7 +544,10 @@ namespace backend.Migrations
                 name: "Admins");
 
             migrationBuilder.DropTable(
-                name: "Applicants");
+                name: "Bookmarks");
+
+            migrationBuilder.DropTable(
+                name: "JobApplications");
 
             migrationBuilder.DropTable(
                 name: "JobSchemes");
@@ -416,6 +562,15 @@ namespace backend.Migrations
                 name: "RefreshTokens");
 
             migrationBuilder.DropTable(
+                name: "RemunerationTypes");
+
+            migrationBuilder.DropTable(
+                name: "Resumes");
+
+            migrationBuilder.DropTable(
+                name: "CoverLetters");
+
+            migrationBuilder.DropTable(
                 name: "Skills");
 
             migrationBuilder.DropTable(
@@ -423,6 +578,9 @@ namespace backend.Migrations
 
             migrationBuilder.DropTable(
                 name: "Programmes");
+
+            migrationBuilder.DropTable(
+                name: "Applicants");
 
             migrationBuilder.DropTable(
                 name: "Recruiters");

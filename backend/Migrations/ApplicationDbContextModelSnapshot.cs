@@ -62,6 +62,33 @@ namespace backend.Migrations
                     b.ToTable("JobApplications");
                 });
 
+            modelBuilder.Entity("backend.Components.Bookmark.Models.Bookmark", b =>
+                {
+                    b.Property<int>("BookmarkId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasColumnName("bookmark_id");
+
+                    b.Property<int>("ApplicantId")
+                        .HasColumnType("int")
+                        .HasColumnName("applicant_id");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime(6)")
+                        .HasColumnName("created_at");
+
+                    b.Property<int>("JobsId")
+                        .HasColumnType("int")
+                        .HasColumnName("jobs_id");
+
+                    b.HasKey("BookmarkId");
+
+                    b.HasIndex("ApplicantId", "JobsId")
+                        .IsUnique();
+
+                    b.ToTable("Bookmarks");
+                });
+
             modelBuilder.Entity("backend.Components.Company.Models.Company", b =>
                 {
                     b.Property<int>("CompanyId")
@@ -216,39 +243,6 @@ namespace backend.Migrations
                     b.ToTable("CoverLetters");
                 });
 
-            modelBuilder.Entity("backend.Components.Resume.Models.Resume", b =>
-                {
-                    b.Property<int>("ResumeId")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int")
-                        .HasColumnName("resume_id");
-
-                    b.Property<int>("ApplicantId")
-                        .HasColumnType("int")
-                        .HasColumnName("applicant_id");
-
-                    b.Property<string>("ResumePath")
-                        .IsRequired()
-                        .HasMaxLength(1000)
-                        .HasColumnType("varchar(1000)")
-                        .HasColumnName("resume_path");
-
-                    b.Property<string>("ResumeText")
-                        .IsRequired()
-                        .HasColumnType("longtext")
-                        .HasColumnName("resume_text");
-
-                    b.Property<DateTime>("UploadedAt")
-                        .HasColumnType("datetime(6)")
-                        .HasColumnName("uploaded_at");
-
-                    b.HasKey("ResumeId");
-
-                    b.HasIndex("ApplicantId");
-
-                    b.ToTable("Resumes");
-                });
-
             modelBuilder.Entity("backend.Components.JobListing.Models.JobListing", b =>
                 {
                     b.Property<int>("JobId")
@@ -314,7 +308,7 @@ namespace backend.Migrations
                         .HasColumnType("int")
                         .HasColumnName("recruiter_id");
 
-                    b.Property<string>("RenumerationType")
+                    b.Property<string>("RemunerationType")
                         .IsRequired()
                         .HasColumnType("longtext")
                         .HasColumnName("renumeration_type");
@@ -339,7 +333,7 @@ namespace backend.Migrations
                     b.ToTable("JobListings");
                 });
 
-            modelBuilder.Entity("backend.Components.JobListing.Models.JobScheme", b =>
+            modelBuilder.Entity("backend.Components.JobScheme.Models.JobScheme", b =>
                 {
                     b.Property<int>("SchemeId")
                         .ValueGeneratedOnAdd()
@@ -360,7 +354,7 @@ namespace backend.Migrations
                     b.ToTable("JobSchemes");
                 });
 
-            modelBuilder.Entity("backend.Components.JobListing.Models.JobSkill", b =>
+            modelBuilder.Entity("backend.Components.JobSkill.Models.JobSkill", b =>
                 {
                     b.Property<int>("JobSkillId")
                         .ValueGeneratedOnAdd()
@@ -384,7 +378,7 @@ namespace backend.Migrations
                     b.ToTable("JobSkills");
                 });
 
-            modelBuilder.Entity("backend.Components.JobListing.Models.Programme", b =>
+            modelBuilder.Entity("backend.Components.Programme.Models.Programme", b =>
                 {
                     b.Property<int>("ProgrammeId")
                         .ValueGeneratedOnAdd()
@@ -401,7 +395,7 @@ namespace backend.Migrations
                     b.ToTable("Programmes");
                 });
 
-            modelBuilder.Entity("backend.Components.JobListing.Models.Qualification", b =>
+            modelBuilder.Entity("backend.Components.Qualification.Models.Qualification", b =>
                 {
                     b.Property<int>("QualificationId")
                         .ValueGeneratedOnAdd()
@@ -425,7 +419,61 @@ namespace backend.Migrations
                     b.ToTable("Qualifications");
                 });
 
-            modelBuilder.Entity("backend.Components.JobListing.Models.Skill", b =>
+            modelBuilder.Entity("backend.Components.RemunerationType.Models.RemunerationType", b =>
+                {
+                    b.Property<int>("RemunerationId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasColumnName("remnmeration_id");
+
+                    b.Property<string>("Type")
+                        .IsRequired()
+                        .HasMaxLength(20)
+                        .HasColumnType("varchar(20)")
+                        .HasColumnName("type");
+
+                    b.HasKey("RemunerationId");
+
+                    b.HasIndex("Type")
+                        .IsUnique();
+
+                    b.ToTable("RemunerationTypes");
+                });
+
+            modelBuilder.Entity("backend.Components.Resume.Models.Resume", b =>
+                {
+                    b.Property<int>("ResumeId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasColumnName("resume_id");
+
+                    b.Property<int>("ApplicantId")
+                        .HasColumnType("int")
+                        .HasColumnName("applicant_id");
+
+                    b.Property<string>("ResumePath")
+                        .IsRequired()
+                        .HasMaxLength(1000)
+                        .HasColumnType("varchar(1000)")
+                        .HasColumnName("resume_path");
+
+                    b.Property<string>("ResumeText")
+                        .IsRequired()
+                        .HasColumnType("longtext")
+                        .HasColumnName("resume_text");
+
+                    b.Property<DateTime>("UploadedAt")
+                        .HasColumnType("datetime(6)")
+                        .HasColumnName("uploaded_at");
+
+                    b.HasKey("ResumeId");
+
+                    b.HasIndex("ApplicantId");
+
+                    b.ToTable("Resumes");
+                });
+
+            modelBuilder.Entity("backend.Components.Skill.Models.Skill", b =>
                 {
                     b.Property<int>("SkillId")
                         .ValueGeneratedOnAdd()
@@ -701,15 +749,6 @@ namespace backend.Migrations
                         .IsRequired();
                 });
 
-            modelBuilder.Entity("backend.Components.Resume.Models.Resume", b =>
-                {
-                    b.HasOne("backend.User.Models.Applicant", null)
-                        .WithMany()
-                        .HasForeignKey("ApplicantId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-                });
-
             modelBuilder.Entity("backend.Components.JobListing.Models.JobListing", b =>
                 {
                     b.HasOne("backend.User.Models.Recruiter", null)
@@ -719,7 +758,7 @@ namespace backend.Migrations
                         .IsRequired();
                 });
 
-            modelBuilder.Entity("backend.Components.JobListing.Models.JobSkill", b =>
+            modelBuilder.Entity("backend.Components.JobSkill.Models.JobSkill", b =>
                 {
                     b.HasOne("backend.Components.JobListing.Models.JobListing", null)
                         .WithMany()
@@ -727,14 +766,14 @@ namespace backend.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("backend.Components.JobListing.Models.Skill", null)
+                    b.HasOne("backend.Components.Skill.Models.Skill", null)
                         .WithMany()
                         .HasForeignKey("SkillId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
                 });
 
-            modelBuilder.Entity("backend.Components.JobListing.Models.Qualification", b =>
+            modelBuilder.Entity("backend.Components.Qualification.Models.Qualification", b =>
                 {
                     b.HasOne("backend.Components.JobListing.Models.JobListing", null)
                         .WithMany()
@@ -742,9 +781,18 @@ namespace backend.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("backend.Components.JobListing.Models.Programme", null)
+                    b.HasOne("backend.Components.Programme.Models.Programme", null)
                         .WithMany()
                         .HasForeignKey("ProgrammeId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("backend.Components.Resume.Models.Resume", b =>
+                {
+                    b.HasOne("backend.User.Models.Applicant", null)
+                        .WithMany()
+                        .HasForeignKey("ApplicantId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
                 });

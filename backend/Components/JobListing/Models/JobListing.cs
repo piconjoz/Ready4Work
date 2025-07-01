@@ -30,8 +30,8 @@ public class JobListing
     [Column("is_visible")]
     private bool IsVisible { get; set; } = true;
 
-    [Column("renumeration_type")]
-    private string RenumerationType { get; set; } = string.Empty;
+    [Column("remumeration_type")]
+    private string RemunerationType { get; set; } = string.Empty;
 
     [Column("job_duration")]
     private string JobDuration { get; set; } = string.Empty;
@@ -62,7 +62,7 @@ public class JobListing
 
     private JobListing() { }
 
-    internal JobListing(int recruiterId, string jobRequirements, string jobDesription, string listingName, DateTime deadline, int maxVacancies, bool isVisble, string renumerationType, string jobDuration, float rate, string workingHours, string jobScheme, int permittedQualifications, int skillsets, string jobStatus)
+    internal JobListing(int recruiterId, string jobRequirements, string jobDesription, string listingName, DateTime deadline, int maxVacancies, bool isVisble, string remunerationType, string jobDuration, float rate, string workingHours, string jobScheme, int permittedQualifications, int skillsets, string jobStatus)
     {
         RecruiterId = recruiterId;
         JobRequirements = jobRequirements;
@@ -71,7 +71,7 @@ public class JobListing
         Deadline = deadline;
         MaxVacancies = maxVacancies;
         IsVisible = isVisble;
-        RenumerationType = renumerationType;
+        RemunerationType = remunerationType;
         JobDuration = jobDuration;
         Rate = rate;
         WorkingHours = workingHours;
@@ -93,7 +93,7 @@ public class JobListing
     internal DateTime GetDeadline() => Deadline;
     internal int GetMaxVacancies() => MaxVacancies;
     internal bool GetIsVisible() => IsVisible;
-    internal string GetRenumerationType() => RenumerationType;
+    internal string GetRemunerationType() => RemunerationType;
     internal string GetJobDuration() => JobDuration;
     internal float GetRate() => Rate;
     internal string GetWorkingHours() => WorkingHours;
@@ -114,7 +114,7 @@ public class JobListing
     internal void SetDeadline(DateTime deadline) => Deadline = deadline;
     internal void SetMaxVacancies(int maxVacancies) => MaxVacancies = maxVacancies;
     internal void SetIsVisible(bool isVisble) => IsVisible = isVisble;
-    internal void SetRenumerationType(string renumerationType) => RenumerationType = renumerationType;
+    internal void SetRemunerationType(string remunerationType) => RemunerationType = remunerationType;
     internal void SetJobDuration(string jobDuration) => JobDuration = jobDuration;
     internal void SetRate(float rate) => Rate = rate;
     internal void SetWorkingHours(string workingHours) => WorkingHours = workingHours;
