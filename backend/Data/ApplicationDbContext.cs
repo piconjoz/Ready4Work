@@ -5,6 +5,7 @@ using backend.Components.Company.Models;
 using backend.User.Models;
 using backend.Components.User.Models;
 using backend.Components.JobListing.Models;
+using backend.Components.JobScheme.Models;
 
 public class ApplicationDbContext : DbContext
     {
@@ -23,7 +24,6 @@ public class ApplicationDbContext : DbContext
         public DbSet<Programme> Programmes { get; set; }
         public DbSet<JobSkill> JobSkills { get; set; }
         public DbSet<Qualification> Qualifications { get; set; }
-
         public DbSet<JobScheme> JobSchemes { get; set; }
         public DbSet<RemunerationType> RemunerationTypes { get; set;}
 

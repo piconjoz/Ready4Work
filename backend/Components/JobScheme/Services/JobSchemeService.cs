@@ -1,9 +1,9 @@
-namespace backend.JobScheme.Services;
+namespace backend.Components.JobScheme.Services;
 
-using backend.Components.JobListing.Models;
+using backend.Components.JobScheme.Models;
 // using backend.JobScheme.DTOs;
-using backend.Components.JobListing.Services.Interfaces;
-using backend.Components.JobListing.Repositories.Interfaces;
+using backend.Components.JobScheme.Services.Interfaces;
+using backend.Components.JobScheme.Repositories.Interfaces;
 
 public class JobSchemeService : IJobSchemeService
 {

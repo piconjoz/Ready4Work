@@ -1,6 +1,6 @@
-namespace backend.Components.JobListing.Services.Interfaces;
+namespace backend.Components.JobScheme.Services.Interfaces;
 
-using backend.Components.JobListing.Models;
+using backend.Components.JobScheme.Models;
 // using backend.Components.JobListing.DTOs;
 
 public interface IJobSchemeService

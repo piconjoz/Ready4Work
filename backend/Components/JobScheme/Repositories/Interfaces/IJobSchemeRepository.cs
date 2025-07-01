@@ -1,6 +1,6 @@
-namespace backend.Components.JobListing.Repositories.Interfaces;
+namespace backend.Components.JobScheme.Repositories.Interfaces;
 
-using backend.Components.JobListing.Models;
+using backend.Components.JobScheme.Models;
 
 public interface IJobSchemeRepository
 {

@@ -1,4 +1,4 @@
-namespace backend.Components.JobListing.Models;
+namespace backend.Components.JobScheme.Models;
 
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
