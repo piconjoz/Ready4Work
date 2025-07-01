@@ -1,6 +1,6 @@
-namespace backend.Components.JobListing.Repositories.Interfaces;
+namespace backend.Components.RemunerationType.Repositories.Interfaces;
 
-using backend.Components.JobListing.Models;
+using backend.Components.RemunerationType.Models;
 
 public interface IRemunerationTypeRepository
 {

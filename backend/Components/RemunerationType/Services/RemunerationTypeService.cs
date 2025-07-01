@@ -1,8 +1,8 @@
-namespace backend.Components.JobListing.Services;
+namespace backend.Components.RemunerationType.Services;
 
-using backend.Components.JobListing.Models;
-using backend.Components.JobListing.Services.Interfaces;
-using backend.Components.JobListing.Repositories.Interfaces;
+using backend.Components.RemunerationType.Models;
+using backend.Components.RemunerationType.Services.Interfaces;
+using backend.Components.RemunerationType.Repositories.Interfaces;
 
 public class RemunerationTypeService : IRemunerationTypeService
 {

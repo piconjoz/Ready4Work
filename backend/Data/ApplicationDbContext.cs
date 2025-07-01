@@ -7,6 +7,8 @@ using backend.Components.JobListing.Models;
 using backend.Components.User.Models;
 using backend.Components.Skill.Models;
 using backend.Components.JobScheme.Models;
+using backend.Components.RemunerationType.Models;
+
 public class ApplicationDbContext : DbContext
     {
         public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options) : base(options)
