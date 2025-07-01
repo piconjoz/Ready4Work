@@ -60,6 +60,7 @@ builder.Services.AddScoped<IAdminService, AdminService>();
 builder.Services.AddScoped<DatabaseSeedingService>();
 builder.Services.AddScoped<IRefreshTokenService, RefreshTokenService>();
 builder.Services.AddScoped<IAuthService, AuthService>();
+builder.Services.AddScoped<IAdminAccountManagementService, AdminAccountManagementService>();
 
 // configure JWT authentication
 var jwtSettings = builder.Configuration.GetSection("Jwt");

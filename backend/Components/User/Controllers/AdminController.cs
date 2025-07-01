@@ -18,19 +18,24 @@ public class AdminController : ControllerBase
     private readonly IApplicantService _applicantService;
     private readonly IRecruiterService _recruiterService;
     private readonly ICompanyService _companyService;
+    private readonly IAdminAccountManagementService _accountManagementService;
+
 
     public AdminController(
         IAdminService adminService,
         IUserService userService,
         IApplicantService applicantService,
         IRecruiterService recruiterService,
-        ICompanyService companyService)
+        ICompanyService companyService,
+        IAdminAccountManagementService accountManagementService)
     {
         _adminService = adminService;
         _userService = userService;
         _applicantService = applicantService;
         _recruiterService = recruiterService;
         _companyService = companyService;
+        _accountManagementService = accountManagementService;
+        
     }
 
     // GET /api/admins/profile
@@ -239,6 +244,209 @@ public class AdminController : ControllerBase
             return StatusCode(500, new { message = "An error occurred while deleting company" });
         }
     }
+
+     // CREATE - POST /api/admins/accounts
+    [HttpPost("accounts")]
+    public async Task<ActionResult<AccountManagementResponseDTO>> CreateUserAccount([FromBody] CreateUserAccountDTO request)
+    {
+        try
+        {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+
+            var adminUserId = GetUserIdFromToken();
+            if (adminUserId == null)
+            {
+                return Unauthorized(new { message = "Invalid token" });
+            }
+
+            if (GetUserTypeFromToken() != 3)
+            {
+                return Forbid("Access denied: Only admins can create user accounts");
+            }
+
+            var result = await _accountManagementService.CreateUserAccountAsync(request, adminUserId.Value);
+            
+            return CreatedAtAction(
+                nameof(GetUserAccount), 
+                new { userId = result.UserId }, 
+                result
+            );
+        }
+        catch (InvalidOperationException ex)
+        {
+            return Conflict(new { message = ex.Message });
+        }
+        catch (ArgumentException ex)
+        {
+            return BadRequest(new { message = ex.Message });
+        }
+        catch (Exception ex)
+        {
+            return StatusCode(500, new { message = "An error occurred while creating the user account" });
+        }
+    }
+
+    // READ - GET /api/admins/accounts
+    [HttpGet("accounts")]
+    public async Task<ActionResult<List<AccountManagementResponseDTO>>> GetAllUserAccounts()
+    {
+        try
+        {
+            if (GetUserTypeFromToken() != 3)
+            {
+                return Forbid("Access denied: Only admins can view user accounts");
+            }
+
+            var users = await _accountManagementService.GetAllUsersAsync();
+            return Ok(users);
+        }
+        catch (Exception ex)
+        {
+            return StatusCode(500, new { message = "An error occurred while retrieving user accounts" });
+        }
+    }
+
+    // READ - GET /api/admins/accounts/{userId}
+    [HttpGet("accounts/{userId}")]
+    public async Task<ActionResult<AccountManagementResponseDTO>> GetUserAccount(int userId)
+    {
+        try
+        {
+            if (GetUserTypeFromToken() != 3)
+            {
+                return Forbid("Access denied: Only admins can view user accounts");
+            }
+
+            if (userId <= 0)
+            {
+                return BadRequest(new { message = "Invalid user ID" });
+            }
+
+            var user = await _accountManagementService.GetUserAccountAsync(userId);
+            if (user == null)
+            {
+                return NotFound(new { message = "User not found" });
+            }
+
+            return Ok(user);
+        }
+        catch (Exception ex)
+        {
+            return StatusCode(500, new { message = "An error occurred while retrieving the user account" });
+        }
+    }
+
+    // READ - GET /api/admins/accounts/type/{userType}
+    [HttpGet("accounts/type/{userType}")]
+    public async Task<ActionResult<List<AccountManagementResponseDTO>>> GetUsersByType(int userType)
+    {
+        try
+        {
+            if (GetUserTypeFromToken() != 3)
+            {
+                return Forbid("Access denied: Only admins can view user accounts");
+            }
+
+            if (userType < 1 || userType > 3)
+            {
+                return BadRequest(new { message = "User type must be 1 (Applicant), 2 (Recruiter), or 3 (Admin)" });
+            }
+
+            var users = await _accountManagementService.GetUsersByTypeAsync(userType);
+            return Ok(users);
+        }
+        catch (Exception ex)
+        {
+            return StatusCode(500, new { message = "An error occurred while retrieving users by type" });
+        }
+    }
+
+    // UPDATE - PUT /api/admins/accounts/{userId}
+    [HttpPut("accounts/{userId}")]
+    public async Task<ActionResult<AccountManagementResponseDTO>> UpdateUserAccount(int userId, [FromBody] UpdateUserAccountDTO request)
+    {
+        try
+        {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+
+            var adminUserId = GetUserIdFromToken();
+            if (adminUserId == null)
+            {
+                return Unauthorized(new { message = "Invalid token" });
+            }
+
+            if (GetUserTypeFromToken() != 3)
+            {
+                return Forbid("Access denied: Only admins can update user accounts");
+            }
+
+            if (userId <= 0)
+            {
+                return BadRequest(new { message = "Invalid user ID" });
+            }
+
+            var result = await _accountManagementService.UpdateUserAccountAsync(userId, request, adminUserId.Value);
+            return Ok(result);
+        }
+        catch (InvalidOperationException ex)
+        {
+            return NotFound(new { message = ex.Message });
+        }
+        catch (ArgumentException ex)
+        {
+            return BadRequest(new { message = ex.Message });
+        }
+        catch (Exception ex)
+        {
+            return StatusCode(500, new { message = "An error occurred while updating the user account" });
+        }
+    }
+
+    // DELETE - DELETE /api/admins/accounts/{userId}
+    [HttpDelete("accounts/{userId}")]
+    public async Task<ActionResult> DeleteUserAccount(int userId)
+    {
+        try
+        {
+            var adminUserId = GetUserIdFromToken();
+            if (adminUserId == null)
+            {
+                return Unauthorized(new { message = "Invalid token" });
+            }
+
+            if (GetUserTypeFromToken() != 3)
+            {
+                return Forbid("Access denied: Only admins can delete user accounts");
+            }
+
+            if (userId <= 0)
+            {
+                return BadRequest(new { message = "Invalid user ID" });
+            }
+
+            var result = await _accountManagementService.DeleteUserAccountAsync(userId, adminUserId.Value);
+            if (!result)
+            {
+                return NotFound(new { message = "User not found" });
+            }
+
+            return Ok(new { message = "User account deleted successfully" });
+        }
+        catch (InvalidOperationException ex)
+        {
+            return BadRequest(new { message = ex.Message });
+        }
+        catch (Exception ex)
+        {
+            return StatusCode(500, new { message = "An error occurred while deleting the user account" });
+        }
+    }   
 
     // GET /api/admins/system/info
     // Gets system information and health status
