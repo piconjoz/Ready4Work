@@ -4,7 +4,7 @@
 - Backend (ASP.NET)
 - Frontend (Nginx serving React pages)
 - Database (MySQL)
-- File server (Node.js)
+- File server (Node.js)[Port 8080]
 - Certbot (Use to refresh SSL certificates for HTTPS)
 
 ## GitHub Actions (CI/CD)
@@ -27,6 +27,7 @@
 `docker compose -f docker-compose up <service>`
 
 ## Files
+- Working directory: `/dev/home/ready4work/production`
 - Backend docker image is store in `backend/`.
 - Frontend build is stored into `frontend/dist`.
 - File server configuration file is stored in `upload-server`.
