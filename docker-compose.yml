@@ -1,7 +1,7 @@
 services:
-  dev_nginx:
+  nginx:
     image: nginx:latest
-    container_name: dev_nginx_proxy
+    container_name: nginx_proxy
     restart: unless-stopped
     ports:
       - "80:80"  # Required for certbot HTTP challenge
@@ -12,49 +12,88 @@ services:
       - ./certbot/conf:/etc/letsencrypt  # SSL certs storage
       - ./frontend/dist:/var/www/html/:ro
     networks:
-      dev-webproxy:
-        ipv4_address: 10.12.0.6
+      net_backend_nginx:
+        ipv4_address: 172.1.0.2
 
-  dev_certbot:
+  file_server:
+    image: node:18-slim
+    container_name: file_server
+    restart: unless-stopped
+    working_dir: /app
+    volumes:
+      - ./upload-server:/app
+      - uploads-data:/uploads
+    networks:
+      net_backend_file:
+        ipv4_address: 172.2.0.2
+    command: >
+      sh -c "
+      npm init -y &&
+      npm install express multer &&
+      node upload-server.js
+      "
+
+  certbot:
     image: certbot/certbot
-    container_name: dev_certbot
+    container_name: certbot
     volumes:
       - ./certbot/www:/var/www/certbot
       - ./certbot/conf:/etc/letsencrypt
     networks:
-      dev-webproxy:
-        ipv4_address: 10.12.0.7
+      net_backend_nginx:
+        ipv4_address: 172.1.0.4
     entrypoint: sh -c "certbot certonly --webroot -w /var/www/certbot --email dev@ready4work.com --agree-tos --no-eff-email --rsa-key-size 4096 --expand --force-renewal -d ready4work.duckdns.org -d www.ready4work.duckdns.org"
 
-  dev_backend:
-    image: dev-backend-image:latest            # Use the same name as `docker build -t`
+  backend:
+    image: backend-image:latest            # Use the same name as `docker build -t`
     container_name: backend-server
     restart: unless-stopped
     environment:
-      - ConnectionStrings__DefaultConnection=server=database;port=3306;database=ready4work;user=dev;password=s*xuspUtrlVOzukati0e
+      - ConnectionStrings__DefaultConnection=${CONNECTION_STRING}      
+      - VIRUSTOTAL_API_KEY=${VIRUSTOTAL_API_KEY}    
     networks:
-      dev-webproxy:
-        ipv4_address: 10.12.0.8
+      net_backend_nginx:
+        ipv4_address: 172.1.0.3
+      net_backend_file:
+        ipv4_address: 172.2.0.3
+      net_backend_mysql:
+        ipv4_address: 172.3.0.3
 
   database:
     container_name: mysql_database
     image: mysql:8.0
     restart: unless-stopped
     environment:
-      MYSQL_ROOT_PASSWORD: gajubRlhabi9iW?jldex
-      MYSQL_DATABASE: ready4work
-      MYSQL_USER: dev
-      MYSQL_PASSWORD: s*xuspUtrlVOzukati0e
+      - MYSQL_ROOT_PASSWORD=${MYSQL_ROOT_PASSWORD}
+      - MYSQL_DATABASE=${MYSQL_DATABASE}
+      - MYSQL_USER=${MYSQL_USER}
+      - MYSQL_PASSWORD=${MYSQL_PASSWORD}
     volumes:
       - mysql_data:/var/lib/mysql
+    networks:
+      net_backend_mysql:
+        ipv4_address: 172.3.0.2
 
 networks:
-  dev-webproxy:
+  net_backend_nginx:
     driver: bridge
     ipam:
       config:
-        - subnet: 10.12.0.0/16
-          gateway: 10.12.0.1
+        - subnet: 172.1.0.0/24
+          gateway: 172.1.0.1
+  net_backend_file:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 172.2.0.0/24
+          gateway: 172.2.0.1
+  net_backend_mysql:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 172.3.0.0/16
+          gateway: 172.3.0.1
 
 volumes:
   mysql_data:
+  uploads-data:
