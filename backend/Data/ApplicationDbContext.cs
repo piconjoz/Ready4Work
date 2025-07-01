@@ -25,6 +25,7 @@ public class ApplicationDbContext : DbContext
         public DbSet<Qualification> Qualifications { get; set; }
 
         public DbSet<JobScheme> JobSchemes { get; set; }
+        public DbSet<RemunerationType> RemunerationTypes { get; set;}
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -264,7 +265,7 @@ public class ApplicationDbContext : DbContext
             entity.Property("IsVisible")
                 .HasColumnName("is_visible");
 
-            entity.Property("RenumerationType")
+            entity.Property("RemunerationType")
                 .HasColumnName("renumeration_type");
 
             entity.Property("JobDuration")
@@ -365,7 +366,23 @@ public class ApplicationDbContext : DbContext
 
             entity.HasIndex("SchemeName").IsUnique();
         });
-        
+
+        // Add RemunerationType entity
+        modelBuilder.Entity<RemunerationType>(entity =>
+        {
+            entity.HasKey("RemunerationId");
+            
+            entity.Property("RemunerationId")
+                .HasColumnName("remnmeration_id");
+                
+            entity.Property("Type")
+                .IsRequired()
+                .HasMaxLength(20)
+                .HasColumnName("type");
+                
+            entity.HasIndex("Type").IsUnique();
+        });
+
 
     }
 }
