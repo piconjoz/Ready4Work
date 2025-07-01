@@ -9,23 +9,31 @@ using backend.User.Models;
 using backend.Components.Resume.Models;
 using backend.Components.Bookmark.Models;
 using backend.Components.User.Models;
+using backend.Components.JobListing.Models;
 
 public class ApplicationDbContext : DbContext
-{
-    public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options) : base(options)
     {
-    }
+        public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options) : base(options)
+        {
+        }
 
-    public DbSet<Company> Companies { get; set; }
-    public DbSet<User> Users { get; set; }
-    public DbSet<Admin> Admins { get; set; }
-    public DbSet<Applicant> Applicants { get; set; }
-    public DbSet<Recruiter> Recruiters { get; set; }
-    public DbSet<RefreshToken> RefreshTokens { get; set; }
+        public DbSet<Company> Companies { get; set; }
+        public DbSet<User> Users { get; set; }
+        public DbSet<Admin> Admins { get; set; }
+        public DbSet<Applicant> Applicants { get; set; }
+        public DbSet<Recruiter> Recruiters { get; set; }
+        public DbSet<RefreshToken> RefreshTokens { get; set; }
     public DbSet<JobApplication> JobApplications { get; set; }
     public DbSet<CoverLetter> CoverLetters { get; set; }  // Add CoverLetter DbSet
     public DbSet<Resume> Resumes { get; set; }
     public DbSet<Bookmark> Bookmarks { get; set; }
+        public DbSet<JobListing> JobListings { get; set; }
+        public DbSet<Skill> Skills { get; set; }
+        public DbSet<Programme> Programmes { get; set; }
+        public DbSet<JobSkill> JobSkills { get; set; }
+        public DbSet<Qualification> Qualifications { get; set; }
+
+        public DbSet<JobScheme> JobSchemes { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -315,5 +323,135 @@ public class ApplicationDbContext : DbContext
             entity.Property(e => e.CreatedAt).HasColumnName("created_at");
             entity.HasIndex(e => new { e.ApplicantId, e.JobsId }).IsUnique();
         });
+
+        // JobListing
+        modelBuilder.Entity<JobListing>(entity =>
+        {
+            entity.HasKey("JobId");
+            entity.Property("RecruiterId")
+                .IsRequired()
+                .HasColumnName("recruiter_id");
+
+            entity.Property("JobRequirements")
+                .HasColumnName("job_requirements");
+
+            entity.Property("JobDescription")
+                .HasColumnName("job_description");
+
+            entity.Property("ListingName")
+                .HasColumnName("listing_name");
+
+            entity.Property("Deadline")
+                .HasColumnName("deadline");
+
+            entity.Property("MaxVacancies")
+                .HasColumnName("max_vacancies");
+
+            entity.Property("IsVisible")
+                .HasColumnName("is_visible");
+
+            entity.Property("RenumerationType")
+                .HasColumnName("renumeration_type");
+
+            entity.Property("JobDuration")
+                .HasColumnName("job_duration");
+
+            entity.Property("Rate")
+                .HasColumnName("rate");
+
+            entity.Property("WorkingHours")
+                .HasColumnName("working_hours");
+
+            entity.Property("JobScheme")
+                .HasColumnName("job_scheme");
+
+            entity.Property("PermittedQualifications")
+                .HasColumnName("permitted_qualifications");
+
+            entity.Property("Skillsets")
+                .HasColumnName("skillsets");
+
+            entity.Property("JobStatus")
+                .HasColumnName("job_status");
+
+            entity.Property("CreatedAt")
+                .HasColumnName("created_at");
+
+            entity.Property("UpdatedAt")
+                .HasColumnName("updated_at");
+
+            entity.HasOne<Recruiter>()
+                .WithMany()
+                .HasForeignKey("RecruiterId")
+                .OnDelete(DeleteBehavior.Cascade);
+        });
+
+        // Skills entity
+        modelBuilder.Entity<Skill>(entity =>
+        {
+            entity.HasKey("SkillId");
+            entity.Property("skill").HasColumnName("skill");
+        });
+
+        // Programme entity
+        modelBuilder.Entity<Programme>(entity =>
+        {
+            entity.HasKey("ProgrammeId");
+            entity.Property("ProgrammeName").HasColumnName("programme_name");
+        });
+
+        // Job skills entity
+        modelBuilder.Entity<JobSkill>(entity =>
+        {
+            entity.HasKey("JobSkillId");
+            entity.Property("JobId").HasColumnName("job_id").IsRequired();
+            entity.Property("SkillId").HasColumnName("skill_id").IsRequired();
+
+            entity.HasOne<JobListing>()
+                .WithMany()
+                .HasForeignKey("JobId")
+                .OnDelete(DeleteBehavior.Cascade);
+
+            entity.HasOne<Skill>()
+                .WithMany()
+                .HasForeignKey("SkillId")
+                .OnDelete(DeleteBehavior.Cascade);
+        });
+
+        // Qualification entity
+        modelBuilder.Entity<Qualification>(entity =>
+        {
+            entity.HasKey("QualificationId");
+            entity.Property("ProgrammeId").HasColumnName("programme_id").IsRequired();
+            entity.Property("JobId").HasColumnName("job_id").IsRequired();
+
+            entity.HasOne<Programme>()
+                .WithMany()
+                .HasForeignKey("ProgrammeId")
+                .OnDelete(DeleteBehavior.Cascade);
+
+            entity.HasOne<JobListing>()
+                .WithMany()
+                .HasForeignKey("JobId")
+                .OnDelete(DeleteBehavior.Cascade);
+        });
+
+        // Add JobScheme configuration
+        modelBuilder.Entity<JobScheme>(entity =>
+        {
+            entity.HasKey("SchemeId");
+
+            entity.Property("SchemeId")
+                .HasColumnName("scheme_id");
+
+            entity.Property("SchemeName")
+                .IsRequired()
+                .HasMaxLength(50)
+                .HasColumnName("scheme_name");
+
+            entity.HasIndex("SchemeName").IsUnique();
+        });
+        
+
     }
 }
