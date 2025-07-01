@@ -1,8 +1,10 @@
-namespace backend.Components.JobListing.Services;
+namespace backend.Components.JobSkill.Services;
 
-using backend.Components.JobListing.Models;
+using backend.Components.JobSkill.Models;
+using backend.Components.JobSkill.Repositories.Interfaces;
+using backend.Components.Skill.Repositories.Interfaces;
 using backend.Components.JobListing.Repositories.Interfaces;
-using backend.Components.JobListing.Services.Interfaces;
+using backend.Components.JobSkill.Services.Interfaces;
 
 public class JobSkillService : IJobSkillService
 {
