@@ -1,7 +1,7 @@
-namespace backend.Components.JobListing.Services;
+namespace backend.Components.Skill.Services;
 
-using backend.Components.JobListing.Models;
-using backend.Components.JobListing.Repositories.Interfaces;
+using backend.Components.Skill.Models;
+using backend.Components.Skill.Repositories.Interfaces;
 
 public class SkillService : ISkillService
 {

@@ -3,10 +3,10 @@ namespace backend.Data;
 using Microsoft.EntityFrameworkCore;
 using backend.Components.Company.Models;
 using backend.User.Models;
-using backend.Components.User.Models;
 using backend.Components.JobListing.Models;
+using backend.Components.User.Models;
+using backend.Components.Skill.Models;
 using backend.Components.JobScheme.Models;
-
 public class ApplicationDbContext : DbContext
     {
         public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options) : base(options)
@@ -371,15 +371,15 @@ public class ApplicationDbContext : DbContext
         modelBuilder.Entity<RemunerationType>(entity =>
         {
             entity.HasKey("RemunerationId");
-            
+
             entity.Property("RemunerationId")
                 .HasColumnName("remnmeration_id");
-                
+
             entity.Property("Type")
                 .IsRequired()
                 .HasMaxLength(20)
                 .HasColumnName("type");
-                
+
             entity.HasIndex("Type").IsUnique();
         });
 

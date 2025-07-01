@@ -1,6 +1,6 @@
-namespace backend.Components.JobListing.Repositories.Interfaces;
+namespace backend.Components.Skill.Repositories.Interfaces;
 
-using backend.Components.JobListing.Models;
+using backend.Components.Skill.Models;
 
 public interface ISkillRepository
 {
