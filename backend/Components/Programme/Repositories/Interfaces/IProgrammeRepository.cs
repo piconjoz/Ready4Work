@@ -1,6 +1,6 @@
-namespace backend.Components.JobListing.Repositories.Interfaces;
+namespace backend.Components.Programme.Repositories.Interfaces;
 
-using backend.Components.JobListing.Models;
+using backend.Components.Programme.Models;
 public interface IProgrammeRepository
 {
     Task<List<Programme>> GetAllProgrammesAsync();

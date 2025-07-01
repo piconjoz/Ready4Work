@@ -1,6 +1,6 @@
-namespace backend.Components.JobListing.Services.Interfaces;
+namespace backend.Components.Programme.Services.Interfaces;
 
-using backend.Components.JobListing.Models;
+using backend.Components.Programme.Models;
 
 public interface IProgrammeService
 {

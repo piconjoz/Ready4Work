@@ -1,7 +1,7 @@
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
-namespace backend.Components.JobListing.Models
+namespace backend.Components.Programme.Models
 {
     public class Programme
     {

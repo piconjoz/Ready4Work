@@ -8,6 +8,7 @@ using backend.Components.User.Models;
 using backend.Components.Skill.Models;
 using backend.Components.JobScheme.Models;
 using backend.Components.RemunerationType.Models;
+using backend.Components.Programme.Models;
 
 public class ApplicationDbContext : DbContext
     {
