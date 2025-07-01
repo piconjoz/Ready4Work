@@ -1,8 +1,10 @@
-namespace backend.Components.JobListing.Services;
+namespace backend.Components.Qualification.Services;
 
-using backend.Components.JobListing.Models;
+using backend.Components.Qualification.Models;
+using backend.Components.Qualification.Repositories.Interfaces;
 using backend.Components.JobListing.Repositories.Interfaces;
-using backend.Components.JobListing.Services.Interfaces;
+using backend.Components.Programme.Repositories.Interfaces;
+using backend.Components.Qualification.Services.Interfaces;
 
 public class QualificationService : IQualificationService
 {

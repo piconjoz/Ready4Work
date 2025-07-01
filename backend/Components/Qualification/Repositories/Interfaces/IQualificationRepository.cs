@@ -1,6 +1,6 @@
-namespace backend.Components.JobListing.Repositories.Interfaces;
+namespace backend.Components.Qualification.Repositories.Interfaces;
 
-using backend.Components.JobListing.Models;
+using backend.Components.Qualification.Models;
 
 public interface IQualificationRepository
 {

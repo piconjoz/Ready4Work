@@ -1,6 +1,6 @@
-namespace backend.Components.JobListing.Services.Interfaces;
+namespace backend.Components.Qualification.Services.Interfaces;
 
-using backend.Components.JobListing.Models;
+using backend.Components.Qualification.Models;
 
 public interface IQualificationService
 {

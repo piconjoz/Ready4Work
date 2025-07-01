@@ -1,7 +1,7 @@
-namespace backend.Components.JobListing.Repositories;
+namespace backend.Components.Qualification.Repositories;
 
-using backend.Components.JobListing.Models;
-using backend.Components.JobListing.Repositories.Interfaces;
+using backend.Components.Qualification.Models;
+using backend.Components.Qualification.Repositories.Interfaces;
 using backend.Data;
 using Microsoft.EntityFrameworkCore;
 
