@@ -4,7 +4,7 @@ import toast from "react-hot-toast";
 import StatusInputField from "../../../../components/StatusInputField";
 import SelectField from "../../../../components/SelectField";
 import PrimaryButton from "../../../../components/PrimaryButton";
-import { onboardRecruiter } from "../../../../services/authApi";
+import { onboardRecruiter } from "../../../services/authApi";
 
 export default function SummaryForm({
   signupData = {},
