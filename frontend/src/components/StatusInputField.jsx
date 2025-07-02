@@ -102,7 +102,7 @@ export default function StatusInputField({
       </div>
 
       {/* Fixed height container for error messages */}
-      <div className="h-6 mt-2 mb-2">
+      <div className="mt-2 mb-2">
         {isError && errorMessage && (
           <div className="flex items-center gap-1 text-[#D54B21]">
             <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
