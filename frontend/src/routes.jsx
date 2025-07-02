@@ -14,6 +14,7 @@ import BasePage from "./features/applicant/pages/BasePage.jsx";
 // Admin Pages
 import AdminUsersPage from "./features/admin/pages/AdminUsersPage.jsx";
 import AdminListingsPage from "./features/admin/pages/AdminListingsPage.jsx";
+import AdminDashboardPage from "./features/admin/pages/AdminDashboardPage.jsx";
 
 // Applicant Pages
 import ApplicantOnboardingPage from "./features/applicant/pages/ApplicantOnboardingPage.jsx";
@@ -53,11 +54,13 @@ function AppRoutes() {
 
       {/* Admin Routes - Protected for Admin users only */}
       <Route path="admin">
+        <Route index element={<Navigate to="dashboard" />} />
+        
         <Route
-          path="companies"
+          path="dashboard"
           element={
             <ProtectedRoute requiredUserType={3}>
-              <CompaniesPage />
+              <AdminDashboardPage />
             </ProtectedRoute>
           }
         />
@@ -78,10 +81,10 @@ function AppRoutes() {
           }
         />
         <Route
-          path="dashboard"
+          path="companies"
           element={
             <ProtectedRoute requiredUserType={3}>
-              <div>Admin Dashboard Coming Soon...</div>
+              <CompaniesPage />
             </ProtectedRoute>
           }
         />
