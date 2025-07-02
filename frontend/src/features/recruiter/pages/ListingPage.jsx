@@ -1,5 +1,6 @@
 import RecruiterHeader from "../../../components/RecruiterHeader";
 import ListingCard from "../../../components/ListingCard";
+import PrimaryButton from "../../../components/PrimaryButton";
 
 
 
@@ -49,7 +50,15 @@ export default function RecruiterListingPage() {
 
       {/* Overview */}
       <div className="pt-6">
-        <h1 className="text-2xl font-semibold">Job Listings</h1>
+        <div className="flex justify-between items-center">
+          <h1 className="text-2xl font-semibold">Job Listings</h1>
+          <div className="w-40">
+            <PrimaryButton
+              label="Add Listing"
+              onClick={() => console.log("Create New Listing Clicked")}
+            />
+          </div>
+        </div>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-4">
           {listings.map((listing, index) => (
             <ListingCard
