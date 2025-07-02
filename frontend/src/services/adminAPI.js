@@ -63,15 +63,7 @@ export const getUserById = async (userId) => {
   }
 };
 
-export const createUserAccount = async (userData) => {
-  try {
-    const response = await api.post("/admins/accounts", userData);
-    return response.data;
-  } catch (error) {
-    console.error("Error creating user account:", error);
-    throw error;
-  }
-};
+// Removed createUserAccount function - no longer needed
 
 export const updateUserAccount = async (userId, userData) => {
   try {

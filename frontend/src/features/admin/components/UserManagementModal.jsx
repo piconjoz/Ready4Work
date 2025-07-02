@@ -1,9 +1,8 @@
 // frontend/src/features/admin/components/UserManagementModal.jsx
 import React, { useState, useEffect } from "react";
 import StatusInputField from "../../../components/StatusInputField";
-import SelectField from "../../../components/SelectField";
 import PrimaryButton from "../../../components/PrimaryButton";
-import { createUserAccount, updateUserAccount } from "../../../services/adminAPI";
+import { updateUserAccount } from "../../../services/adminAPI";
 import toast from "react-hot-toast";
 
 export default function UserManagementModal({ 
@@ -12,7 +11,12 @@ export default function UserManagementModal({
   user = null, 
   onSuccess 
 }) {
-  const isEditing = !!user;
+  // This modal now only handles editing existing users
+  if (!user) {
+    console.warn("UserManagementModal: No user provided for editing");
+    return null;
+  }
+
   const [loading, setLoading] = useState(false);
   const [formData, setFormData] = useState({
     email: "",
@@ -20,7 +24,6 @@ export default function UserManagementModal({
     lastName: "",
     phone: "",
     gender: "",
-    password: "",
     userType: 1,
     isActive: true,
     isVerified: false,
@@ -39,14 +42,13 @@ export default function UserManagementModal({
   const [errors, setErrors] = useState({});
 
   useEffect(() => {
-    if (isEditing && user) {
+    if (user) {
       setFormData({
         email: user.email || "",
         firstName: user.fullName?.split(' ')[0] || "",
         lastName: user.fullName?.split(' ').slice(1).join(' ') || "",
         phone: "",
         gender: "",
-        password: "", // Don't populate password for security
         userType: user.userType || 1,
         isActive: user.isActive ?? true,
         isVerified: user.isVerified ?? false,
@@ -60,31 +62,9 @@ export default function UserManagementModal({
           department: user.roleData?.department || ""
         }
       });
-    } else {
-      // Reset form for new user
-      setFormData({
-        email: "",
-        firstName: "",
-        lastName: "",
-        phone: "",
-        gender: "",
-        password: "",
-        userType: 1,
-        isActive: true,
-        isVerified: false,
-        applicantData: {
-          programmeId: 1,
-          admitYear: new Date().getFullYear()
-        },
-        recruiterData: {
-          companyId: 1,
-          jobTitle: "",
-          department: ""
-        }
-      });
     }
     setErrors({});
-  }, [isEditing, user, isOpen]);
+  }, [user, isOpen]);
 
   const handleInputChange = (e) => {
     const { name, value, type, checked } = e.target;
@@ -118,12 +98,6 @@ export default function UserManagementModal({
 
     if (!formData.firstName.trim()) newErrors.firstName = "First name is required";
     if (!formData.lastName.trim()) newErrors.lastName = "Last name is required";
-    
-    if (!isEditing && !formData.password.trim()) {
-      newErrors.password = "Password is required";
-    } else if (formData.password && formData.password.length < 8) {
-      newErrors.password = "Password must be at least 8 characters";
-    }
 
     // Role-specific validation
     if (formData.userType === 1) {
@@ -154,20 +128,13 @@ export default function UserManagementModal({
     setLoading(true);
     try {
       const userData = {
-        email: formData.email,
         firstName: formData.firstName,
         lastName: formData.lastName,
         phone: formData.phone || null,
         gender: formData.gender || null,
-        userType: formData.userType,
         isActive: formData.isActive,
         isVerified: formData.isVerified
       };
-
-      // Add password for new users
-      if (!isEditing) {
-        userData.password = formData.password;
-      }
 
       // Add role-specific data
       if (formData.userType === 1) {
@@ -176,22 +143,17 @@ export default function UserManagementModal({
         userData.recruiterData = formData.recruiterData;
       }
 
-      if (isEditing) {
-        await updateUserAccount(user.userId, userData);
-        toast.success("User updated successfully");
-      } else {
-        await createUserAccount(userData);
-        toast.success("User created successfully");
-      }
+      await updateUserAccount(user.userId, userData);
+      toast.success("User updated successfully");
 
       onSuccess();
       onClose();
     } catch (error) {
-      console.error("Error saving user:", error);
+      console.error("Error updating user:", error);
       if (error.response?.data?.message) {
         toast.error(error.response.data.message);
       } else {
-        toast.error(isEditing ? "Failed to update user" : "Failed to create user");
+        toast.error("Failed to update user");
       }
     } finally {
       setLoading(false);
@@ -200,27 +162,12 @@ export default function UserManagementModal({
 
   if (!isOpen) return null;
 
-  const userTypeOptions = [
-    { value: 1, label: "Applicant" },
-    { value: 2, label: "Recruiter" },
-    { value: 3, label: "Administrator" }
-  ];
-
-  const genderOptions = [
-    { value: "", label: "Select Gender" },
-    { value: "Male", label: "Male" },
-    { value: "Female", label: "Female" },
-    { value: "Other", label: "Other" }
-  ];
-
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 px-4">
       <div className="bg-white w-full max-w-2xl max-h-[90vh] rounded-xl p-6 overflow-y-auto shadow-xl">
         {/* Header */}
         <div className="flex justify-between items-center mb-6">
-          <h2 className="text-xl font-bold">
-            {isEditing ? "Edit User" : "Create New User"}
-          </h2>
+          <h2 className="text-xl font-bold">Edit User</h2>
           <button 
             onClick={onClose} 
             className="bg-gray-100 hover:bg-gray-200 text-gray-800 px-4 py-2 rounded-lg text-sm"
@@ -232,102 +179,129 @@ export default function UserManagementModal({
         <form onSubmit={handleSubmit} className="space-y-4">
           {/* Basic Information */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <StatusInputField
-              label="Email"
-              name="email"
-              type="email"
-              value={formData.email}
-              onChange={handleInputChange}
-              status={errors.email ? "error" : "default"}
-              errorMessage={errors.email}
-            />
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                Email
+              </label>
+              <input
+                type="email"
+                value={formData.email}
+                readOnly
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg bg-gray-50 text-gray-500 cursor-not-allowed"
+              />
+            </div>
             
-            <StatusInputField
-              label="First Name"
-              name="firstName"
-              value={formData.firstName}
-              onChange={handleInputChange}
-              status={errors.firstName ? "error" : "default"}
-              errorMessage={errors.firstName}
-            />
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                First Name
+              </label>
+              <input
+                type="text"
+                name="firstName"
+                value={formData.firstName}
+                onChange={handleInputChange}
+                className={`w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-black focus:border-transparent ${
+                  errors.firstName ? 'border-red-500' : 'border-gray-300'
+                }`}
+                placeholder="Enter first name"
+              />
+              {errors.firstName && (
+                <p className="text-red-500 text-sm mt-1">{errors.firstName}</p>
+              )}
+            </div>
 
-            <StatusInputField
-              label="Last Name"
-              name="lastName"
-              value={formData.lastName}
-              onChange={handleInputChange}
-              status={errors.lastName ? "error" : "default"}
-              errorMessage={errors.lastName}
-            />
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                Last Name
+              </label>
+              <input
+                type="text"
+                name="lastName"
+                value={formData.lastName}
+                onChange={handleInputChange}
+                className={`w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-black focus:border-transparent ${
+                  errors.lastName ? 'border-red-500' : 'border-gray-300'
+                }`}
+                placeholder="Enter last name"
+              />
+              {errors.lastName && (
+                <p className="text-red-500 text-sm mt-1">{errors.lastName}</p>
+              )}
+            </div>
 
-            <StatusInputField
-              label="Phone (Optional)"
-              name="phone"
-              value={formData.phone}
-              onChange={handleInputChange}
-            />
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                Phone (Optional)
+              </label>
+              <input
+                type="text"
+                name="phone"
+                value={formData.phone}
+                onChange={handleInputChange}
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-black focus:border-transparent"
+                placeholder="Enter phone number"
+              />
+            </div>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <SelectField
-              label="Gender"
-              name="gender"
-              value={formData.gender}
-              onChange={handleInputChange}
-              options={genderOptions}
-            />
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                Gender
+              </label>
+              <select
+                name="gender"
+                value={formData.gender}
+                onChange={handleInputChange}
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-black focus:border-transparent"
+              >
+                <option value="">Select Gender</option>
+                <option value="Male">Male</option>
+                <option value="Female">Female</option>
+                <option value="Other">Other</option>
+              </select>
+            </div>
 
-            <SelectField
-              label="User Type"
-              name="userType"
-              value={formData.userType}
-              onChange={handleInputChange}
-              options={userTypeOptions}
-            />
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                User Type
+              </label>
+              <input
+                type="text"
+                value={formData.userType === 1 ? "Applicant" : formData.userType === 2 ? "Recruiter" : "Admin"}
+                readOnly
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg bg-gray-50 text-gray-500 cursor-not-allowed"
+              />
+            </div>
           </div>
 
-          {/* Password field (only for new users) */}
-          {!isEditing && (
-            <StatusInputField
-              label="Password"
-              name="password"
-              type="password"
-              value={formData.password}
-              onChange={handleInputChange}
-              status={errors.password ? "error" : "default"}
-              errorMessage={errors.password}
-            />
-          )}
-
-          {/* User Status (only for editing) */}
-          {isEditing && (
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div className="flex items-center gap-4">
-                <label className="flex items-center gap-2">
-                  <input
-                    type="checkbox"
-                    name="isActive"
-                    checked={formData.isActive}
-                    onChange={handleInputChange}
-                    className="accent-black"
-                  />
-                  <span className="text-sm">Active Account</span>
-                </label>
-              </div>
-              <div className="flex items-center gap-4">
-                <label className="flex items-center gap-2">
-                  <input
-                    type="checkbox"
-                    name="isVerified"
-                    checked={formData.isVerified}
-                    onChange={handleInputChange}
-                    className="accent-black"
-                  />
-                  <span className="text-sm">Verified Account</span>
-                </label>
-              </div>
+          {/* User Status */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="flex items-center gap-4">
+              <label className="flex items-center gap-2">
+                <input
+                  type="checkbox"
+                  name="isActive"
+                  checked={formData.isActive}
+                  onChange={handleInputChange}
+                  className="accent-black"
+                />
+                <span className="text-sm">Active Account</span>
+              </label>
             </div>
-          )}
+            <div className="flex items-center gap-4">
+              <label className="flex items-center gap-2">
+                <input
+                  type="checkbox"
+                  name="isVerified"
+                  checked={formData.isVerified}
+                  onChange={handleInputChange}
+                  className="accent-black"
+                />
+                <span className="text-sm">Verified Account</span>
+              </label>
+            </div>
+          </div>
 
           {/* Role-specific fields */}
           {formData.userType === 1 && (
@@ -391,7 +365,7 @@ export default function UserManagementModal({
           <div className="flex gap-3 pt-4">
             <PrimaryButton
               type="submit"
-              label={loading ? (isEditing ? "Updating..." : "Creating...") : (isEditing ? "Update User" : "Create User")}
+              label={loading ? "Updating..." : "Update User"}
               disabled={loading}
               className="flex-1"
             />

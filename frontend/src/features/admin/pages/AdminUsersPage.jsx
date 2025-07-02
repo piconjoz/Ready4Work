@@ -8,7 +8,6 @@ import {
   getUsersByType, 
   deleteUserAccount, 
   toggleUserActivation,
-  createUserAccount,
   updateUserAccount 
 } from "../../../services/adminAPI";
 import toast from "react-hot-toast";
@@ -20,7 +19,6 @@ export default function AdminUsersPage() {
   const [error, setError] = useState(null);
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedUserType, setSelectedUserType] = useState("all");
-  const [showCreateModal, setShowCreateModal] = useState(false);
   const [showEditModal, setShowEditModal] = useState(false);
   const [selectedUser, setSelectedUser] = useState(null);
 
@@ -249,12 +247,7 @@ export default function AdminUsersPage() {
               Manage all system users ({filteredUsers.length} of {users.length} shown)
             </p>
           </div>
-          <button
-            onClick={() => setShowCreateModal(true)}
-            className="px-4 py-2 bg-black text-white rounded-lg text-sm hover:bg-gray-800"
-          >
-            Create User
-          </button>
+          {/* Removed Create User button */}
         </div>
 
         {/* Filters */}
@@ -325,11 +318,10 @@ export default function AdminUsersPage() {
           </table>
         </div>
 
-        {/* User Management Modal */}
+        {/* User Management Modal - Only for editing */}
         <UserManagementModal
-          isOpen={showCreateModal || showEditModal}
+          isOpen={showEditModal}
           onClose={() => {
-            setShowCreateModal(false);
             setShowEditModal(false);
             setSelectedUser(null);
           }}
