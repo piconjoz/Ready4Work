@@ -27,9 +27,9 @@ public class ApplicationController : ControllerBase
         try
         {
             int userId = 1; // Hardcoded for testing
-            _logger.LogInformation("Processing application for user {UserId} to job {JobId}", userId, request.JobListingId);
+            _logger.LogInformation("Processing application for user {UserId} to job {JobId}", userId, request.JobId);
 
-            var result = await _applicationService.SubmitApplicationWithCoverLetterAsync(userId, request.JobListingId);
+            var result = await _applicationService.SubmitApplicationWithCoverLetterAsync(userId, request.JobId);
 
             if (!result.Success)
             {
@@ -70,7 +70,7 @@ public class ApplicationController : ControllerBase
             var result = applications.Select(app => new
             {
                 ApplicationId = app.ApplicationId,
-                JobListingId = app.JobListingId,
+                JobListingId = app.JobId,
                 CoverLetter = app.CoverLetterId,
                 Status = app.Status,
                 AppliedDate = app.AppliedDate,

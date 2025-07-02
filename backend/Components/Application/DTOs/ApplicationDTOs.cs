@@ -6,7 +6,7 @@ public class SubmitApplicationDto
 {
     [Required]
     [Range(1, int.MaxValue, ErrorMessage = "Valid job listing ID is required")]
-    public int JobListingId { get; set; }
+    public int JobId { get; set; }
 }
 
 public class ApplicationResponseDto

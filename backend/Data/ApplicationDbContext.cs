@@ -18,28 +18,25 @@ using backend.Components.Qualification.Models;
 using backend.Components.JobSkill.Models;
 
 public class ApplicationDbContext : DbContext
-    {
-        public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options) : base(options)
-        {
-        }
-
-        public DbSet<Company> Companies { get; set; }
-        public DbSet<User> Users { get; set; }
-        public DbSet<Admin> Admins { get; set; }
-        public DbSet<Applicant> Applicants { get; set; }
-        public DbSet<Recruiter> Recruiters { get; set; }
-        public DbSet<RefreshToken> RefreshTokens { get; set; }
+{
+    public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options) : base(options) {}
+    public DbSet<Company> Companies { get; set; }
+    public DbSet<User> Users { get; set; }
+    public DbSet<Admin> Admins { get; set; }
+    public DbSet<Applicant> Applicants { get; set; }
+    public DbSet<Recruiter> Recruiters { get; set; }
+    public DbSet<RefreshToken> RefreshTokens { get; set; }
     public DbSet<JobApplication> JobApplications { get; set; }
     public DbSet<CoverLetter> CoverLetters { get; set; }  // Add CoverLetter DbSet
     public DbSet<Resume> Resumes { get; set; }
     public DbSet<Bookmark> Bookmarks { get; set; }
-        public DbSet<JobListing> JobListings { get; set; }
-        public DbSet<Skill> Skills { get; set; }
-        public DbSet<Programme> Programmes { get; set; }
-        public DbSet<JobSkill> JobSkills { get; set; }
-        public DbSet<Qualification> Qualifications { get; set; }
-        public DbSet<JobScheme> JobSchemes { get; set; }
-        public DbSet<RemunerationType> RemunerationTypes { get; set;}
+    public DbSet<JobListing> JobListings { get; set; }
+    public DbSet<Skill> Skills { get; set; }
+    public DbSet<Programme> Programmes { get; set; }
+    public DbSet<JobSkill> JobSkills { get; set; }
+    public DbSet<Qualification> Qualifications { get; set; }
+    public DbSet<JobScheme> JobSchemes { get; set; }
+    public DbSet<RemunerationType> RemunerationTypes { get; set;}
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -268,9 +265,9 @@ public class ApplicationDbContext : DbContext
 
             // Foreign key to Applicant
             entity.HasOne<Applicant>()
-                  .WithMany()
-                  .HasForeignKey("ApplicantId")
-                  .OnDelete(DeleteBehavior.Cascade);
+                    .WithMany()
+                    .HasForeignKey("ApplicantId")
+                    .OnDelete(DeleteBehavior.Cascade);
 
             entity.HasIndex(e => e.ApplicantId);
         });
@@ -280,7 +277,7 @@ public class ApplicationDbContext : DbContext
         {
             entity.HasKey("ApplicationId");
             entity.Property("ApplicantId").IsRequired().HasColumnName("applicant_id");
-            entity.Property("JobListingId").IsRequired().HasColumnName("job_listing_id");
+            entity.Property("JobId").IsRequired().HasColumnName("job_id");
             entity.Property("CoverLetterId").IsRequired().HasColumnName("cover_letter_id");
             entity.Property("Status").IsRequired().HasMaxLength(50).HasColumnName("status");
             entity.Property("AppliedDate").HasColumnName("applied_date");
@@ -288,17 +285,23 @@ public class ApplicationDbContext : DbContext
 
             // Foreign key to Applicant
             entity.HasOne<Applicant>("Applicant")
-                  .WithMany()
-                  .HasForeignKey("ApplicantId")
-                  .OnDelete(DeleteBehavior.Cascade);
+                    .WithMany()
+                    .HasForeignKey("ApplicantId")
+                    .OnDelete(DeleteBehavior.Cascade);
 
             // Foreign key to CoverLetter
             entity.HasOne<CoverLetter>("CoverLetter")
-                  .WithMany()
-                  .HasForeignKey("CoverLetterId")
-                  .OnDelete(DeleteBehavior.Restrict);  // Don't cascade delete cover letters
+                    .WithMany()
+                    .HasForeignKey("CoverLetterId")
+                    .OnDelete(DeleteBehavior.Restrict);  // Don't cascade delete cover letters
 
-            entity.HasIndex("ApplicantId", "JobListingId").IsUnique(); // Prevent duplicate applications
+            // Foreign Key to JobListing based on jobId
+            entity.HasOne<JobListing>()
+                    .WithMany()
+                    .HasForeignKey("JobId")
+                    .OnDelete(DeleteBehavior.Cascade); // deletion of job listing means deleting the applications to it
+
+            entity.HasIndex("ApplicantId", "JobId").IsUnique(); // Prevent duplicate applications
             entity.HasIndex("CoverLetterId");
         });
 
@@ -312,9 +315,9 @@ public class ApplicationDbContext : DbContext
             entity.Property(e => e.UploadedAt).IsRequired().HasColumnName("uploaded_at");
 
             entity.HasOne<Applicant>()
-                  .WithMany()
-                  .HasForeignKey("ApplicantId")
-                  .OnDelete(DeleteBehavior.Cascade);
+                    .WithMany()
+                    .HasForeignKey("ApplicantId")
+                    .OnDelete(DeleteBehavior.Cascade);
 
             entity.HasIndex(e => e.ApplicantId);
         });
@@ -357,7 +360,7 @@ public class ApplicationDbContext : DbContext
                 .HasColumnName("is_visible");
 
             entity.Property("RemunerationType")
-                .HasColumnName("renumeration_type");
+                .HasColumnName("remuneration_type");
 
             entity.Property("JobDuration")
                 .HasColumnName("job_duration");
