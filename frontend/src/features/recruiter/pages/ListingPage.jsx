@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import RecruiterHeader from "../../../components/RecruiterHeader";
 import ListingCard from "../../../components/ListingCard";
 import PrimaryButton from "../../../components/PrimaryButton";
@@ -10,6 +11,7 @@ export default function RecruiterListingPage() {
   const [listings, setListings] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const navigate = useNavigate();
 
   useEffect(() => {
     const loadListings = async () => {
@@ -42,7 +44,7 @@ export default function RecruiterListingPage() {
           <div className="w-40">
             <PrimaryButton
               label="Add Listing"
-              onClick={() => console.log("Create New Listing Clicked")}
+              onClick={() => navigate("/listing/edit")}
             />
           </div>
         </div>

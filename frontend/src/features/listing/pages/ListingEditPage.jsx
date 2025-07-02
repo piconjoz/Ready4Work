@@ -82,7 +82,7 @@ export default function ListingEditPage() {
         <div className="hidden md:flex gap-8 mt-4 border-b border-gray-200">
           {[
             { value: "applicants", label: "Applicants", icon: <BsPeopleFill /> },
-            { value: "info", label: "Applicantion Info", icon: <MdChecklist /> },
+            { value: "info", label: "Application Info", icon: <MdChecklist /> },
             { value: "job", label: "Job Info", icon: <PiFrameCornersFill /> }
           ].map((option) => (
             <button

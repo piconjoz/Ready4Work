@@ -145,3 +145,14 @@ export const onboardRecruiter = async (onboardingData) => {
     throw error;
   }
 };
+
+// Check if a student email is valid
+export const checkStudent = async (email) => {
+  try {
+    const response = await baseAuthApi.post("/auth/check", { email });
+    return response.data.isValid;
+  } catch (error) {
+    console.error("Error checking student:", error);
+    throw error;
+  }
+};

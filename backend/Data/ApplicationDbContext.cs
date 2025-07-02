@@ -16,6 +16,7 @@ using backend.Components.RemunerationType.Models;
 using backend.Components.Programme.Models;
 using backend.Components.Qualification.Models;
 using backend.Components.JobSkill.Models;
+using backend.Components.Student.Models;
 
 public class ApplicationDbContext : DbContext
 {
@@ -37,6 +38,7 @@ public class ApplicationDbContext : DbContext
     public DbSet<Qualification> Qualifications { get; set; }
     public DbSet<JobScheme> JobSchemes { get; set; }
     public DbSet<RemunerationType> RemunerationTypes { get; set;}
+    public DbSet<StudentProfile> StudentProfiles { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -477,6 +479,79 @@ public class ApplicationDbContext : DbContext
             entity.HasIndex("Type").IsUnique();
         });
 
+        // StudentProfile entity configuration
+        modelBuilder.Entity<StudentProfile>(e =>
+        {
+            e.HasKey(p => p.Id);
+            e.Property(p => p.Id).HasColumnName("student_profile_id");
+            e.Property(p => p.NricFin).IsRequired().HasMaxLength(20).HasColumnName("nric_fin");
+            e.Property(p => p.StudentId).IsRequired().HasColumnName("student_id");
+            e.Property(p => p.Nationality).HasMaxLength(100).HasColumnName("nationality");
+            e.Property(p => p.AdmitYear).HasColumnName("admit_year");
+            e.Property(p => p.PrimaryContactNumber).HasMaxLength(20).HasColumnName("primary_contact_number");
+            e.Property(p => p.Gender).HasMaxLength(10).HasColumnName("gender");
+            e.Property(p => p.DegreeProgramme).HasMaxLength(200).HasColumnName("degree_programme");
+            e.Property(p => p.FullName)
+                .IsRequired()
+                .HasMaxLength(200)
+                .HasColumnName("full_name");
+            e.Property(p => p.Email)
+                .IsRequired()
+                .HasMaxLength(255)
+                .HasColumnName("email");
+            e.HasIndex(p => p.StudentId).IsUnique();
+            e.HasData(
+                new {
+                    Id = 1,
+                    NricFin = "T01234567",
+                    StudentId = 2941985,
+                    Nationality = "Singapore",
+                    AdmitYear = 2020,
+                    PrimaryContactNumber = "94304313",
+                    Gender = "Male",
+                    DegreeProgramme = "BA in User Experience and Game Design",
+                    FullName = "Alice Tan",
+                    Email = "2941985@sit.singaporetech.edu.sg"
+                },
+                new {
+                    Id = 2,
+                    NricFin = "T01654321",
+                    StudentId = 230230,
+                    Nationality = "Singapore",
+                    AdmitYear = 2021,
+                    PrimaryContactNumber = "91234567",
+                    Gender = "Female",
+                    DegreeProgramme = "BSc in Computer Science",
+                    FullName = "Bob Lim",
+                    Email = "230230@sit.singaporetech.edu.sg"
+                },
+                new {
+                    Id = 3,
+                    NricFin = "T0000000A",
+                    StudentId = 2301886,
+                    Nationality = "Singapore",
+                    AdmitYear = 2021,
+                    PrimaryContactNumber = "90737044",
+                    Gender = "Male",
+                    DegreeProgramme = "Information and Communications Technology (Software Engineering)",
+                    FullName = "Marcus Foo",
+                    Email = "2301886@sit.singaporetech.edu.sg"
+                },
+                new {
+                    Id = 4,
+                    NricFin = "T1111111B",
+                    StudentId = 2302221,
+                    Nationality = "Singapore",
+                    AdmitYear = 2021,
+                    PrimaryContactNumber = "99001344",
+                    Gender = "Male",
+                    DegreeProgramme = "Information and Communications Technology (Information Security)",
+                    FullName = "Hariz Darwisy Bin Adan",
+                    Email = "2302221@sit.singaporetech.edu.sg"
+                }
+               
+            );
+        });
 
     }
 }

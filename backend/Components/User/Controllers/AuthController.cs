@@ -1,3 +1,4 @@
+using backend.Components.Student.Services.Interfaces;
 namespace backend.User.Controllers;
 
 using Microsoft.AspNetCore.Mvc;
@@ -12,15 +13,18 @@ public class AuthController : ControllerBase
     private readonly IAuthService _authService;
     private readonly IJWTService _jwtService;
     private readonly IUserService _userService;
+    private readonly IStudentProfileService _studentService;
 
     public AuthController(
         IAuthService authService,
         IJWTService jwtService,
-        IUserService userService)
+        IUserService userService,
+        IStudentProfileService studentService)
     {
         _authService = authService;
         _jwtService = jwtService;
         _userService = userService;
+        _studentService = studentService;
     }
 
     // POST /api/auth/signup/applicant
@@ -214,6 +218,21 @@ public class AuthController : ControllerBase
         }
     }
 
+    // POST /api/auth/check
+    // validates if the provided email belongs to a valid student profile
+    [HttpPost("check")]
+    public async Task<ActionResult<CheckStudentResponseDTO>> CheckStudent([FromBody] CheckStudentRequestDTO request)
+    {
+        if (!ModelState.IsValid)
+            return BadRequest(ModelState);
+
+        var exists = await _studentService.StudentExistsAsync(request.Email);
+        if (!exists)
+            return NotFound(new { message = "No Student Found" });
+
+        return Ok(new CheckStudentResponseDTO { IsValid = true });
+    }
+
     // POST /api/auth/validate
     // validates if token is still valid
     [HttpPost("validate")]
@@ -338,4 +357,15 @@ public class AuthController : ControllerBase
 public class RefreshTokenRequest
 {
     public string Token { get; set; } = string.Empty;
+}
+
+public class CheckStudentRequestDTO
+{
+    [Required]
+    public string Email { get; set; } = string.Empty;
+}
+
+public class CheckStudentResponseDTO
+{
+    public bool IsValid { get; set; }
 }
