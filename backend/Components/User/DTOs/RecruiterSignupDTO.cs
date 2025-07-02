@@ -2,12 +2,8 @@ namespace backend.User.DTOs;
 
 using System.ComponentModel.DataAnnotations;
 
-public class RecruiterSignupDto
+public class RecruiterSignupDTO
 {
-    [Required(ErrorMessage = "nric is required")]
-    [StringLength(20, ErrorMessage = "nric cannot exceed 20 characters")]
-    public string NRIC { get; set; } = string.Empty;
-
     [Required(ErrorMessage = "email is required")]
     [EmailAddress(ErrorMessage = "invalid email format")]
     [StringLength(255, ErrorMessage = "email cannot exceed 255 characters")]

@@ -1,6 +1,6 @@
 namespace backend.User.DTOs;
 
-public class RecruiterResponseDto
+public class RecruiterResponseDTO
 {
     public int RecruiterId { get; set; }
     public int UserId { get; set; }
@@ -11,5 +11,5 @@ public class RecruiterResponseDto
     public DateTime UpdatedAt { get; set; }
     
     // user info included for convenience
-    public UserResponseDto? User { get; set; }
+    public UserResponseDTO? User { get; set; }
 }

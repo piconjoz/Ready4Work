@@ -1,6 +1,6 @@
 namespace backend.User.DTOs;
 
-public class AdminResponseDto
+public class AdminResponseDTO
 {
     public int AdminId { get; set; }
     public int UserId { get; set; }
@@ -8,5 +8,5 @@ public class AdminResponseDto
     public DateTime UpdatedAt { get; set; }
     
     // user info included for convenience
-    public UserResponseDto? User { get; set; }
+    public UserResponseDTO? User { get; set; }
 }

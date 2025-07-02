@@ -16,11 +16,10 @@ public class UserService : IUserService
         _passwordService = passwordService;
     }
 
-    public async Task<User> CreateUserAsync(string nric, string email, string firstName, string lastName, 
+    public async Task<User> CreateUserAsync(string email, string firstName, string lastName,
                                            string? phone, string? gender, int userType, string password)
     {
         // validate input
-        if (string.IsNullOrWhiteSpace(nric)) throw new ArgumentException("nric cannot be empty");
         if (string.IsNullOrWhiteSpace(email)) throw new ArgumentException("email cannot be empty");
         if (string.IsNullOrWhiteSpace(firstName)) throw new ArgumentException("first name cannot be empty");
         if (string.IsNullOrWhiteSpace(lastName)) throw new ArgumentException("last name cannot be empty");
@@ -32,17 +31,11 @@ public class UserService : IUserService
             throw new InvalidOperationException("email already exists");
         }
 
-        // check if nric already exists
-        if (await NricExistsAsync(nric))
-        {
-            throw new InvalidOperationException("nric already exists");
-        }
-
         // hash the password
         var (salt, hashedPassword) = _passwordService.HashPassword(password);
 
         // create the user entity
-        var user = new User(nric, email, firstName, lastName, phone, gender, userType, salt, hashedPassword);
+        var user = new User(email, firstName, lastName, phone, gender, userType, salt, hashedPassword);
 
         // save to database
         return await _userRepository.CreateAsync(user);
@@ -60,19 +53,15 @@ public class UserService : IUserService
         return await _userRepository.GetByEmailAsync(email);
     }
 
-    public async Task<User?> GetUserByNricAsync(string nric)
-    {
-        if (string.IsNullOrWhiteSpace(nric)) return null;
-        return await _userRepository.GetByNricAsync(nric);
-    }
+
 
     public async Task<bool> ValidateUserCredentialsAsync(string email, string password)
     {
-        if (string.IsNullOrWhiteSpace(email) || string.IsNullOrWhiteSpace(password)) 
+        if (string.IsNullOrWhiteSpace(email) || string.IsNullOrWhiteSpace(password))
             return false;
 
         var user = await GetUserByEmailAsync(email);
-        if (user == null || !user.GetIsActive()) 
+        if (user == null || !user.GetIsActive())
             return false;
 
         return _passwordService.VerifyPassword(password, user.GetSalt(), user.GetPasswordHash());
@@ -162,18 +151,13 @@ public class UserService : IUserService
         return await _userRepository.ExistsByEmailAsync(email);
     }
 
-    public async Task<bool> NricExistsAsync(string nric)
-    {
-        if (string.IsNullOrWhiteSpace(nric)) return false;
-        return await _userRepository.ExistsByNricAsync(nric);
-    }
 
-    public UserResponseDto ConvertToResponseDto(User user)
+
+    public UserResponseDTO ConvertToResponseDTO(User user)
     {
-        return new UserResponseDto
+        return new UserResponseDTO
         {
             UserId = user.GetUserId(),
-            NRIC = user.GetNRIC(),
             Email = user.GetEmail(),
             FirstName = user.GetFirstName(),
             LastName = user.GetLastName(),

@@ -1,6 +1,6 @@
 namespace backend.User.DTOs;
 
-public class UserResponseDto
+public class UserResponseDTO
 {
     public int UserId { get; set; }
     public string NRIC { get; set; } = string.Empty;

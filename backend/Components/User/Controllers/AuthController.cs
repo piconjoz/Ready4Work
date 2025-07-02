@@ -1,0 +1,306 @@
+namespace backend.User.Controllers;
+
+using Microsoft.AspNetCore.Mvc;
+using backend.User.DTOs;
+using backend.User.Services.Interfaces;
+using System.ComponentModel.DataAnnotations;
+
+[ApiController]
+[Route("api/auth")]
+public class AuthController : ControllerBase
+{
+    private readonly IAuthService _authService;
+
+    public AuthController(IAuthService authService)
+    {
+        _authService = authService;
+    }
+
+    // POST /api/auth/signup/applicant
+    // separate endpoint prevents usertype manipulation
+    [HttpPost("signup/applicant")]
+    public async Task<ActionResult<AuthResponseDTO>> SignupApplicant([FromBody] ApplicantSignupDTO signupDto)
+    {
+        try
+        {
+            // validate model state from data annotations
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+
+            var result = await _authService.SignupApplicantAsync(signupDto);
+            
+            // Set refresh token in httpOnly cookie
+            if (!string.IsNullOrEmpty(result.RefreshToken))
+            {
+                SetRefreshTokenCookie(result.RefreshToken);
+            }
+            
+            // Don't send refresh token in response body
+            result.RefreshToken = null;
+            
+            return Ok(result);
+        }
+        catch (ArgumentException ex)
+        {
+            // business rule validation errors (e.g., invalid email format)
+            return BadRequest(new { message = ex.Message });
+        }
+        catch (InvalidOperationException ex)
+        {
+            // business logic errors (e.g., email already exists)
+            return Conflict(new { message = ex.Message });
+        }
+        catch (Exception ex)
+        {
+            // unexpected errors - don't expose internal details
+            return StatusCode(500, new { message = "An error occurred during registration" });
+        }
+    }
+
+    // POST /api/auth/signup/recruiter
+    // separate endpoint prevents usertype manipulation
+    [HttpPost("signup/recruiter")]
+    public async Task<ActionResult<AuthResponseDTO>> SignupRecruiter([FromBody] RecruiterSignupDTO signupDto)
+    {
+        try
+        {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+
+            var result = await _authService.SignupRecruiterAsync(signupDto);
+            
+            // Set refresh token in httpOnly cookie
+            if (!string.IsNullOrEmpty(result.RefreshToken))
+            {
+                SetRefreshTokenCookie(result.RefreshToken);
+            }
+            
+            // Don't send refresh token in response body
+            result.RefreshToken = null;
+            
+            return Ok(result);
+        }
+        catch (ArgumentException ex)
+        {
+            return BadRequest(new { message = ex.Message });
+        }
+        catch (InvalidOperationException ex)
+        {
+            return Conflict(new { message = ex.Message });
+        }
+        catch (Exception ex)
+        {
+            return StatusCode(500, new { message = "An error occurred during registration" });
+        }
+    }
+
+    // POST /api/auth/login
+    // unified login for all user types
+    [HttpPost("login")]
+    public async Task<ActionResult<AuthResponseDTO>> Login([FromBody] LoginDTO loginDto)
+    {
+        try
+        {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+
+            var result = await _authService.LoginAsync(loginDto);
+            
+            // Set refresh token in httpOnly cookie
+            if (!string.IsNullOrEmpty(result.RefreshToken))
+            {
+                SetRefreshTokenCookie(result.RefreshToken);
+            }
+            
+            // Don't send refresh token in response body
+            result.RefreshToken = null;
+            
+            return Ok(result);
+        }
+        catch (UnauthorizedAccessException ex)
+        {
+            // credential validation errors
+            return Unauthorized(new { message = ex.Message });
+        }
+        catch (ArgumentException ex)
+        {
+            return BadRequest(new { message = ex.Message });
+        }
+        catch (Exception ex)
+        {
+            return StatusCode(500, new { message = "An error occurred during login" });
+        }
+    }
+
+    // POST /api/auth/refresh
+    // refreshes access token using refresh token from cookie
+    [HttpPost("refresh")]
+    public async Task<ActionResult<AuthResponseDTO>> RefreshToken()
+    {
+        try
+        {
+            // Get refresh token from httpOnly cookie
+            var refreshToken = Request.Cookies["refreshToken"];
+
+            if (string.IsNullOrWhiteSpace(refreshToken))
+            {
+                return Unauthorized(new { message = "Refresh token not found" });
+            }
+
+            var result = await _authService.RefreshTokenAsync(refreshToken);
+            if (result == null)
+            {
+                return Unauthorized(new { message = "Invalid or expired refresh token" });
+            }
+
+            // Set new refresh token in httpOnly cookie
+            if (!string.IsNullOrEmpty(result.RefreshToken))
+            {
+                SetRefreshTokenCookie(result.RefreshToken);
+            }
+
+            // Return new access token (don't include refresh token in response body)
+            return Ok(new AuthResponseDTO
+            {
+                Token = result.Token,
+                ExpiresAt = result.ExpiresAt,
+                User = result.User,
+                RefreshToken = null // Don't send refresh token in response body
+            });
+        }
+        catch (Exception ex)
+        {
+            return StatusCode(500, new { message = "An error occurred during token refresh" });
+        }
+    }
+
+    // POST /api/auth/logout
+    // revokes refresh token and clears cookies
+    [HttpPost("logout")]
+    public async Task<ActionResult> Logout()
+    {
+        try
+        {
+            // Get refresh token from cookie
+            var refreshToken = Request.Cookies["refreshToken"];
+
+            if (!string.IsNullOrWhiteSpace(refreshToken))
+            {
+                // Revoke the refresh token in database
+                await _authService.RevokeRefreshTokenAsync(refreshToken);
+            }
+
+            // Clear the refresh token cookie
+            Response.Cookies.Delete("refreshToken");
+
+            return Ok(new { message = "Logged out successfully" });
+        }
+        catch (Exception ex)
+        {
+            return StatusCode(500, new { message = "An error occurred during logout" });
+        }
+    }
+
+    // POST /api/auth/validate
+    // validates if token is still valid
+    [HttpPost("validate")]
+    public async Task<ActionResult<bool>> ValidateToken([FromBody] RefreshTokenRequest request)
+    {
+        try
+        {
+            if (string.IsNullOrWhiteSpace(request.Token))
+            {
+                return BadRequest(new { message = "Token is required" });
+            }
+
+            var isValid = await _authService.ValidateTokenAsync(request.Token);
+            return Ok(new { isValid });
+        }
+        catch (Exception ex)
+        {
+            return StatusCode(500, new { message = "An error occurred during token validation" });
+        }
+    }
+
+    // POST /api/auth/verify/{userId}
+    // verifies user account (for email verification)
+    [HttpPost("verify/{userId}")]
+    public async Task<ActionResult> VerifyUser(int userId)
+    {
+        try
+        {
+            if (userId <= 0)
+            {
+                return BadRequest(new { message = "Invalid user ID" });
+            }
+
+            var success = await _authService.VerifyUserAsync(userId);
+            if (!success)
+            {
+                return NotFound(new { message = "User not found or already verified" });
+            }
+
+            return Ok(new { message = "User verified successfully" });
+        }
+        catch (Exception ex)
+        {
+            return StatusCode(500, new { message = "An error occurred during verification" });
+        }
+    }
+
+    // POST /api/auth/onboard/recruiter
+    // onboards recruiter and company in one step
+    [HttpPost("onboard/recruiter")]
+    public async Task<IActionResult> CompanyAndRecruiterRegistration([FromBody] RecruiterOnboardingDTO dto)
+    {
+        if (!ModelState.IsValid)
+        {
+            return BadRequest(ModelState);
+        }
+
+        try
+        {
+            var result = await _authService.OnboardRecruiterAndCompanyAsync(dto);
+            if (result == null)
+                return StatusCode(500, "Onboarding failed.");
+            return Ok(result);
+        }
+        catch (InvalidOperationException ex)
+        {
+            // Known business errors (company/user already exists)
+            return Conflict(new { message = ex.Message });
+        }
+        catch (Exception ex)
+        {
+            // Unexpected errors
+            return StatusCode(500, ex.Message);
+        }
+    }
+
+    // Helper method to set refresh token in httpOnly cookie
+    private void SetRefreshTokenCookie(string refreshToken)
+    {
+        var cookieOptions = new CookieOptions
+        {
+            HttpOnly = true,        // Prevents XSS attacks
+            Secure = false,         // Set to true in production with HTTPS
+            SameSite = SameSiteMode.Strict, // CSRF protection
+            Expires = DateTime.UtcNow.AddDays(30), // Match refresh token expiry
+            Path = "/"
+        };
+
+        Response.Cookies.Append("refreshToken", refreshToken, cookieOptions);
+    }
+}
+
+// helper dto for token requests
+public class RefreshTokenRequest
+{
+    public string Token { get; set; } = string.Empty;
+}

@@ -1,6 +1,12 @@
 import React from "react";
 
-export default function DisclaimerCheckbox({ title, description, name }) {
+export default function DisclaimerCheckbox({
+  title,
+  description,
+  name,
+  checked,
+  onChange,
+}) {
   return (
     <div className="mt-10 mb-10 flex items-center justify-between">
       {/* Informant Text */}
@@ -11,7 +17,13 @@ export default function DisclaimerCheckbox({ title, description, name }) {
 
       {/* Checkbox */}
       <label className="flex items-center mr-2">
-        <input type="checkbox" name={name} className="accent-black scale-150" />
+        <input
+          type="checkbox"
+          name={name}
+          className="accent-black scale-150"
+          checked={checked}
+          onChange={onChange}
+        />
       </label>
     </div>
   );

@@ -2,7 +2,7 @@ namespace backend.User.DTOs;
 
 using System.ComponentModel.DataAnnotations;
 
-public class LoginDto
+public class LoginDTO
 {
     [Required(ErrorMessage = "email is required")]
     [EmailAddress(ErrorMessage = "invalid email format")]

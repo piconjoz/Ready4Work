@@ -9,4 +9,6 @@ public interface ICompanyRepository
     Task<Company> CreateAsync(Company company);
     Task<Company> UpdateAsync(Company company);
     Task<bool> DeleteAsync(int companyId);
+
+    Task<Company?> GetCompanyByUENAsync(string uen);
 }
