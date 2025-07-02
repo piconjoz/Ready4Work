@@ -28,6 +28,10 @@ using backend.Components.User.Repositories.Interfaces;
 using backend.Components.User.Repositories;
 using backend.Components.User.Services;
 using backend.Components.User.Services.Interfaces;
+using backend.Components.JobListing.Repositories.Interfaces;
+using backend.Components.JobListing.Repositories;
+using backend.Components.JobListing.Services.Interfaces;
+using backend.Components.JobListing.Services;
 
 DotNetEnv.Env.Load();
 
@@ -117,6 +121,10 @@ builder.Services.AddScoped<IApplicantService, ApplicantService>();
 builder.Services.AddScoped<IRecruiterService, RecruiterService>();
 builder.Services.AddScoped<IRefreshTokenService, RefreshTokenService>();
 builder.Services.AddScoped<IAuthService, AuthService>();
+
+// register dependency injection for job listing components
+builder.Services.AddScoped<IJobListingRepository, JobListingRepository>();
+builder.Services.AddScoped<IJobListingService, JobListingService>();
 
 // configure JWT authentication
 var jwtSettings = builder.Configuration.GetSection("Jwt");

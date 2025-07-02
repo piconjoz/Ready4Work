@@ -7,6 +7,8 @@ using backend.Components.Application.Repository;
 using backend.Components.CoverLetter.Services;
 using backend.Components.CoverLetter.Repository;
 using backend.User.Services.Interfaces;
+using backend.Components.JobListing.Repositories.Interfaces;
+using System.Threading.Tasks;
 
 public class ApplicationService : IApplicationService
 {
@@ -16,6 +18,7 @@ public class ApplicationService : IApplicationService
     private readonly ICoverLetterService _coverLetterService;
     private readonly ICoverLetterRepository _coverLetterRepository;
     private readonly ILogger<ApplicationService> _logger;
+    private readonly IJobListingRepository _jobListingRepository;
 
     public ApplicationService(
         IAIService aiService,
@@ -23,7 +26,8 @@ public class ApplicationService : IApplicationService
         IApplicationRepository applicationRepository,
         ICoverLetterService coverLetterService,
         ICoverLetterRepository coverLetterRepository,
-        ILogger<ApplicationService> logger)
+        ILogger<ApplicationService> logger,
+        IJobListingRepository jobListingRepository)
     {
         _aiService = aiService;
         _userService = userService;
@@ -31,19 +35,20 @@ public class ApplicationService : IApplicationService
         _coverLetterService = coverLetterService;
         _coverLetterRepository = coverLetterRepository;
         _logger = logger;
+        _jobListingRepository = jobListingRepository;
     }
 
-    public async Task<ApplicationResult> SubmitApplicationWithCoverLetterAsync(int applicantId, int jobListingId)
+    public async Task<ApplicationResult> SubmitApplicationWithCoverLetterAsync(int applicantId, int jobId)
     {
         try
         {
-            _logger.LogInformation("Starting application submission for applicant {ApplicantId} and job {JobId}", applicantId, jobListingId);
+            _logger.LogInformation("Starting application submission for applicant {ApplicantId} and job {JobId}", applicantId, jobId);
 
             // 1. Check if application already exists
-            var existingApplication = await _applicationRepository.GetByApplicantAndJobAsync(applicantId, jobListingId);
+            var existingApplication = await _applicationRepository.GetByApplicantAndJobAsync(applicantId, jobId);
             if (existingApplication != null)
             {
-                _logger.LogWarning("Duplicate application attempt for applicant {ApplicantId} and job {JobId}", applicantId, jobListingId);
+                _logger.LogWarning("Duplicate application attempt for applicant {ApplicantId} and job {JobId}", applicantId, jobId);
                 return new ApplicationResult
                 {
                     Success = false,
@@ -69,15 +74,15 @@ public class ApplicationService : IApplicationService
             var applicantName = $"{user.GetFirstName()} {user.GetLastName()}";
             */
 
-            // 3. Get job details (using mock data based on jobListingId)
-            var (jobTitle, jobDescription) = GetMockJobData(jobListingId);
-            _logger.LogInformation("Retrieved job data: {JobTitle} for job {JobId}", jobTitle, jobListingId);
+            // 3. Get job details (using mock data based on jobId)
+            var (jobTitle, jobDescription) = GetMockJobData(jobId);
+            _logger.LogInformation("Retrieved job data: {JobTitle} for job {JobId}", jobTitle, jobId);
 
             // 4. Get resume keywords (using the extracted keywords from the text file)
             var resumeKeywords = GetApplicantResumeKeywords(applicantId);
 
             // 5. Generate cover letter using AI
-            _logger.LogInformation("Generating AI cover letter for applicant {ApplicantId} and job {JobId}", applicantId, jobListingId);
+            _logger.LogInformation("Generating AI cover letter for applicant {ApplicantId} and job {JobId}", applicantId, jobId);
             
             var coverLetterText = await _aiService.GenerateCoverLetterAsync(
                 resumeKeywords,
@@ -115,7 +120,7 @@ public class ApplicationService : IApplicationService
             
             var application = new JobApplication(
                 applicantId,
-                jobListingId,
+                jobId,
                 coverLetter.CoverLetterId,  // Reference to CoverLetter entity (follows ER diagram)
                 "pending"
             );
@@ -124,7 +129,7 @@ public class ApplicationService : IApplicationService
             _logger.LogInformation("Job application created with ID {ApplicationId}", savedApplication.ApplicationId);
 
             _logger.LogInformation("Application submission completed successfully for applicant {ApplicantId} and job {JobId}. Application ID: {ApplicationId}, Cover Letter ID: {CoverLetterId}", 
-                applicantId, jobListingId, savedApplication.ApplicationId, coverLetter.CoverLetterId);
+                applicantId, jobId, savedApplication.ApplicationId, coverLetter.CoverLetterId);
 
             return new ApplicationResult
             {
@@ -137,7 +142,7 @@ public class ApplicationService : IApplicationService
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "Error submitting application for applicant {ApplicantId} and job {JobId}", applicantId, jobListingId);
+            _logger.LogError(ex, "Error submitting application for applicant {ApplicantId} and job {JobId}", applicantId, jobId);
             return new ApplicationResult
             {
                 Success = false,
@@ -146,11 +151,11 @@ public class ApplicationService : IApplicationService
         }
     }
 
-    private (string jobTitle, string jobDescription) GetMockJobData(int jobListingId)
+    private (string jobTitle, string jobDescription) GetMockJobData(int jobId)
     {
-        // Mock job data based on jobListingId
+        // Mock job data based on jobId
         // In real implementation, this would query the database
-        return jobListingId switch
+        return jobId switch
         {
             1 => (
                 "EDE2022 Probability & Statistical Signal Processing Student Coach",
@@ -277,10 +282,14 @@ CONTACT INFORMATION:
 
     // Additional helper methods for potential future use
 
-    private bool IsValidJobListingId(int jobListingId)
+    private async Task<bool> IsValidJobListingId(int jobId)
     {
         // In real implementation, this would query the JobListings table
-        return jobListingId > 0 && jobListingId <= 10;
+        // return jobId > 0 && jobId <= 10;
+        var jobListing = await _jobListingRepository.GetJobListingByIdAsync(jobId);
+        if (jobListing == null) return false;
+        return true;
+
     }
 
     private async Task<bool> HasUserAppliedRecently(int applicantId)

@@ -14,8 +14,8 @@ public class JobApplication
     public int ApplicantId { get; set; }
     
     [Required]
-    [Column("job_listing_id")]
-    public int JobListingId { get; set; }
+    [Column("job_id")]
+    public int JobId { get; set; }
     
     [Required]
     [Column("cover_letter_id")]
@@ -40,10 +40,10 @@ public class JobApplication
     public JobApplication() { }
 
     // Constructor for services
-    public JobApplication(int applicantId, int jobListingId, int coverLetterId, string status)
+    public JobApplication(int applicantId, int jobId, int coverLetterId, string status)
     {
         ApplicantId = applicantId;
-        JobListingId = jobListingId;
+        JobId = jobId;
         CoverLetterId = coverLetterId;
         Status = status;
         AppliedDate = DateTime.UtcNow;

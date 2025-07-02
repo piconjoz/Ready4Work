@@ -50,4 +50,15 @@ public class JobListingRepository : IJobListingRepository
         return true;
     }
     // other related functions go here
+    public async Task<List<JobListing>> GetVisibleJobListingsByRecruiterIdAsync(int recruiterId)
+    {
+        // by right the properties are supposed to be public but for the sake of security (for now)
+        // just retrieve the listings out and sort them in this method as opposed to selecting through the database
+        var jobListings = await _context.JobListings.ToListAsync();
+        var recruiterListings = jobListings.Where(j => j.GetRecruiterId() == recruiterId).ToList();
+        // var jobListing = await _context.JobListings
+        //     .Where(j => j.GetRecruiterId() == recruiterId) //&& j.GetIsVisible() == true) // do we need show old 
+        //     .ToListAsync();
+        return recruiterListings;
+    }
 }

@@ -18,10 +18,10 @@ public class ApplicationRepository : IApplicationRepository
         return await _context.JobApplications.FirstOrDefaultAsync(a => a.ApplicationId == applicationId);
     }
 
-    public async Task<JobApplication?> GetByApplicantAndJobAsync(int applicantId, int jobListingId)
+    public async Task<JobApplication?> GetByApplicantAndJobAsync(int applicantId, int jobId)
     {
-        return await _context.JobApplications.FirstOrDefaultAsync(a => 
-            a.ApplicantId == applicantId && a.JobListingId == jobListingId);
+        return await _context.JobApplications.FirstOrDefaultAsync(a =>
+            a.ApplicantId == applicantId && a.JobId == jobId);
     }
 
     public async Task<List<JobApplication>> GetByApplicantIdAsync(int applicantId)
@@ -54,5 +54,13 @@ public class ApplicationRepository : IApplicationRepository
         _context.JobApplications.Remove(application);
         await _context.SaveChangesAsync();
         return true;
+    }
+
+    // get a list of all applications correlating to jobIds stated
+    public async Task<List<JobApplication>> GetAllApplicationsAsync(List<int> jobIds)
+    {
+        return await _context.JobApplications
+            .Where(a => jobIds.Contains(a.JobId))
+            .ToListAsync();
     }
 }
