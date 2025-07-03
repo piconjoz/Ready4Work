@@ -402,6 +402,15 @@ public class ApplicationDbContext : DbContext
         {
             entity.HasKey("SkillId");
             entity.Property("skill").HasColumnName("skill");
+            
+            entity.HasData(
+                new Skill { SkillId = 1, skill = "NetSuite Proficency"},
+                new Skill { SkillId = 2, skill = "Java Proficency"},
+                new Skill { SkillId = 3, skill = "Auditing Proficiency"},
+                new Skill { SkillId = 4, skill = "Oracle Proficiency"},
+                new Skill { SkillId = 5, skill = "Microsoft Excel Proficiency"}
+                // add as necessary
+            );
         });
 
         // Programme entity
@@ -409,6 +418,49 @@ public class ApplicationDbContext : DbContext
         {
             entity.HasKey("ProgrammeId");
             entity.Property("ProgrammeName").HasColumnName("programme_name");
+            entity.HasData(
+                new Programme { ProgrammeId = 1, ProgrammeName = "Accountancy" },
+                new Programme { ProgrammeId = 2, ProgrammeName = "Aircraft Systems Engineering" },
+                new Programme { ProgrammeId = 3, ProgrammeName = "Applied Artificial Intelligence" },
+                new Programme { ProgrammeId = 4, ProgrammeName = "Applied Computing (Fintech)" },
+                new Programme { ProgrammeId = 5, ProgrammeName = "Applied Computing (Stackable Micro-credential Pathway)" },
+                new Programme { ProgrammeId = 6, ProgrammeName = "Aviation Management" },
+                new Programme { ProgrammeId = 7, ProgrammeName = "Business and Infocomm Technology" },
+                new Programme { ProgrammeId = 8, ProgrammeName = "Chemical Engineering" },
+                new Programme { ProgrammeId = 9, ProgrammeName = "Civil Engineering" },
+                new Programme { ProgrammeId = 10, ProgrammeName = "Communication and Digital Media" },
+                new Programme { ProgrammeId = 11, ProgrammeName = "Computer Engineering" },
+                new Programme { ProgrammeId = 12, ProgrammeName = "Computer Science in Interactive Media and Game Development" },
+                new Programme { ProgrammeId = 13, ProgrammeName = "Computer Science in Real-Time Interactive Simulation" },
+                new Programme { ProgrammeId = 14, ProgrammeName = "Computing Science" },
+                new Programme { ProgrammeId = 15, ProgrammeName = "Diagnostic Radiography" },
+                new Programme { ProgrammeId = 16, ProgrammeName = "Dietetics and Nutrition" },
+                new Programme { ProgrammeId = 17, ProgrammeName = "Digital Art and Animation" },
+                new Programme { ProgrammeId = 18, ProgrammeName = "Digital Supply Chain" },
+                new Programme { ProgrammeId = 19, ProgrammeName = "Electrical and Electronic Engineering" },
+                new Programme { ProgrammeId = 20, ProgrammeName = "Electrical and Electronic Engineering (Stackable Micro-credential Pathway)" },
+                new Programme { ProgrammeId = 21, ProgrammeName = "Electrical Power Engineering" },
+                new Programme { ProgrammeId = 22, ProgrammeName = "Electronics and Data Engineering" },
+                new Programme { ProgrammeId = 23, ProgrammeName = "Engineering Systems" },
+                new Programme { ProgrammeId = 24, ProgrammeName = "Food Business Management (Baking and Pastry Arts)" },
+                new Programme { ProgrammeId = 25, ProgrammeName = "Food Business Management (Culinary Arts)" },
+                new Programme { ProgrammeId = 26, ProgrammeName = "Food Technology" },    
+                new Programme { ProgrammeId = 27, ProgrammeName = "Hospitality and Tourism Management" },
+                new Programme { ProgrammeId = 28, ProgrammeName = "Information and Communications Technology (Information Security)" },
+                new Programme { ProgrammeId = 29, ProgrammeName = "Information and Communications Technology (Software Engineering)" },
+                new Programme { ProgrammeId = 30, ProgrammeName = "Infrastructure and Systems Engineering" },
+                new Programme { ProgrammeId = 31, ProgrammeName = "Infrastructure and Systems Engineering (Stackable Micro-credential Pathway)" },
+                new Programme { ProgrammeId = 32, ProgrammeName = "Mechanical Design and Manufacturing Engineering" },
+                new Programme { ProgrammeId = 33, ProgrammeName = "Mechanical Engineering" },
+                new Programme { ProgrammeId = 34, ProgrammeName = "Naval Architecture and Marine Engineering" },
+                new Programme { ProgrammeId = 35, ProgrammeName = "Nursing (Post-registration)" },
+                new Programme { ProgrammeId = 36, ProgrammeName = "Nursing (Pre-registration and Specialty Training)" },
+                new Programme { ProgrammeId = 37, ProgrammeName = "Occupational Therapy" },
+                new Programme { ProgrammeId = 38, ProgrammeName = "Pharmaceutical Engineering" },
+                new Programme { ProgrammeId = 39, ProgrammeName = "Physiotherapy" },
+                new Programme { ProgrammeId = 40, ProgrammeName = "Radiation Therapy" },
+                new Programme { ProgrammeId = 41, ProgrammeName = "Robotics Systems" }
+            );
         });
 
         // Job skills entity
@@ -477,6 +529,14 @@ public class ApplicationDbContext : DbContext
                 .HasColumnName("type");
 
             entity.HasIndex("Type").IsUnique();
+
+            // Prefilled static data
+            entity.HasData(
+                new RemunerationType { RemunerationId = 1, Type = "Hourly" },
+                new RemunerationType { RemunerationId = 2, Type = "Monthly" },
+                new RemunerationType { RemunerationId = 3, Type = "Project-based" },
+                new RemunerationType { RemunerationId = 4, Type = "Contract-based" }
+            );
         });
 
         // StudentProfile entity configuration

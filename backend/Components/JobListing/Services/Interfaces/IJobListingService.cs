@@ -12,5 +12,5 @@ public interface IJobListingService
     Task<bool> DeleteJobListingAsync(int jobId);
     Task<List<JobListing>> GetAllJobListingAsync();
     // Other implemenation go here
-    Task<List<JobListingResponseDTO>> GetAllRecruiterJobListingsAsync(int recruiterId);
+    Task<List<JobListingRecruiterShowAllDTO>> GetAllRecruiterJobListingsAsync(int recruiterId);
 }

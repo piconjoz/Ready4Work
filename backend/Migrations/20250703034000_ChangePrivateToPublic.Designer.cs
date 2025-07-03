@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using backend.Data;
 
@@ -10,9 +11,11 @@ using backend.Data;
 namespace backend.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250703034000_ChangePrivateToPublic")]
+    partial class ChangePrivateToPublic
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -395,213 +398,6 @@ namespace backend.Migrations
                     b.HasKey("ProgrammeId");
 
                     b.ToTable("Programmes");
-
-                    b.HasData(
-                        new
-                        {
-                            ProgrammeId = 1,
-                            ProgrammeName = "Accountancy"
-                        },
-                        new
-                        {
-                            ProgrammeId = 2,
-                            ProgrammeName = "Aircraft Systems Engineering"
-                        },
-                        new
-                        {
-                            ProgrammeId = 3,
-                            ProgrammeName = "Applied Artificial Intelligence"
-                        },
-                        new
-                        {
-                            ProgrammeId = 4,
-                            ProgrammeName = "Applied Computing (Fintech)"
-                        },
-                        new
-                        {
-                            ProgrammeId = 5,
-                            ProgrammeName = "Applied Computing (Stackable Micro-credential Pathway)"
-                        },
-                        new
-                        {
-                            ProgrammeId = 6,
-                            ProgrammeName = "Aviation Management"
-                        },
-                        new
-                        {
-                            ProgrammeId = 7,
-                            ProgrammeName = "Business and Infocomm Technology"
-                        },
-                        new
-                        {
-                            ProgrammeId = 8,
-                            ProgrammeName = "Chemical Engineering"
-                        },
-                        new
-                        {
-                            ProgrammeId = 9,
-                            ProgrammeName = "Civil Engineering"
-                        },
-                        new
-                        {
-                            ProgrammeId = 10,
-                            ProgrammeName = "Communication and Digital Media"
-                        },
-                        new
-                        {
-                            ProgrammeId = 11,
-                            ProgrammeName = "Computer Engineering"
-                        },
-                        new
-                        {
-                            ProgrammeId = 12,
-                            ProgrammeName = "Computer Science in Interactive Media and Game Development"
-                        },
-                        new
-                        {
-                            ProgrammeId = 13,
-                            ProgrammeName = "Computer Science in Real-Time Interactive Simulation"
-                        },
-                        new
-                        {
-                            ProgrammeId = 14,
-                            ProgrammeName = "Computing Science"
-                        },
-                        new
-                        {
-                            ProgrammeId = 15,
-                            ProgrammeName = "Diagnostic Radiography"
-                        },
-                        new
-                        {
-                            ProgrammeId = 16,
-                            ProgrammeName = "Dietetics and Nutrition"
-                        },
-                        new
-                        {
-                            ProgrammeId = 17,
-                            ProgrammeName = "Digital Art and Animation"
-                        },
-                        new
-                        {
-                            ProgrammeId = 18,
-                            ProgrammeName = "Digital Supply Chain"
-                        },
-                        new
-                        {
-                            ProgrammeId = 19,
-                            ProgrammeName = "Electrical and Electronic Engineering"
-                        },
-                        new
-                        {
-                            ProgrammeId = 20,
-                            ProgrammeName = "Electrical and Electronic Engineering (Stackable Micro-credential Pathway)"
-                        },
-                        new
-                        {
-                            ProgrammeId = 21,
-                            ProgrammeName = "Electrical Power Engineering"
-                        },
-                        new
-                        {
-                            ProgrammeId = 22,
-                            ProgrammeName = "Electronics and Data Engineering"
-                        },
-                        new
-                        {
-                            ProgrammeId = 23,
-                            ProgrammeName = "Engineering Systems"
-                        },
-                        new
-                        {
-                            ProgrammeId = 24,
-                            ProgrammeName = "Food Business Management (Baking and Pastry Arts)"
-                        },
-                        new
-                        {
-                            ProgrammeId = 25,
-                            ProgrammeName = "Food Business Management (Culinary Arts)"
-                        },
-                        new
-                        {
-                            ProgrammeId = 26,
-                            ProgrammeName = "Food Technology"
-                        },
-                        new
-                        {
-                            ProgrammeId = 27,
-                            ProgrammeName = "Hospitality and Tourism Management"
-                        },
-                        new
-                        {
-                            ProgrammeId = 28,
-                            ProgrammeName = "Information and Communications Technology (Information Security)"
-                        },
-                        new
-                        {
-                            ProgrammeId = 29,
-                            ProgrammeName = "Information and Communications Technology (Software Engineering)"
-                        },
-                        new
-                        {
-                            ProgrammeId = 30,
-                            ProgrammeName = "Infrastructure and Systems Engineering"
-                        },
-                        new
-                        {
-                            ProgrammeId = 31,
-                            ProgrammeName = "Infrastructure and Systems Engineering (Stackable Micro-credential Pathway)"
-                        },
-                        new
-                        {
-                            ProgrammeId = 32,
-                            ProgrammeName = "Mechanical Design and Manufacturing Engineering"
-                        },
-                        new
-                        {
-                            ProgrammeId = 33,
-                            ProgrammeName = "Mechanical Engineering"
-                        },
-                        new
-                        {
-                            ProgrammeId = 34,
-                            ProgrammeName = "Naval Architecture and Marine Engineering"
-                        },
-                        new
-                        {
-                            ProgrammeId = 35,
-                            ProgrammeName = "Nursing (Post-registration)"
-                        },
-                        new
-                        {
-                            ProgrammeId = 36,
-                            ProgrammeName = "Nursing (Pre-registration and Specialty Training)"
-                        },
-                        new
-                        {
-                            ProgrammeId = 37,
-                            ProgrammeName = "Occupational Therapy"
-                        },
-                        new
-                        {
-                            ProgrammeId = 38,
-                            ProgrammeName = "Pharmaceutical Engineering"
-                        },
-                        new
-                        {
-                            ProgrammeId = 39,
-                            ProgrammeName = "Physiotherapy"
-                        },
-                        new
-                        {
-                            ProgrammeId = 40,
-                            ProgrammeName = "Radiation Therapy"
-                        },
-                        new
-                        {
-                            ProgrammeId = 41,
-                            ProgrammeName = "Robotics Systems"
-                        });
                 });
 
             modelBuilder.Entity("backend.Components.Qualification.Models.Qualification", b =>
@@ -647,28 +443,6 @@ namespace backend.Migrations
                         .IsUnique();
 
                     b.ToTable("RemunerationTypes");
-
-                    b.HasData(
-                        new
-                        {
-                            RemunerationId = 1,
-                            Type = "Hourly"
-                        },
-                        new
-                        {
-                            RemunerationId = 2,
-                            Type = "Monthly"
-                        },
-                        new
-                        {
-                            RemunerationId = 3,
-                            Type = "Project-based"
-                        },
-                        new
-                        {
-                            RemunerationId = 4,
-                            Type = "Contract-based"
-                        });
                 });
 
             modelBuilder.Entity("backend.Components.Resume.Models.Resume", b =>
@@ -719,33 +493,6 @@ namespace backend.Migrations
                     b.HasKey("SkillId");
 
                     b.ToTable("Skills");
-
-                    b.HasData(
-                        new
-                        {
-                            SkillId = 1,
-                            skill = "NetSuite Proficency"
-                        },
-                        new
-                        {
-                            SkillId = 2,
-                            skill = "Java Proficency"
-                        },
-                        new
-                        {
-                            SkillId = 3,
-                            skill = "Auditing Proficiency"
-                        },
-                        new
-                        {
-                            SkillId = 4,
-                            skill = "Oracle Proficiency"
-                        },
-                        new
-                        {
-                            SkillId = 5,
-                            skill = "Microsoft Excel Proficiency"
-                        });
                 });
 
             modelBuilder.Entity("backend.Components.Student.Models.StudentProfile", b =>

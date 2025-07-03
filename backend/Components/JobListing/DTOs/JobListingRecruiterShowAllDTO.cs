@@ -1,6 +1,6 @@
 namespace backend.Components.JobListing.DTOs;
 
-public class JobListingResponseDTO
+public class JobListingRecruiterShowAllDTO
 {
     // public int JobId { get; set; }
     public string ListingName { get; set; } = string.Empty;

@@ -25,7 +25,7 @@ public class JobListingController : ControllerBase
     // GET /api/jobListing/listings
     // get the relevant information for the recruiter listing page
     [HttpGet("listings")]
-    public async Task<ActionResult<List<JobListingResponseDTO>>> GetRecruiterListings()
+    public async Task<ActionResult<List<JobListingRecruiterShowAllDTO>>> GetRecruiterListings()
     {
         try
         {
@@ -44,7 +44,7 @@ public class JobListingController : ControllerBase
             var recruiterListings = await _jobListingService.GetAllRecruiterJobListingsAsync(recruiterId);
             if (!recruiterListings.Any())
             {
-                return Ok(new List<JobListingResponseDTO>()); // Return empty list
+                return Ok(new List<JobListingRecruiterShowAllDTO>()); // Return empty list
             }
             return Ok(recruiterListings);
         }
@@ -55,7 +55,7 @@ public class JobListingController : ControllerBase
         catch (Exception ex)
         {
             // return StatusCode(500, new { message = "An error occurred while fetching job listings" });
-            Console.WriteLine($"[ERROR] {ex.Message}\n{ex.StackTrace}"); // ✅ Log to console
+            // Console.WriteLine($"[ERROR] {ex.Message}\n{ex.StackTrace}"); // Log to console
             return StatusCode(500, new { message = "An error occurred while fetching job listings" });
         }
     }

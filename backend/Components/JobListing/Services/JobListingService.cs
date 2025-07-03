@@ -88,7 +88,7 @@ public class JobListingService : IJobListingService
 
     // Other business logics handle here
     // Retrieve all job listings under recruiter
-    public async Task<List<JobListingResponseDTO>> GetAllRecruiterJobListingsAsync(int recruiterId)
+    public async Task<List<JobListingRecruiterShowAllDTO>> GetAllRecruiterJobListingsAsync(int recruiterId)
     {
         /* 
         retrieve how many job listings are under recruiter, check if visible
@@ -103,7 +103,7 @@ public class JobListingService : IJobListingService
         if (!jobListings.Any())
         {
             // return empty list
-            return new List<JobListingResponseDTO>();
+            return new List<JobListingRecruiterShowAllDTO>();
         }
         // get all applications that are available based on the ids of the list of job Listings
         var ids = jobListings.Select(j => j.GetJobId()).ToList();
@@ -117,7 +117,7 @@ public class JobListingService : IJobListingService
             int pending = listingApps.Count(a => a.Status == "pending");
             int accepted = listingApps.Count(a => a.Status == "accepted");
 
-            return new JobListingResponseDTO
+            return new JobListingRecruiterShowAllDTO
             {
                 ListingName = j.GetListingName(),
                 PublishedDate = j.GetCreatedAt(),
