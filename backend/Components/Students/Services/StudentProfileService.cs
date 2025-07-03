@@ -21,23 +21,23 @@ namespace backend.Components.Student.Services
         }
 
          public async Task<StudentProfileDTO?> GetProfileByEmailAsync(string email)
-    {
-        var profile = await _repo.GetByEmailAsync(email);
-        if (profile == null) 
-            return null;
-
-        return new StudentProfileDTO
         {
-            NricFin              = profile.NricFin,
-            StudentId            = profile.StudentId,
-            Nationality          = profile.Nationality,
-            AdmitYear            = profile.AdmitYear,
-            PrimaryContactNumber = profile.PrimaryContactNumber,
-            Gender               = profile.Gender,
-            DegreeProgramme      = profile.DegreeProgramme,
-            FullName             = profile.FullName,
-            Email                = profile.Email
-        };
-    }
+            var profile = await _repo.GetByEmailAsync(email);
+            if (profile == null) 
+                return null;
+
+            return new StudentProfileDTO
+            {
+                NricFin              = profile.NricFin,
+                StudentId            = profile.StudentId,
+                Nationality          = profile.Nationality,
+                AdmitYear            = profile.AdmitYear,
+                PrimaryContactNumber = profile.PrimaryContactNumber,
+                Gender               = profile.Gender,
+                DegreeProgramme      = profile.DegreeProgramme,
+                FullName             = profile.FullName,
+                Email                = profile.Email
+            };
+        }
     }
 }
