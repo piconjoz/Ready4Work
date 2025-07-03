@@ -7,12 +7,12 @@ namespace backend.Components.Programme.Models
     {
         [Key]
         [Column("programme_id")]
-        private int ProgrammeId { get; set; }
+        public int ProgrammeId { get; set; }
 
         [Column("programme_name")]
-        private string ProgrammeName { get; set; } = string.Empty;
+        public string ProgrammeName { get; set; } = string.Empty;
 
-        private Programme() { }
+        public Programme() { }
 
         internal Programme(string programme_name)
         {

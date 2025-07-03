@@ -7,17 +7,17 @@ namespace backend.Components.JobSkill.Models
     {
         [Key]
         [Column("job_skill_id")]
-        private int JobSkillId { get; set; }
+        public int JobSkillId { get; set; }
 
         [Required]
         [Column("job_id")]
-        private int JobId { get; set; }
+        public int JobId { get; set; }
 
         [Required]
         [Column("skill_id")]
-        private int SkillId { get; set; }
+        public int SkillId { get; set; }
 
-        private JobSkill() { }
+        public JobSkill() { }
 
         internal JobSkill(int skill_Id, int job_id)
         {
