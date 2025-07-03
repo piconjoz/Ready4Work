@@ -3,6 +3,7 @@ namespace backend.Data;
 
 using Microsoft.EntityFrameworkCore;
 using backend.Components.Company.Models;
+using backend.Components.ApplicantPreference.Models;
 using backend.Components.Application.Models;
 using backend.Components.CoverLetter.Models;
 using backend.User.Models;
@@ -39,6 +40,7 @@ public class ApplicationDbContext : DbContext
     public DbSet<JobScheme> JobSchemes { get; set; }
     public DbSet<RemunerationType> RemunerationTypes { get; set;}
     public DbSet<StudentProfile> StudentProfiles { get; set; }
+    public DbSet<ApplicantPreference> ApplicantPreferences { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {

@@ -1,4 +1,3 @@
-import { useState } from "react";
 import { MdCheck } from "react-icons/md"; // Material Design check icon
 
 function Toggle({ checked, onChange }) {
@@ -20,16 +19,17 @@ function Toggle({ checked, onChange }) {
   );
 }
 
-export default function DescToggle({ title, description, name, defaultChecked = true }) {
-  const [checked, setChecked] = useState(defaultChecked);
-
+export default function DescToggle({ title, description, name, checked, onChange }) {
   return (
     <div className="flex items-center justify-between">
       <div>
         <p className="text-sm">{title}</p>
         <p className="text-sm text-[#5E5E5E]">{description}</p>
       </div>
-      <Toggle checked={checked} onChange={() => setChecked((v) => !v)} />
+      <Toggle
+        checked={checked}
+        onChange={(e) => onChange(e.target.checked)}
+      />
     </div>
   );
 }

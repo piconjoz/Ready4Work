@@ -15,5 +15,8 @@ public class UserResponseDTO
     public DateTime UpdatedAt { get; set; }
     public bool IsVerified { get; set; }
     public int UserType { get; set; } // 1=applicant, 2=recruiter, 3=admin
-    // public int UserSpecificId { get; set; } // applicantId, recruiterId, adminId
+                                      // public int UserSpecificId { get; set; } // applicantId, recruiterId, adminId
+    
+    public int? ApplicantId { get; set; }
+
 }

@@ -32,6 +32,10 @@ using backend.Components.Student.Repositories.Interfaces;
 using backend.Components.Student.Repositories;
 using backend.Components.Student.Services.Interfaces;
 using backend.Components.Student.Services;
+using backend.Components.ApplicantPreference.Repositories.Interfaces;
+using backend.Components.ApplicantPreference.Repositories;
+using backend.Components.ApplicantPreference.Services.Interfaces;
+using backend.Components.ApplicantPreference.Services;
 using MySql.Data.MySqlClient; // Add this using statement
 using System.Threading;      // Add this using statement
 using System;                // Add this using statement
@@ -44,15 +48,15 @@ var builder = WebApplication.CreateBuilder(args);
 // add services to the container.
 builder.Services.AddControllers();
 
-// configure CORS
+// configure a single CORS policy for the React app
 builder.Services.AddCors(options =>
 {
     options.AddPolicy("AllowReactApp", policy =>
     {
         policy.WithOrigins("http://localhost:5173")
-            .AllowAnyMethod()
-            .AllowAnyHeader()
-            .AllowCredentials();
+              .AllowAnyMethod()
+              .AllowAnyHeader()
+              .AllowCredentials();
     });
 });
 
@@ -111,9 +115,13 @@ builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddScoped<IJobListingRepository, JobListingRepository>();
 builder.Services.AddScoped<IJobListingService, JobListingService>();
 
-// StudentProfile components
+// register dependency injection for applicant preference components
+builder.Services.AddScoped<IApplicantPreferenceRepository, ApplicantPreferenceRepository>();
+builder.Services.AddScoped<IApplicantPreferenceService, ApplicantPreferenceService>();
+
+// StudentProfile DI registrations
 builder.Services.AddScoped<IStudentProfileRepository, StudentProfileRepository>();
-builder.Services.AddScoped<IStudentProfileService, StudentProfileService>();
+builder.Services.AddScoped<IStudentProfileService,    StudentProfileService>();
 
 // configure JWT authentication
 var jwtSettings = builder.Configuration.GetSection("Jwt");
@@ -215,6 +223,7 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseCors("AllowReactApp");
+
 app.UseHttpsRedirection();
 
 // authentication and authorization must be in this order

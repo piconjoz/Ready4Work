@@ -77,7 +77,10 @@ export default function SignupForm() {
 
     const signupData = { email, password };
     try {
-      await signupApplicant(signupData);
+      const result = await signupApplicant(signupData);
+      // Debug: log the access token and refresh-token cookie
+      console.log("Access token:", result.token);
+      console.log("Refresh token cookie:", document.cookie);
       navigate("/applicant/onboard");
     } catch (err) {
       // Surface server-side validation errors if present
