@@ -7,6 +7,9 @@ public class UploadResumeDto
 {
     [Required]
     public IFormFile File { get; set; } = default!;
+
+    [Required]
+    public int ApplicantId { get; set; }   // ← add this
 }
 
 public class ResumeResponseDto

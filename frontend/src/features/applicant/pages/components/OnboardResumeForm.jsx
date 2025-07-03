@@ -39,7 +39,7 @@ const handleFileChange = async (e) => {
   if (file) {
     console.log("File selected via input:", file);
     setSelectedFile(file);
-    await handleUpload(file);  // immediately upload after selection
+    await handleUpload(file, applicantId);  // immediately upload after selection
   }
 };
 
@@ -57,11 +57,11 @@ const handleDrop = async (e) => {
     // Clear input to allow reupload of same file
     if (fileInputRef.current) fileInputRef.current.value = null;
     setSelectedFile(file);
-    await handleUpload(file);  // immediately upload after drop
+    await handleUpload(file, applicantId);  // immediately upload after drop
   }
 };
 
-const handleUpload = async (fileToUpload) => {
+const handleUpload = async (fileToUpload, applicantId) => {
   if (!fileToUpload) return;
   // Animate only when the file name changes
   if (fileToUpload.name !== lastFileNameRef.current) {
@@ -72,7 +72,7 @@ const handleUpload = async (fileToUpload) => {
   console.log("Uploading resume via resumeApi:", fileToUpload);
   setUploading(true);
   try {
-    const data = await uploadResume(fileToUpload);
+    const data = await uploadResume(fileToUpload, applicantId);
     console.log("Upload response data:", data);
     // Optionally refresh list or update UI state
   } catch (err) {
@@ -176,7 +176,7 @@ useEffect(() => {
           <button
             className="bg-[#E6E6E6] rounded-2xl px-4 py-2 text-sm"
             onClick={async () => {
-              await handleUpload(selectedFile);
+              await handleUpload(selectedFile, applicantId);
             }}
           >
             {selectedFile ? "Replace Resume" : "Upload Resume"}

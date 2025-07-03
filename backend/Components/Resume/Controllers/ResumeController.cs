@@ -1,11 +1,13 @@
 using Microsoft.AspNetCore.Mvc;
 using backend.Components.Resume.DTOs;
 using backend.Components.Resume.Services;
+using Microsoft.AspNetCore.Authorization;
 
 namespace backend.Components.Resume.Controllers;
 
 [ApiController]
 [Route("api/resumes")]
+[Authorize]     
 public class ResumeController : ControllerBase
 {
     private readonly IResumeService _service;
@@ -21,10 +23,8 @@ public class ResumeController : ControllerBase
     [HttpPost("upload")]
     public async Task<ActionResult<ResumeResponseDto>> Upload([FromForm] UploadResumeDto dto)
     {
-        int userId = 1; // TODO: replace with real auth
-        _logger.LogInformation("User {UserId} uploading resume", userId);
-
-        var result = await _service.UploadAsync(userId, dto);
+        var result = await _service.UploadAsync(dto.ApplicantId, dto);
+         _logger.LogInformation("Applicant {ApplicantId} uploading resume", dto.ApplicantId);
         return Ok(result);
     }
 
