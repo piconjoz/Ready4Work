@@ -7,12 +7,12 @@ namespace backend.Components.Skill.Models
     {
         [Key]
         [Column("skill_id")]
-        private int SkillId { get; set; }
+        public int SkillId { get; set; }
 
         [Column("skill")]
-        private string skill { get; set; } = string.Empty;
+        public string skill { get; set; } = string.Empty;
 
-        private Skill() { }
+        public Skill() { }
 
         internal Skill(string skill_name)
         {

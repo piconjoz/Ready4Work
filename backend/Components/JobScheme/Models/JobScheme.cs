@@ -7,14 +7,14 @@ public class JobScheme
 {
     [Key]
     [Column("scheme_id")]
-    private int SchemeId { get; set; }
+    public int SchemeId { get; set; }
     
     [Required]
     [Column("scheme_name")]
-    private string SchemeName { get; set; }
+    public string SchemeName { get; set; }
     
-    // private constructor for ef core
-    private JobScheme() { }
+    // public constructor for ef core
+    public JobScheme() { }
     
     // internal constructor - only services can create job schemes
     internal JobScheme(string schemeName)
