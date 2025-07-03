@@ -1,6 +1,6 @@
 using backend.Components.Student.Services.Interfaces;
 namespace backend.User.Controllers;
-
+using backend.Components.Student.DTOs;
 using Microsoft.AspNetCore.Mvc;
 using backend.User.DTOs;
 using backend.User.Services.Interfaces;
@@ -30,15 +30,34 @@ public class AuthController : ControllerBase
     // POST /api/auth/signup/applicant
     // separate endpoint prevents usertype manipulation
     [HttpPost("signup/applicant")]
-    public async Task<ActionResult<AuthResponseDTO>> SignupApplicant([FromBody] ApplicantSignupDTO signupDto)
+    public async Task<ActionResult<AuthResponseDTO>> SignupApplicant([FromBody] SignupByEmailDTO input)
     {
         try
         {
-            // validate model state from data annotations
-            if (!ModelState.IsValid)
+            // Minimal validation for required fields only
+            var signupDto = new ApplicantSignupDTO
             {
-                return BadRequest(ModelState);
-            }
+                Email = input.Email,
+                Password = input.Password
+            };
+
+            // ★ Populate signupDto from existing student profile
+            var studentProfile = await _studentService.GetProfileByEmailAsync(signupDto.Email);
+            if (studentProfile == null)
+                return NotFound(new { message = "Student profile not found" });
+
+            // Map profile fields into signupDto
+            signupDto.NRIC = studentProfile.NricFin;
+            // Split full name into first/last
+            var names = studentProfile.FullName.Split(' ');
+            signupDto.FirstName = names.First();
+            signupDto.LastName = string.Join(" ", names.Skip(1));
+            signupDto.Phone = studentProfile.PrimaryContactNumber;
+            signupDto.Gender = studentProfile.Gender;
+            signupDto.AdmitYear = studentProfile.AdmitYear;
+            // TODO: map DegreeProgramme string to your internal ProgrammeId
+            // For now, set to 0 or throw if not mapped
+            signupDto.ProgrammeId = 1; // Replace with mapping logic if available
 
             var result = await _authService.SignupApplicantAsync(signupDto);
             
@@ -231,6 +250,19 @@ public class AuthController : ControllerBase
             return NotFound(new { message = "No Student Found" });
 
         return Ok(new CheckStudentResponseDTO { IsValid = true });
+    }
+
+    [HttpGet("student-profile")]
+    public async Task<ActionResult<StudentProfileDTO>> GetStudentProfile([FromQuery] string email)
+    {
+        if (string.IsNullOrWhiteSpace(email))
+            return BadRequest(new { message = "Email is required" });
+
+        var dto = await _studentService.GetProfileByEmailAsync(email);
+        if (dto == null)
+            return NotFound(new { message = "No Student Found" });
+
+        return Ok(dto);
     }
 
     // POST /api/auth/validate

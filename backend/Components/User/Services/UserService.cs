@@ -28,7 +28,7 @@ public class UserService : IUserService
         // check if email already exists
         if (await EmailExistsAsync(email))
         {
-            throw new InvalidOperationException("email already exists");
+            throw new InvalidOperationException("Email already exists, Please login instead.");
         }
 
         // hash the password

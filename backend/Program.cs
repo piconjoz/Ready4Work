@@ -20,10 +20,6 @@ using backend.Components.Resume.Services;
 using backend.Components.Bookmark.Repository;
 using backend.Components.Bookmark.Services;
 using backend.Components.Company.Services.Interfaces;
-// using backend.User.Repositories.Interfaces;
-// using backend.User.Repositories;
-// using backend.User.Services.Interfaces;
-// using backend.User.Services;
 using backend.Components.User.Repositories.Interfaces;
 using backend.Components.User.Repositories;
 using backend.Components.User.Services;
@@ -36,6 +32,10 @@ using backend.Components.Student.Repositories.Interfaces;
 using backend.Components.Student.Repositories;
 using backend.Components.Student.Services.Interfaces;
 using backend.Components.Student.Services;
+using MySql.Data.MySqlClient; // Add this using statement
+using System.Threading;      // Add this using statement
+using System;                // Add this using statement
+
 
 DotNetEnv.Env.Load();
 
@@ -59,27 +59,8 @@ builder.Services.AddCors(options =>
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
-// BACK TO IN-MEMORY DATABASE FOR DEVELOPMENT
-// builder.Services.AddDbContext<ApplicationDbContext>(options =>
-//     options.UseInMemoryDatabase("Ready4WorkTestDB"));
-
-// under appsettings.json, please change the relevant Default connections
-//   "ConnectionStrings": {
-//     "DefaultConnection": "server=localhost(usually, unless using outside connection);port=3306;database=YourDatabase;user=yourMySqlUser;password=yourMySqlPassword;"
-//   }
-// if possible, use a development appsetting to ensure your fields are not exposed
-// i.e. appsettings.Development.json
-// before running your dotnet migrations and build, run the following:
-// SET ASPNETCORE_ENVIRONMENT=Development
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
     options.UseMySQL(builder.Configuration.GetConnectionString("DefaultConnection")));
-
-
-// COMMENT OUT MYSQL (MIGRATIONS ARE GENERATED, DON'T NEED IT FOR NOW)
-/*
-builder.Services.AddDbContext<ApplicationDbContext>(options =>
-    options.UseMySQL("Server=localhost;Port=3306;Database=Ready4WorkTemp;Uid=root;Pwd=temp;"));
-*/
 
 // register dependency injection for company repositories and services
 builder.Services.AddScoped<ICompanyRepository, CompanyRepository>();
@@ -165,12 +146,66 @@ builder.Services.AddAuthorization();
 
 var app = builder.Build();
 
-// BACK TO IN-MEMORY DATABASE CREATION
+// *** IMPORTANT: ADD RETRY LOGIC HERE ***
 using (var scope = app.Services.CreateScope())
 {
     var context = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
-    context.Database.EnsureCreated();
+    var retries = 50; 
+    var delay = 1000; 
+
+    for (int i = 0; i < retries; i++)
+    {
+        try
+        {
+            Console.WriteLine($"Attempting to connect to database... (Attempt {i + 1}/{retries})");
+            context.Database.EnsureCreated(); 
+            Console.WriteLine("Database connection successful and ensured created.");
+            break; 
+        }
+        catch (MySqlException ex)
+        {
+            // Check if the inner exception is a SocketException with 'Connection refused' error code (10061 for Windows, 111 for Linux)
+            if (ex.InnerException is System.Net.Sockets.SocketException socketEx && 
+                (socketEx.ErrorCode == 10061 || socketEx.ErrorCode == 111))
+            {
+                Console.WriteLine($"Database connection failed (Connection refused from MySqlException): {ex.Message}. Retrying in {delay / 1000} seconds...");
+                Thread.Sleep(delay);
+            }
+            else
+            {
+                // If it's a MySqlException but not a connection refused, re-throw
+                Console.WriteLine($"An unretryable MySqlException occurred: {ex.Message}");
+                throw; 
+            }
+        }
+        catch (System.Net.Sockets.SocketException ex) // Directly catch SocketException too
+        {
+            // Explicitly catch SocketException if it occurs directly (though often wrapped by MySqlException)
+            if (ex.ErrorCode == 10061 || ex.ErrorCode == 111)
+            {
+                Console.WriteLine($"Database connection failed (SocketException: Connection refused): {ex.Message}. Retrying in {delay / 1000} seconds...");
+                Thread.Sleep(delay);
+            }
+            else
+            {
+                Console.WriteLine($"An unretryable SocketException occurred: {ex.Message}");
+                throw;
+            }
+        }
+        catch (Exception ex) 
+        {
+            Console.WriteLine($"An unexpected general error occurred during database connection: {ex.Message}");
+            throw; 
+        }
+
+        if (i == retries - 1)
+        {
+            Console.WriteLine("Exceeded maximum retries. Could not connect to the database.");
+            throw new Exception("Failed to connect to the database after multiple retries.");
+        }
+    }
 }
+// *** END RETRY LOGIC ***
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())

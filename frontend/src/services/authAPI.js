@@ -156,3 +156,10 @@ export const checkStudent = async (email) => {
     throw error;
   }
 };
+
+export const getStudentProfile = async (email) => {
+  const response = await baseAuthApi.get("/auth/student-profile", {
+    params: { email }
+  });
+  return response.data;  // StudentProfileDTO
+};

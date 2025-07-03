@@ -4,7 +4,7 @@ import StatusInputField from "../../../../components/StatusInputField";
 import PrimaryButton from "../../../../components/PrimaryButton";
 import NoticeBanner from "../../../../components/NoticeBanner";
 import DisclaimerCheckbox from "../../../../components/DisclaimerCheckbox";
-import { checkStudent } from "../../../../services/authAPI";
+import { signupApplicant, checkStudent } from "../../../../services/authAPI";
 
 export default function SignupForm() {
   const navigate = useNavigate();
@@ -20,6 +20,8 @@ export default function SignupForm() {
   const [otp, setOtp] = useState("");
   const [otpError, setOtpError] = useState("");
   const [emailError, setEmailError] = useState("");
+  // New state for server-side errors
+  const [serverError, setServerError] = useState("");
 
   // Check email domain and set account type
   useEffect(() => {
@@ -65,25 +67,32 @@ export default function SignupForm() {
     }
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    if (accountType === "student") {
-      if (otp !== "1234") {
-        setOtpError("Invalid OTP");
-        return;
-      }
+    setServerError(""); // Clear server error at the start
+    if (accountType === "student" && otp !== "1234") {
+      setOtpError("Invalid OTP");
+      return;
     }
-    const signupData = {
-      email,
-      password,
-      accountType,
-      registrationDate: new Date().toISOString().split("T")[0],
-    };
-    sessionStorage.setItem("signupData", JSON.stringify(signupData));
-    if (accountType === "employer") {
-      navigate("/recruiter/onboard");
-    } else {
+
+    const signupData = { email, password };
+    try {
+      await signupApplicant(signupData);
       navigate("/applicant/onboard");
+    } catch (err) {
+      // Surface server-side validation errors if present
+      const resp = err.response;
+      if (resp && resp.data && resp.data.errors) {
+        // pick first field error
+        const fieldErrors = Object.values(resp.data.errors).flat();
+        setServerError(fieldErrors.join(" "));
+      } else if (resp && resp.data && resp.data.title) {
+        setServerError(resp.data.title);
+      } else if (resp && resp.data && resp.data.message) {
+        setServerError(resp.data.message);
+      } else {
+        setServerError("Error creating account");
+      }
     }
   };
 
@@ -135,6 +144,13 @@ export default function SignupForm() {
           value={otp}
           onChange={(e) => setOtp(e.target.value)}
         />
+      )}
+
+      {/* Server-side error display */}
+      {serverError && (
+        <div className="text-red-600 mt-2">
+          {serverError}
+        </div>
       )}
 
       {/* Account Detection Banner */}

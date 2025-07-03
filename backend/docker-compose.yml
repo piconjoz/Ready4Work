@@ -30,7 +30,7 @@ services:
     depends_on:
       db:
         condition: service_healthy
-    command: /bin/sh -c "dotnet backend.dll"
+    command: /bin/sh -c "until nc -z db 3306; do echo 'Waiting for database'; sleep 1; done; dotnet backend.dll"
     networks:
       - db-net
 
