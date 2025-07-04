@@ -1,0 +1,69 @@
+name: Test and Deploy to Development Setting
+
+on:
+  push:
+    branches:
+      - development
+
+jobs:
+  CI-CD:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Node.jobs
+        uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+
+      # FRONTEND BUILD
+      - name: Install dependencies
+        run: 
+          npm install --prefix ./frontend
+      
+      - name: Building frontend
+        run:  
+          npm run build --prefix ./frontend
+
+      # BACKEND BUILD
+      - name: Build backend Docker image
+        run: |
+          docker build -t backend-image:latest -f ./backend/Dockerfile ./backend
+          docker save -o backend.tar backend-image:latest
+          chmod 644 backend.tar
+          ls -l backend.tar
+
+      # SET UP SSH KEY FOR RSYNC
+      - name: Set up SSH key
+        run: |
+          mkdir -p ~/.ssh
+          echo "${{ secrets.CLOUD_KEY }}" > ~/.ssh/id_rsa
+          chmod 600 ~/.ssh/id_rsa
+          ssh-keyscan ${{ vars.CLOUD_HOST }} >> ~/.ssh/known_hosts
+
+      # DEPLOY TO CLOUD SERVER
+      - name: Upload frontend using RSYNC
+        run: |
+          rsync -avz -e "ssh -i ~/.ssh/id_rsa" ./frontend/dist ${{ vars.CLOUD_USER }}@${{ vars.CLOUD_HOST }}:/home/dev/ready4work/production/frontend/
+
+      # Copy backend image to server using SCP
+      - name: Copy backend image to server
+        uses: appleboy/scp-action@v0.1.6
+        with:
+          host: ${{ vars.CLOUD_HOST }}
+          username: ${{ vars.CLOUD_USER }}
+          key: ${{ secrets.CLOUD_KEY }}
+          source: "backend.tar"
+          target: "/home/dev/ready4work/production/backend"
+
+      # Restart backend docker container
+      - name: Restart backend docker container
+        uses: appleboy/ssh-action@v1
+        with:
+          host: ${{ vars.CLOUD_HOST }}
+          username: ${{ vars.CLOUD_USER }}
+          key: ${{ secrets.CLOUD_KEY }}
+          script: |
+            docker load < /home/dev/ready4work/production/backend/backend.tar
+            docker compose -f /home/dev/ready4work/production/docker-compose.yml up -d backend
