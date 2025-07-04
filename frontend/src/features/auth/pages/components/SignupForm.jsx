@@ -50,26 +50,36 @@ export default function SignupForm() {
   const handleEmailBlur = async () => {
     if (email.trim() && email.includes("@")) {
       setShouldShowDetection(true);
-      // verify student via API
-      try {
-        const isValid = await checkStudent(email);
-        if (isValid) {
-          setShowOtpField(true);
-          setEmailError("");
-        } else {
+
+      // updated to only verify student emails
+      const isStudentEmail = email
+        .toLowerCase()
+        .includes("@sit.singaporetech.edu.sg");
+
+      if (isStudentEmail) {
+        try {
+          const isValid = await checkStudent(email);
+          if (isValid) {
+            setShowOtpField(true);
+            setEmailError("");
+          } else {
+            setShowOtpField(false);
+            setEmailError("No Student Found");
+          }
+        } catch (err) {
           setShowOtpField(false);
-          setEmailError("No Student Found");
+          setEmailError(`Error verifying student email: ${err}`);
         }
-      } catch (err) {
+      } else {
         setShowOtpField(false);
-        setEmailError("Error verifying student email");
+        setEmailError("");
       }
     }
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setServerError(""); // Clear server error at the start
+    setServerError("");
     if (accountType === "student" && otp !== "1234") {
       setOtpError("Invalid OTP");
       return;
@@ -77,11 +87,19 @@ export default function SignupForm() {
 
     const signupData = { email, password };
     try {
-      const result = await signupApplicant(signupData);
-      // Debug: log the access token and refresh-token cookie
+      let result;
+
+      if (accountType === "student") {
+        result = await signupApplicant(signupData);
+        sessionStorage.setItem("signupData", JSON.stringify(signupData));
+        navigate("/applicant/onboard");
+      } else if (accountType === "employer") {
+        sessionStorage.setItem("signupData", JSON.stringify(signupData));
+        navigate("/recruiter/onboard");
+      }
+
       console.log("Access token:", result.token);
       console.log("Refresh token cookie:", document.cookie);
-      navigate("/applicant/onboard");
     } catch (err) {
       // Surface server-side validation errors if present
       const resp = err.response;
@@ -150,11 +168,7 @@ export default function SignupForm() {
       )}
 
       {/* Server-side error display */}
-      {serverError && (
-        <div className="text-red-600 mt-2">
-          {serverError}
-        </div>
-      )}
+      {serverError && <div className="text-red-600 mt-2">{serverError}</div>}
 
       {/* Account Detection Banner */}
       {showNotice && accountType && shouldShowDetection && (
