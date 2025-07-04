@@ -50,7 +50,7 @@ export default function Profile() {
         {/* Name and Email */}
         <div className="flex flex-col">
           <span className="text-base font-medium text-black">{profile.fullName}</span>
-          <span className="text-sm text-gray-500">{profile.Email}</span>
+          <span className="text-sm text-gray-500">{profile.email}</span>
         </div>
       </div>
       <div className="mt-10">
