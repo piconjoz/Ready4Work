@@ -5,7 +5,7 @@ using System.Security.Claims;
 public interface IJWTService
 {
     // generates a jwt token for a user
-    string GenerateToken(int userId, int userType);
+    string GenerateToken(int userId, int userType, int? applicantId = null);
     
     // validates a jwt token and returns claims if valid
     ClaimsPrincipal? ValidateToken(string token);

@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Mvc;
 using backend.User.DTOs;
 using backend.User.Services.Interfaces;
 using System.ComponentModel.DataAnnotations;
+using Microsoft.AspNetCore.Authorization;
 
 [ApiController]
 [Route("api/auth")]
@@ -60,16 +61,16 @@ public class AuthController : ControllerBase
             signupDto.ProgrammeId = 1; // Replace with mapping logic if available
 
             var result = await _authService.SignupApplicantAsync(signupDto);
-            
+
             // Set refresh token in httpOnly cookie
             if (!string.IsNullOrEmpty(result.RefreshToken))
             {
                 SetRefreshTokenCookie(result.RefreshToken);
             }
-            
+
             // Don't send refresh token in response body
             result.RefreshToken = null;
-            
+
             return Ok(result);
         }
         catch (ArgumentException ex)
@@ -102,16 +103,16 @@ public class AuthController : ControllerBase
             }
 
             var result = await _authService.SignupRecruiterAsync(signupDto);
-            
+
             // Set refresh token in httpOnly cookie
             if (!string.IsNullOrEmpty(result.RefreshToken))
             {
                 SetRefreshTokenCookie(result.RefreshToken);
             }
-            
+
             // Don't send refresh token in response body
             result.RefreshToken = null;
-            
+
             return Ok(result);
         }
         catch (ArgumentException ex)
@@ -141,16 +142,16 @@ public class AuthController : ControllerBase
             }
 
             var result = await _authService.LoginAsync(loginDto);
-            
+
             // Set refresh token in httpOnly cookie
             if (!string.IsNullOrEmpty(result.RefreshToken))
             {
                 SetRefreshTokenCookie(result.RefreshToken);
             }
-            
+
             // Don't send refresh token in response body
             result.RefreshToken = null;
-            
+
             return Ok(result);
         }
         catch (UnauthorizedAccessException ex)
@@ -278,7 +279,7 @@ public class AuthController : ControllerBase
             }
 
             var isValid = await _authService.ValidateTokenAsync(request.Token);
-        
+
             if (!isValid)
             {
                 return Ok(new { isValid = false });
@@ -296,9 +297,10 @@ public class AuthController : ControllerBase
             {
                 return Ok(new { isValid = false });
             }
-        
-            return Ok(new { 
-                isValid = true, 
+
+            return Ok(new
+            {
+                isValid = true,
                 userType = user.GetUserType(),
                 userId = user.GetUserId(),
                 email = user.GetEmail(),
@@ -383,6 +385,22 @@ public class AuthController : ControllerBase
 
         Response.Cookies.Append("refreshToken", refreshToken, cookieOptions);
     }
+    
+
+    [AllowAnonymous]
+    [HttpPost("validate-credentials")]
+    public async Task<ActionResult> ValidateCredentials([FromBody] LoginRequest request)
+    {
+        if (!ModelState.IsValid)
+            return BadRequest(ModelState);
+
+        // call into IUserService
+        bool valid = await _userService.ValidateUserCredentialsAsync(request.Email, request.Password);
+        if (!valid)
+            return Unauthorized(new { message = "Invalid credentials" });
+
+        return Ok(new { message = "Credentials valid" });
+    }
 }
 
 // helper dto for token requests
@@ -400,4 +418,14 @@ public class CheckStudentRequestDTO
 public class CheckStudentResponseDTO
 {
     public bool IsValid { get; set; }
+}
+
+// DTO for validating credentials
+public class LoginRequest
+{
+    [Required]
+    public string Email { get; set; } = string.Empty;
+
+    [Required]
+    public string Password { get; set; } = string.Empty;
 }
