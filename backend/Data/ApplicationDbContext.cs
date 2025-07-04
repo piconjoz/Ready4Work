@@ -610,6 +610,30 @@ public class ApplicationDbContext : DbContext
                     DegreeProgramme = "Information and Communications Technology (Information Security)",
                     FullName = "Hariz Darwisy Bin Adan",
                     Email = "2302221@sit.singaporetech.edu.sg"
+                },
+                new {
+                    Id = 5,
+                    NricFin = "T2222222C",
+                    StudentId = 2301938,
+                    Nationality = "Singapore",
+                    AdmitYear = 2021,
+                    PrimaryContactNumber = "91109999",
+                    Gender = "Male",
+                    DegreeProgramme = "Information and Communications Technology (Software Engineering)",
+                    FullName = "Xuan Yang",
+                    Email = "2301938@sit.singaporetech.edu.sg"
+                },
+                new {
+                    Id = 6,
+                    NricFin = "T3333333D",
+                    StudentId = 2301900,
+                    Nationality = "Singapore",
+                    AdmitYear = 2021,
+                    PrimaryContactNumber = "99999110",
+                    Gender = "Male",
+                    DegreeProgramme = "Information and Communications Technology (Software Engineering)",
+                    FullName = "Dinie Zikry",
+                    Email = "2301900@sit.singaporetech.edu.sg"
                 }
                
             );
