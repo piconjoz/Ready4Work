@@ -19,6 +19,50 @@ namespace backend.Migrations
                 .HasAnnotation("ProductVersion", "8.0.11")
                 .HasAnnotation("Relational:MaxIdentifierLength", 64);
 
+            modelBuilder.Entity("backend.Components.ApplicantPreference.Models.ApplicantPreference", b =>
+                {
+                    b.Property<int>("PreferenceId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    b.Property<int>("ApplicantId")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime(6)");
+
+                    b.Property<bool>("DisableDownload")
+                        .HasColumnType("tinyint(1)");
+
+                    b.Property<bool>("HideInfoUntilOffered")
+                        .HasColumnType("tinyint(1)");
+
+                    b.Property<bool>("RedactedResume")
+                        .HasColumnType("tinyint(1)");
+
+                    b.Property<string>("RemunerationType")
+                        .IsRequired()
+                        .HasColumnType("longtext");
+
+                    b.Property<DateTime>("UpdatedAt")
+                        .HasColumnType("datetime(6)");
+
+                    b.Property<string>("WorkingHoursEnd")
+                        .IsRequired()
+                        .HasColumnType("longtext");
+
+                    b.Property<string>("WorkingHoursStart")
+                        .IsRequired()
+                        .HasColumnType("longtext");
+
+                    b.HasKey("PreferenceId");
+
+                    b.HasIndex("ApplicantId")
+                        .IsUnique();
+
+                    b.ToTable("ApplicantPreferences");
+                });
+
             modelBuilder.Entity("backend.Components.Application.Models.JobApplication", b =>
                 {
                     b.Property<int>("ApplicationId")
@@ -864,6 +908,32 @@ namespace backend.Migrations
                             NricFin = "T1111111B",
                             PrimaryContactNumber = "99001344",
                             StudentId = 2302221
+                        },
+                        new
+                        {
+                            Id = 5,
+                            AdmitYear = 2021,
+                            DegreeProgramme = "Information and Communications Technology (Software Engineering)",
+                            Email = "2301938@sit.singaporetech.edu.sg",
+                            FullName = "Xuan Yang",
+                            Gender = "Male",
+                            Nationality = "Singapore",
+                            NricFin = "T2222222C",
+                            PrimaryContactNumber = "91109999",
+                            StudentId = 2301938
+                        },
+                        new
+                        {
+                            Id = 6,
+                            AdmitYear = 2021,
+                            DegreeProgramme = "Information and Communications Technology (Software Engineering)",
+                            Email = "2301900@sit.singaporetech.edu.sg",
+                            FullName = "Dinie Zikry",
+                            Gender = "Male",
+                            Nationality = "Singapore",
+                            NricFin = "T3333333D",
+                            PrimaryContactNumber = "99999110",
+                            StudentId = 2301900
                         });
                 });
 

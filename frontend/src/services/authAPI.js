@@ -113,26 +113,6 @@ export const signupApplicant = async (signupData) => {
   }
 };
 
-export const signupRecruiter = async (signupData) => {
-  try {
-    const response = await baseAuthApi.post(
-      "/auth/signup/recruiter",
-      signupData
-    );
-
-    if (response.data.token) {
-      localStorage.setItem("token", response.data.token);
-      localStorage.setItem("user", JSON.stringify(response.data.user));
-      localStorage.setItem("tokenExpiry", response.data.expiresAt);
-    }
-
-    return response.data;
-  } catch (error) {
-    console.error("Error signing up recruiter:", error);
-    throw error;
-  }
-};
-
 export const onboardRecruiter = async (onboardingData) => {
   try {
     const response = await baseAuthApi.post(
@@ -159,7 +139,7 @@ export const checkStudent = async (email) => {
 
 export const getStudentProfile = async (email) => {
   const response = await baseAuthApi.get("/auth/student-profile", {
-    params: { email }
+    params: { email },
   });
-  return response.data;  // StudentProfileDTO
+  return response.data; // StudentProfileDTO
 };
