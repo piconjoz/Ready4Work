@@ -50,7 +50,8 @@ services:
     restart: unless-stopped
     environment:
       - ConnectionStrings__DefaultConnection=${CONNECTION_STRING}      
-      - VIRUSTOTAL_API_KEY=${VIRUSTOTAL_API_KEY}    
+      - VIRUSTOTAL_API_KEY=${VIRUSTOTAL_API_KEY}
+      - SENDGRID_API_KEY=${SENDGRID_API_KEY}
     networks:
       net_backend_nginx:
         ipv4_address: 172.1.0.3
