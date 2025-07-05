@@ -4,6 +4,7 @@ import StatusInputField from "../../../../components/StatusInputField";
 import PrimaryButton from "../../../../components/PrimaryButton";
 import NoticeBanner from "../../../../components/NoticeBanner";
 import DisclaimerCheckbox from "../../../../components/DisclaimerCheckbox";
+import { signupApplicant, checkStudent } from "../../../../services/authAPI";
 
 export default function SignupForm() {
   const navigate = useNavigate();
@@ -14,6 +15,13 @@ export default function SignupForm() {
   const [showNotice, setShowNotice] = useState(false);
   const [shouldShowDetection, setShouldShowDetection] = useState(false);
   const [agreedToTerms, setAgreedToTerms] = useState(false);
+
+  const [showOtpField, setShowOtpField] = useState(false);
+  const [otp, setOtp] = useState("");
+  const [otpError, setOtpError] = useState("");
+  const [emailError, setEmailError] = useState("");
+  // New state for server-side errors
+  const [serverError, setServerError] = useState("");
 
   // Check email domain and set account type
   useEffect(() => {
@@ -39,29 +47,73 @@ export default function SignupForm() {
     setEmail(value);
   };
 
-  const handleEmailBlur = () => {
+  const handleEmailBlur = async () => {
     if (email.trim() && email.includes("@")) {
       setShouldShowDetection(true);
+
+      // updated to only verify student emails
+      const isStudentEmail = email
+        .toLowerCase()
+        .includes("@sit.singaporetech.edu.sg");
+
+      if (isStudentEmail) {
+        try {
+          const isValid = await checkStudent(email);
+          if (isValid) {
+            setShowOtpField(true);
+            setEmailError("");
+          } else {
+            setShowOtpField(false);
+            setEmailError("No Student Found");
+          }
+        } catch (err) {
+          setShowOtpField(false);
+          setEmailError(`Error verifying student email: ${err}`);
+        }
+      } else {
+        setShowOtpField(false);
+        setEmailError("");
+      }
     }
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
+    setServerError("");
+    if (accountType === "student" && otp !== "1234") {
+      setOtpError("Invalid OTP");
+      return;
+    }
 
-    const signupData = {
-      email,
-      password,
-      accountType,
-      registrationDate: new Date().toISOString().split("T")[0],
-    };
+    const signupData = { email, password };
+    try {
+      let result;
 
-    sessionStorage.setItem("signupData", JSON.stringify(signupData));
+      if (accountType === "student") {
+        result = await signupApplicant(signupData);
+        sessionStorage.setItem("signupData", JSON.stringify(signupData));
+        navigate("/applicant/onboard");
+      } else if (accountType === "employer") {
+        sessionStorage.setItem("signupData", JSON.stringify(signupData));
+        navigate("/recruiter/onboard");
+      }
 
-    // Navigate to correct onboarding routes
-    if (accountType === "employer") {
-      navigate("/recruiter/onboard");
-    } else {
-      navigate("/applicant/onboard");
+      console.log("Access token:", result.token);
+      console.log("Refresh token cookie:", document.cookie);
+    } catch (err) {
+      // Surface server-side validation errors if present
+      const resp = err.response;
+      if (resp && resp.data && resp.data.errors) {
+        // pick first field error
+        const fieldErrors = Object.values(resp.data.errors).flat();
+        setServerError(fieldErrors.join(" "));
+      } else if (resp && resp.data && resp.data.title) {
+        setServerError(resp.data.title);
+      } else if (resp && resp.data && resp.data.message) {
+        setServerError(resp.data.message);
+      } else {
+        setServerError("Error creating account");
+      }
     }
   };
 
@@ -71,8 +123,8 @@ export default function SignupForm() {
         label="Email"
         name="email"
         type="email"
-        status="default"
-        errorMessage=""
+        status={emailError ? "error" : "default"}
+        errorMessage={emailError}
         value={email}
         onChange={handleEmailChange}
         onBlur={handleEmailBlur}
@@ -101,6 +153,22 @@ export default function SignupForm() {
         value={retypePassword}
         onChange={(e) => setRetypePassword(e.target.value)}
       />
+
+      {/* OTP Field */}
+      {showOtpField && (
+        <StatusInputField
+          label="OTP"
+          name="otp"
+          type="text"
+          status={otpError ? "error" : "default"}
+          errorMessage={otpError}
+          value={otp}
+          onChange={(e) => setOtp(e.target.value)}
+        />
+      )}
+
+      {/* Server-side error display */}
+      {serverError && <div className="text-red-600 mt-2">{serverError}</div>}
 
       {/* Account Detection Banner */}
       {showNotice && accountType && shouldShowDetection && (
@@ -150,7 +218,8 @@ export default function SignupForm() {
           !retypePassword ||
           password !== retypePassword ||
           !accountType ||
-          !agreedToTerms
+          !agreedToTerms ||
+          (accountType === "student" && !otp)
         }
       />
     </form>

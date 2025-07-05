@@ -1,3 +1,4 @@
+// frontend/src/routes.jsx
 import { Routes, Route, Navigate } from "react-router";
 import ProtectedRoute from "./components/ProtectedRoute"; // ← Add this import
 
@@ -29,7 +30,7 @@ import RecruiterOnboardingPage from "./features/recruiter/pages/RecruiterOnboard
 import RecruiterListingPage from "./features/recruiter/pages/ListingPage.jsx";
 import RecruiterSettingPage from "./features/recruiter/pages/SettingPage.jsx";
 
-// Listing Pages
+// Listing Pages - Using existing ListingPage.jsx (now enhanced with AI functionality)
 import ListingPage from "./features/listing/pages/ListingPage.jsx";
 import ListingEditPage from "./features/listing/pages/ListingEditPage.jsx";
 
@@ -49,6 +50,9 @@ function AppRoutes() {
         {/* Demo routes - can be removed later */}
         <Route path="login_demo" element={<LoginPageDemo />} />
         <Route path="logout_demo" element={<LogoutPageDemo />} />
+
+        <Route path="login" element={<LoginPage />} />
+        <Route path="logout" element={<LogoutPage />} />
       </Route>
 
       {/* Admin Routes - Protected for Admin users only */}
@@ -165,8 +169,8 @@ function AppRoutes() {
         />
       </Route>
 
-      {/* Listing Routes - Can be accessed by appropriate users */}
       <Route path="listing">
+        {/* Using existing ListingPage.jsx (now enhanced with AI cover letter functionality) */}
         <Route
           path="info"
           element={

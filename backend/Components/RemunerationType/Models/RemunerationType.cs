@@ -7,14 +7,14 @@ public class RemunerationType
 {
     [Key]
     [Column("renumeration_id")]
-    private int RemunerationId { get; set; }
+    public int RemunerationId { get; set; }
     
     [Required]
     [Column("type")]
-    private string Type { get; set; }
+    public string Type { get; set; }
     
-    // private constructor for ef core
-    private RemunerationType() { }
+    // public constructor for ef core
+    public RemunerationType() { }
     
     // internal constructor - only services can create remuneration types
     internal RemunerationType (string type)

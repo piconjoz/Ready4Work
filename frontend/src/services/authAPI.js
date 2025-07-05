@@ -113,26 +113,6 @@ export const signupApplicant = async (signupData) => {
   }
 };
 
-export const signupRecruiter = async (signupData) => {
-  try {
-    const response = await baseAuthApi.post(
-      "/auth/signup/recruiter",
-      signupData
-    );
-
-    if (response.data.token) {
-      localStorage.setItem("token", response.data.token);
-      localStorage.setItem("user", JSON.stringify(response.data.user));
-      localStorage.setItem("tokenExpiry", response.data.expiresAt);
-    }
-
-    return response.data;
-  } catch (error) {
-    console.error("Error signing up recruiter:", error);
-    throw error;
-  }
-};
-
 export const onboardRecruiter = async (onboardingData) => {
   try {
     const response = await baseAuthApi.post(
@@ -144,4 +124,22 @@ export const onboardRecruiter = async (onboardingData) => {
     console.error("Error onboarding recruiter:", error);
     throw error;
   }
+};
+
+// Check if a student email is valid
+export const checkStudent = async (email) => {
+  try {
+    const response = await baseAuthApi.post("/auth/check", { email });
+    return response.data.isValid;
+  } catch (error) {
+    console.error("Error checking student:", error);
+    throw error;
+  }
+};
+
+export const getStudentProfile = async (email) => {
+  const response = await baseAuthApi.get("/auth/student-profile", {
+    params: { email },
+  });
+  return response.data; // StudentProfileDTO
 };

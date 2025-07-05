@@ -25,7 +25,7 @@ export default function JobInfo() {
             </div>
         </div>
         {/* Job Description Section */}
-        <div className="bg-white border border-[#D3D3D3] rounded-2xl p-6 mt-6">
+        <div className="bg-white border border-[#D3D3D3] rounded-2xl p-6 mt-6 mb-10">
           <h2 className="text-xl font-semibold mb-4">Job Description</h2>
           <div className="space-y-4">
             <StatusInputField

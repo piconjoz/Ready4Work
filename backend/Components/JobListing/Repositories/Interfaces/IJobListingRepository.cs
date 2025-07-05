@@ -9,4 +9,5 @@ public interface IJobListingRepository
     Task<JobListing> CreateAsync(JobListing jobLsting);
     Task<JobListing> UpdateAsync(JobListing jobListing);
     Task<bool> DeleteAsync(int jobId);
+    Task<List<JobListing>> GetVisibleJobListingsByRecruiterIdAsync(int recruiterId);
 }

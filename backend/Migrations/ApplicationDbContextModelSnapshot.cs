@@ -16,8 +16,124 @@ namespace backend.Migrations
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "8.0.8")
+                .HasAnnotation("ProductVersion", "8.0.11")
                 .HasAnnotation("Relational:MaxIdentifierLength", 64);
+
+            modelBuilder.Entity("backend.Components.ApplicantPreference.Models.ApplicantPreference", b =>
+                {
+                    b.Property<int>("PreferenceId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    b.Property<int>("ApplicantId")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime(6)");
+
+                    b.Property<bool>("DisableDownload")
+                        .HasColumnType("tinyint(1)");
+
+                    b.Property<bool>("HideInfoUntilOffered")
+                        .HasColumnType("tinyint(1)");
+
+                    b.Property<bool>("RedactedResume")
+                        .HasColumnType("tinyint(1)");
+
+                    b.Property<string>("RemunerationType")
+                        .IsRequired()
+                        .HasColumnType("longtext");
+
+                    b.Property<DateTime>("UpdatedAt")
+                        .HasColumnType("datetime(6)");
+
+                    b.Property<string>("WorkingHoursEnd")
+                        .IsRequired()
+                        .HasColumnType("longtext");
+
+                    b.Property<string>("WorkingHoursStart")
+                        .IsRequired()
+                        .HasColumnType("longtext");
+
+                    b.HasKey("PreferenceId");
+
+                    b.HasIndex("ApplicantId")
+                        .IsUnique();
+
+                    b.ToTable("ApplicantPreferences");
+                });
+
+            modelBuilder.Entity("backend.Components.Application.Models.JobApplication", b =>
+                {
+                    b.Property<int>("ApplicationId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasColumnName("application_id");
+
+                    b.Property<int>("ApplicantId")
+                        .HasColumnType("int")
+                        .HasColumnName("applicant_id");
+
+                    b.Property<DateTime>("AppliedDate")
+                        .HasColumnType("datetime(6)")
+                        .HasColumnName("applied_date");
+
+                    b.Property<int>("CoverLetterId")
+                        .HasColumnType("int")
+                        .HasColumnName("cover_letter_id");
+
+                    b.Property<int>("JobId")
+                        .HasColumnType("int")
+                        .HasColumnName("job_id");
+
+                    b.Property<string>("Status")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("varchar(50)")
+                        .HasColumnName("status");
+
+                    b.Property<DateTime>("UpdatedAt")
+                        .HasColumnType("datetime(6)")
+                        .HasColumnName("updated_at");
+
+                    b.HasKey("ApplicationId");
+
+                    b.HasIndex("CoverLetterId");
+
+                    b.HasIndex("JobId");
+
+                    b.HasIndex("ApplicantId", "JobId")
+                        .IsUnique();
+
+                    b.ToTable("JobApplications");
+                });
+
+            modelBuilder.Entity("backend.Components.Bookmark.Models.Bookmark", b =>
+                {
+                    b.Property<int>("BookmarkId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasColumnName("bookmark_id");
+
+                    b.Property<int>("ApplicantId")
+                        .HasColumnType("int")
+                        .HasColumnName("applicant_id");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime(6)")
+                        .HasColumnName("created_at");
+
+                    b.Property<int>("JobsId")
+                        .HasColumnType("int")
+                        .HasColumnName("jobs_id");
+
+                    b.HasKey("BookmarkId");
+
+                    b.HasIndex("ApplicantId", "JobsId")
+                        .IsUnique();
+
+                    b.ToTable("Bookmarks");
+                });
 
             modelBuilder.Entity("backend.Components.Company.Models.Company", b =>
                 {
@@ -126,6 +242,53 @@ namespace backend.Migrations
                     b.ToTable("Companies");
                 });
 
+            modelBuilder.Entity("backend.Components.CoverLetter.Models.CoverLetter", b =>
+                {
+                    b.Property<int>("CoverLetterId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasColumnName("cover_letter_id");
+
+                    b.Property<int>("ApplicantId")
+                        .HasColumnType("int")
+                        .HasColumnName("applicant_id");
+
+                    b.Property<string>("ContentType")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("varchar(50)")
+                        .HasColumnName("content_type");
+
+                    b.Property<string>("CoverLetterPath")
+                        .IsRequired()
+                        .HasMaxLength(1000)
+                        .HasColumnType("varchar(1000)")
+                        .HasColumnName("cover_letter_path");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime(6)")
+                        .HasColumnName("created_at");
+
+                    b.Property<long>("FileSize")
+                        .HasColumnType("bigint")
+                        .HasColumnName("file_size");
+
+                    b.Property<string>("OriginalText")
+                        .IsRequired()
+                        .HasColumnType("longtext")
+                        .HasColumnName("original_text");
+
+                    b.Property<DateTime>("UpdatedAt")
+                        .HasColumnType("datetime(6)")
+                        .HasColumnName("updated_at");
+
+                    b.HasKey("CoverLetterId");
+
+                    b.HasIndex("ApplicantId");
+
+                    b.ToTable("CoverLetters");
+                });
+
             modelBuilder.Entity("backend.Components.JobListing.Models.JobListing", b =>
                 {
                     b.Property<int>("JobId")
@@ -191,10 +354,10 @@ namespace backend.Migrations
                         .HasColumnType("int")
                         .HasColumnName("recruiter_id");
 
-                    b.Property<string>("RenumerationType")
+                    b.Property<string>("RemunerationType")
                         .IsRequired()
                         .HasColumnType("longtext")
-                        .HasColumnName("renumeration_type");
+                        .HasColumnName("remuneration_type");
 
                     b.Property<int>("Skillsets")
                         .HasColumnType("int")
@@ -216,7 +379,7 @@ namespace backend.Migrations
                     b.ToTable("JobListings");
                 });
 
-            modelBuilder.Entity("backend.Components.JobListing.Models.JobScheme", b =>
+            modelBuilder.Entity("backend.Components.JobScheme.Models.JobScheme", b =>
                 {
                     b.Property<int>("SchemeId")
                         .ValueGeneratedOnAdd()
@@ -237,7 +400,7 @@ namespace backend.Migrations
                     b.ToTable("JobSchemes");
                 });
 
-            modelBuilder.Entity("backend.Components.JobListing.Models.JobSkill", b =>
+            modelBuilder.Entity("backend.Components.JobSkill.Models.JobSkill", b =>
                 {
                     b.Property<int>("JobSkillId")
                         .ValueGeneratedOnAdd()
@@ -261,7 +424,7 @@ namespace backend.Migrations
                     b.ToTable("JobSkills");
                 });
 
-            modelBuilder.Entity("backend.Components.JobListing.Models.Programme", b =>
+            modelBuilder.Entity("backend.Components.Programme.Models.Programme", b =>
                 {
                     b.Property<int>("ProgrammeId")
                         .ValueGeneratedOnAdd()
@@ -276,9 +439,216 @@ namespace backend.Migrations
                     b.HasKey("ProgrammeId");
 
                     b.ToTable("Programmes");
+
+                    b.HasData(
+                        new
+                        {
+                            ProgrammeId = 1,
+                            ProgrammeName = "Accountancy"
+                        },
+                        new
+                        {
+                            ProgrammeId = 2,
+                            ProgrammeName = "Aircraft Systems Engineering"
+                        },
+                        new
+                        {
+                            ProgrammeId = 3,
+                            ProgrammeName = "Applied Artificial Intelligence"
+                        },
+                        new
+                        {
+                            ProgrammeId = 4,
+                            ProgrammeName = "Applied Computing (Fintech)"
+                        },
+                        new
+                        {
+                            ProgrammeId = 5,
+                            ProgrammeName = "Applied Computing (Stackable Micro-credential Pathway)"
+                        },
+                        new
+                        {
+                            ProgrammeId = 6,
+                            ProgrammeName = "Aviation Management"
+                        },
+                        new
+                        {
+                            ProgrammeId = 7,
+                            ProgrammeName = "Business and Infocomm Technology"
+                        },
+                        new
+                        {
+                            ProgrammeId = 8,
+                            ProgrammeName = "Chemical Engineering"
+                        },
+                        new
+                        {
+                            ProgrammeId = 9,
+                            ProgrammeName = "Civil Engineering"
+                        },
+                        new
+                        {
+                            ProgrammeId = 10,
+                            ProgrammeName = "Communication and Digital Media"
+                        },
+                        new
+                        {
+                            ProgrammeId = 11,
+                            ProgrammeName = "Computer Engineering"
+                        },
+                        new
+                        {
+                            ProgrammeId = 12,
+                            ProgrammeName = "Computer Science in Interactive Media and Game Development"
+                        },
+                        new
+                        {
+                            ProgrammeId = 13,
+                            ProgrammeName = "Computer Science in Real-Time Interactive Simulation"
+                        },
+                        new
+                        {
+                            ProgrammeId = 14,
+                            ProgrammeName = "Computing Science"
+                        },
+                        new
+                        {
+                            ProgrammeId = 15,
+                            ProgrammeName = "Diagnostic Radiography"
+                        },
+                        new
+                        {
+                            ProgrammeId = 16,
+                            ProgrammeName = "Dietetics and Nutrition"
+                        },
+                        new
+                        {
+                            ProgrammeId = 17,
+                            ProgrammeName = "Digital Art and Animation"
+                        },
+                        new
+                        {
+                            ProgrammeId = 18,
+                            ProgrammeName = "Digital Supply Chain"
+                        },
+                        new
+                        {
+                            ProgrammeId = 19,
+                            ProgrammeName = "Electrical and Electronic Engineering"
+                        },
+                        new
+                        {
+                            ProgrammeId = 20,
+                            ProgrammeName = "Electrical and Electronic Engineering (Stackable Micro-credential Pathway)"
+                        },
+                        new
+                        {
+                            ProgrammeId = 21,
+                            ProgrammeName = "Electrical Power Engineering"
+                        },
+                        new
+                        {
+                            ProgrammeId = 22,
+                            ProgrammeName = "Electronics and Data Engineering"
+                        },
+                        new
+                        {
+                            ProgrammeId = 23,
+                            ProgrammeName = "Engineering Systems"
+                        },
+                        new
+                        {
+                            ProgrammeId = 24,
+                            ProgrammeName = "Food Business Management (Baking and Pastry Arts)"
+                        },
+                        new
+                        {
+                            ProgrammeId = 25,
+                            ProgrammeName = "Food Business Management (Culinary Arts)"
+                        },
+                        new
+                        {
+                            ProgrammeId = 26,
+                            ProgrammeName = "Food Technology"
+                        },
+                        new
+                        {
+                            ProgrammeId = 27,
+                            ProgrammeName = "Hospitality and Tourism Management"
+                        },
+                        new
+                        {
+                            ProgrammeId = 28,
+                            ProgrammeName = "Information and Communications Technology (Information Security)"
+                        },
+                        new
+                        {
+                            ProgrammeId = 29,
+                            ProgrammeName = "Information and Communications Technology (Software Engineering)"
+                        },
+                        new
+                        {
+                            ProgrammeId = 30,
+                            ProgrammeName = "Infrastructure and Systems Engineering"
+                        },
+                        new
+                        {
+                            ProgrammeId = 31,
+                            ProgrammeName = "Infrastructure and Systems Engineering (Stackable Micro-credential Pathway)"
+                        },
+                        new
+                        {
+                            ProgrammeId = 32,
+                            ProgrammeName = "Mechanical Design and Manufacturing Engineering"
+                        },
+                        new
+                        {
+                            ProgrammeId = 33,
+                            ProgrammeName = "Mechanical Engineering"
+                        },
+                        new
+                        {
+                            ProgrammeId = 34,
+                            ProgrammeName = "Naval Architecture and Marine Engineering"
+                        },
+                        new
+                        {
+                            ProgrammeId = 35,
+                            ProgrammeName = "Nursing (Post-registration)"
+                        },
+                        new
+                        {
+                            ProgrammeId = 36,
+                            ProgrammeName = "Nursing (Pre-registration and Specialty Training)"
+                        },
+                        new
+                        {
+                            ProgrammeId = 37,
+                            ProgrammeName = "Occupational Therapy"
+                        },
+                        new
+                        {
+                            ProgrammeId = 38,
+                            ProgrammeName = "Pharmaceutical Engineering"
+                        },
+                        new
+                        {
+                            ProgrammeId = 39,
+                            ProgrammeName = "Physiotherapy"
+                        },
+                        new
+                        {
+                            ProgrammeId = 40,
+                            ProgrammeName = "Radiation Therapy"
+                        },
+                        new
+                        {
+                            ProgrammeId = 41,
+                            ProgrammeName = "Robotics Systems"
+                        });
                 });
 
-            modelBuilder.Entity("backend.Components.JobListing.Models.Qualification", b =>
+            modelBuilder.Entity("backend.Components.Qualification.Models.Qualification", b =>
                 {
                     b.Property<int>("QualificationId")
                         .ValueGeneratedOnAdd()
@@ -302,7 +672,83 @@ namespace backend.Migrations
                     b.ToTable("Qualifications");
                 });
 
-            modelBuilder.Entity("backend.Components.JobListing.Models.Skill", b =>
+            modelBuilder.Entity("backend.Components.RemunerationType.Models.RemunerationType", b =>
+                {
+                    b.Property<int>("RemunerationId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasColumnName("remnmeration_id");
+
+                    b.Property<string>("Type")
+                        .IsRequired()
+                        .HasMaxLength(20)
+                        .HasColumnType("varchar(20)")
+                        .HasColumnName("type");
+
+                    b.HasKey("RemunerationId");
+
+                    b.HasIndex("Type")
+                        .IsUnique();
+
+                    b.ToTable("RemunerationTypes");
+
+                    b.HasData(
+                        new
+                        {
+                            RemunerationId = 1,
+                            Type = "Hourly"
+                        },
+                        new
+                        {
+                            RemunerationId = 2,
+                            Type = "Monthly"
+                        },
+                        new
+                        {
+                            RemunerationId = 3,
+                            Type = "Project-based"
+                        },
+                        new
+                        {
+                            RemunerationId = 4,
+                            Type = "Contract-based"
+                        });
+                });
+
+            modelBuilder.Entity("backend.Components.Resume.Models.Resume", b =>
+                {
+                    b.Property<int>("ResumeId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasColumnName("resume_id");
+
+                    b.Property<int>("ApplicantId")
+                        .HasColumnType("int")
+                        .HasColumnName("applicant_id");
+
+                    b.Property<string>("ResumePath")
+                        .IsRequired()
+                        .HasMaxLength(1000)
+                        .HasColumnType("varchar(1000)")
+                        .HasColumnName("resume_path");
+
+                    b.Property<string>("ResumeText")
+                        .IsRequired()
+                        .HasColumnType("longtext")
+                        .HasColumnName("resume_text");
+
+                    b.Property<DateTime>("UploadedAt")
+                        .HasColumnType("datetime(6)")
+                        .HasColumnName("uploaded_at");
+
+                    b.HasKey("ResumeId");
+
+                    b.HasIndex("ApplicantId");
+
+                    b.ToTable("Resumes");
+                });
+
+            modelBuilder.Entity("backend.Components.Skill.Models.Skill", b =>
                 {
                     b.Property<int>("SkillId")
                         .ValueGeneratedOnAdd()
@@ -317,6 +763,178 @@ namespace backend.Migrations
                     b.HasKey("SkillId");
 
                     b.ToTable("Skills");
+
+                    b.HasData(
+                        new
+                        {
+                            SkillId = 1,
+                            skill = "NetSuite Proficency"
+                        },
+                        new
+                        {
+                            SkillId = 2,
+                            skill = "Java Proficency"
+                        },
+                        new
+                        {
+                            SkillId = 3,
+                            skill = "Auditing Proficiency"
+                        },
+                        new
+                        {
+                            SkillId = 4,
+                            skill = "Oracle Proficiency"
+                        },
+                        new
+                        {
+                            SkillId = 5,
+                            skill = "Microsoft Excel Proficiency"
+                        });
+                });
+
+            modelBuilder.Entity("backend.Components.Student.Models.StudentProfile", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasColumnName("student_profile_id");
+
+                    b.Property<int>("AdmitYear")
+                        .HasColumnType("int")
+                        .HasColumnName("admit_year");
+
+                    b.Property<string>("DegreeProgramme")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("varchar(200)")
+                        .HasColumnName("degree_programme");
+
+                    b.Property<string>("Email")
+                        .IsRequired()
+                        .HasMaxLength(255)
+                        .HasColumnType("varchar(255)")
+                        .HasColumnName("email");
+
+                    b.Property<string>("FullName")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("varchar(200)")
+                        .HasColumnName("full_name");
+
+                    b.Property<string>("Gender")
+                        .IsRequired()
+                        .HasMaxLength(10)
+                        .HasColumnType("varchar(10)")
+                        .HasColumnName("gender");
+
+                    b.Property<string>("Nationality")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("varchar(100)")
+                        .HasColumnName("nationality");
+
+                    b.Property<string>("NricFin")
+                        .IsRequired()
+                        .HasMaxLength(20)
+                        .HasColumnType("varchar(20)")
+                        .HasColumnName("nric_fin");
+
+                    b.Property<string>("PrimaryContactNumber")
+                        .IsRequired()
+                        .HasMaxLength(20)
+                        .HasColumnType("varchar(20)")
+                        .HasColumnName("primary_contact_number");
+
+                    b.Property<int>("StudentId")
+                        .HasColumnType("int")
+                        .HasColumnName("student_id");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("StudentId")
+                        .IsUnique();
+
+                    b.ToTable("StudentProfiles");
+
+                    b.HasData(
+                        new
+                        {
+                            Id = 1,
+                            AdmitYear = 2020,
+                            DegreeProgramme = "BA in User Experience and Game Design",
+                            Email = "2941985@sit.singaporetech.edu.sg",
+                            FullName = "Alice Tan",
+                            Gender = "Male",
+                            Nationality = "Singapore",
+                            NricFin = "T01234567",
+                            PrimaryContactNumber = "94304313",
+                            StudentId = 2941985
+                        },
+                        new
+                        {
+                            Id = 2,
+                            AdmitYear = 2021,
+                            DegreeProgramme = "BSc in Computer Science",
+                            Email = "230230@sit.singaporetech.edu.sg",
+                            FullName = "Bob Lim",
+                            Gender = "Female",
+                            Nationality = "Singapore",
+                            NricFin = "T01654321",
+                            PrimaryContactNumber = "91234567",
+                            StudentId = 230230
+                        },
+                        new
+                        {
+                            Id = 3,
+                            AdmitYear = 2021,
+                            DegreeProgramme = "Information and Communications Technology (Software Engineering)",
+                            Email = "2301886@sit.singaporetech.edu.sg",
+                            FullName = "Marcus Foo",
+                            Gender = "Male",
+                            Nationality = "Singapore",
+                            NricFin = "T0000000A",
+                            PrimaryContactNumber = "90737044",
+                            StudentId = 2301886
+                        },
+                        new
+                        {
+                            Id = 4,
+                            AdmitYear = 2021,
+                            DegreeProgramme = "Information and Communications Technology (Information Security)",
+                            Email = "2302221@sit.singaporetech.edu.sg",
+                            FullName = "Hariz Darwisy Bin Adan",
+                            Gender = "Male",
+                            Nationality = "Singapore",
+                            NricFin = "T1111111B",
+                            PrimaryContactNumber = "99001344",
+                            StudentId = 2302221
+                        },
+                        new
+                        {
+                            Id = 5,
+                            AdmitYear = 2021,
+                            DegreeProgramme = "Information and Communications Technology (Software Engineering)",
+                            Email = "2301938@sit.singaporetech.edu.sg",
+                            FullName = "Xuan Yang",
+                            Gender = "Male",
+                            Nationality = "Singapore",
+                            NricFin = "T2222222C",
+                            PrimaryContactNumber = "91109999",
+                            StudentId = 2301938
+                        },
+                        new
+                        {
+                            Id = 6,
+                            AdmitYear = 2021,
+                            DegreeProgramme = "Information and Communications Technology (Software Engineering)",
+                            Email = "2301900@sit.singaporetech.edu.sg",
+                            FullName = "Dinie Zikry",
+                            Gender = "Male",
+                            Nationality = "Singapore",
+                            NricFin = "T3333333D",
+                            PrimaryContactNumber = "99999110",
+                            StudentId = 2301900
+                        });
                 });
 
             modelBuilder.Entity("backend.Components.User.Models.RefreshToken", b =>
@@ -550,6 +1168,40 @@ namespace backend.Migrations
                     b.ToTable("Users");
                 });
 
+            modelBuilder.Entity("backend.Components.Application.Models.JobApplication", b =>
+                {
+                    b.HasOne("backend.User.Models.Applicant", "Applicant")
+                        .WithMany()
+                        .HasForeignKey("ApplicantId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("backend.Components.CoverLetter.Models.CoverLetter", "CoverLetter")
+                        .WithMany()
+                        .HasForeignKey("CoverLetterId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("backend.Components.JobListing.Models.JobListing", null)
+                        .WithMany()
+                        .HasForeignKey("JobId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Applicant");
+
+                    b.Navigation("CoverLetter");
+                });
+
+            modelBuilder.Entity("backend.Components.CoverLetter.Models.CoverLetter", b =>
+                {
+                    b.HasOne("backend.User.Models.Applicant", null)
+                        .WithMany()
+                        .HasForeignKey("ApplicantId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
             modelBuilder.Entity("backend.Components.JobListing.Models.JobListing", b =>
                 {
                     b.HasOne("backend.User.Models.Recruiter", null)
@@ -559,7 +1211,7 @@ namespace backend.Migrations
                         .IsRequired();
                 });
 
-            modelBuilder.Entity("backend.Components.JobListing.Models.JobSkill", b =>
+            modelBuilder.Entity("backend.Components.JobSkill.Models.JobSkill", b =>
                 {
                     b.HasOne("backend.Components.JobListing.Models.JobListing", null)
                         .WithMany()
@@ -567,14 +1219,14 @@ namespace backend.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("backend.Components.JobListing.Models.Skill", null)
+                    b.HasOne("backend.Components.Skill.Models.Skill", null)
                         .WithMany()
                         .HasForeignKey("SkillId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
                 });
 
-            modelBuilder.Entity("backend.Components.JobListing.Models.Qualification", b =>
+            modelBuilder.Entity("backend.Components.Qualification.Models.Qualification", b =>
                 {
                     b.HasOne("backend.Components.JobListing.Models.JobListing", null)
                         .WithMany()
@@ -582,9 +1234,18 @@ namespace backend.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("backend.Components.JobListing.Models.Programme", null)
+                    b.HasOne("backend.Components.Programme.Models.Programme", null)
                         .WithMany()
                         .HasForeignKey("ProgrammeId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("backend.Components.Resume.Models.Resume", b =>
+                {
+                    b.HasOne("backend.User.Models.Applicant", null)
+                        .WithMany()
+                        .HasForeignKey("ApplicantId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
                 });

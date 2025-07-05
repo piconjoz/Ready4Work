@@ -1,8 +1,14 @@
+// backend/Data/ApplicationDbContext.cs
 namespace backend.Data;
 
 using Microsoft.EntityFrameworkCore;
 using backend.Components.Company.Models;
+using backend.Components.ApplicantPreference.Models;
+using backend.Components.Application.Models;
+using backend.Components.CoverLetter.Models;
 using backend.User.Models;
+using backend.Components.Resume.Models;
+using backend.Components.Bookmark.Models;
 using backend.Components.JobListing.Models;
 using backend.Components.User.Models;
 using backend.Components.Skill.Models;
@@ -11,26 +17,30 @@ using backend.Components.RemunerationType.Models;
 using backend.Components.Programme.Models;
 using backend.Components.Qualification.Models;
 using backend.Components.JobSkill.Models;
+using backend.Components.Student.Models;
 
 public class ApplicationDbContext : DbContext
-    {
-        public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options) : base(options)
-        {
-        }
-
-        public DbSet<Company> Companies { get; set; }
-        public DbSet<User> Users { get; set; }
-        public DbSet<Admin> Admins { get; set; }
-        public DbSet<Applicant> Applicants { get; set; }
-        public DbSet<Recruiter> Recruiters { get; set; }
-        public DbSet<RefreshToken> RefreshTokens { get; set; }
-        public DbSet<JobListing> JobListings { get; set; }
-        public DbSet<Skill> Skills { get; set; }
-        public DbSet<Programme> Programmes { get; set; }
-        public DbSet<JobSkill> JobSkills { get; set; }
-        public DbSet<Qualification> Qualifications { get; set; }
-        public DbSet<JobScheme> JobSchemes { get; set; }
-        public DbSet<RemunerationType> RemunerationTypes { get; set;}
+{
+    public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options) : base(options) {}
+    public DbSet<Company> Companies { get; set; }
+    public DbSet<User> Users { get; set; }
+    public DbSet<Admin> Admins { get; set; }
+    public DbSet<Applicant> Applicants { get; set; }
+    public DbSet<Recruiter> Recruiters { get; set; }
+    public DbSet<RefreshToken> RefreshTokens { get; set; }
+    public DbSet<JobApplication> JobApplications { get; set; }
+    public DbSet<CoverLetter> CoverLetters { get; set; }  // Add CoverLetter DbSet
+    public DbSet<Resume> Resumes { get; set; }
+    public DbSet<Bookmark> Bookmarks { get; set; }
+    public DbSet<JobListing> JobListings { get; set; }
+    public DbSet<Skill> Skills { get; set; }
+    public DbSet<Programme> Programmes { get; set; }
+    public DbSet<JobSkill> JobSkills { get; set; }
+    public DbSet<Qualification> Qualifications { get; set; }
+    public DbSet<JobScheme> JobSchemes { get; set; }
+    public DbSet<RemunerationType> RemunerationTypes { get; set;}
+    public DbSet<StudentProfile> StudentProfiles { get; set; }
+    public DbSet<ApplicantPreference> ApplicantPreferences { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -244,6 +254,89 @@ public class ApplicationDbContext : DbContext
             entity.HasIndex("ExpiresAt");
         });
 
+        // Configure CoverLetter entity
+        modelBuilder.Entity<CoverLetter>(entity =>
+        {
+            entity.HasKey(e => e.CoverLetterId);
+            entity.Property(e => e.CoverLetterId).HasColumnName("cover_letter_id");
+            entity.Property(e => e.ApplicantId).IsRequired().HasColumnName("applicant_id");
+            entity.Property(e => e.CoverLetterPath).IsRequired().HasMaxLength(1000).HasColumnName("cover_letter_path");
+            entity.Property(e => e.OriginalText).HasColumnName("original_text");
+            entity.Property(e => e.FileSize).HasColumnName("file_size");
+            entity.Property(e => e.ContentType).HasMaxLength(50).HasColumnName("content_type");
+            entity.Property(e => e.CreatedAt).HasColumnName("created_at");
+            entity.Property(e => e.UpdatedAt).HasColumnName("updated_at");
+
+            // Foreign key to Applicant
+            entity.HasOne<Applicant>()
+                    .WithMany()
+                    .HasForeignKey("ApplicantId")
+                    .OnDelete(DeleteBehavior.Cascade);
+
+            entity.HasIndex(e => e.ApplicantId);
+        });
+
+        // Configure JobApplication entity with updated relationships
+        modelBuilder.Entity<JobApplication>(entity =>
+        {
+            entity.HasKey("ApplicationId");
+            entity.Property("ApplicantId").IsRequired().HasColumnName("applicant_id");
+            entity.Property("JobId").IsRequired().HasColumnName("job_id");
+            entity.Property("CoverLetterId").IsRequired().HasColumnName("cover_letter_id");
+            entity.Property("Status").IsRequired().HasMaxLength(50).HasColumnName("status");
+            entity.Property("AppliedDate").HasColumnName("applied_date");
+            entity.Property("UpdatedAt").HasColumnName("updated_at");
+
+            // Foreign key to Applicant
+            entity.HasOne<Applicant>("Applicant")
+                    .WithMany()
+                    .HasForeignKey("ApplicantId")
+                    .OnDelete(DeleteBehavior.Cascade);
+
+            // Foreign key to CoverLetter
+            entity.HasOne<CoverLetter>("CoverLetter")
+                    .WithMany()
+                    .HasForeignKey("CoverLetterId")
+                    .OnDelete(DeleteBehavior.Restrict);  // Don't cascade delete cover letters
+
+            // Foreign Key to JobListing based on jobId
+            entity.HasOne<JobListing>()
+                    .WithMany()
+                    .HasForeignKey("JobId")
+                    .OnDelete(DeleteBehavior.Cascade); // deletion of job listing means deleting the applications to it
+
+            entity.HasIndex("ApplicantId", "JobId").IsUnique(); // Prevent duplicate applications
+            entity.HasIndex("CoverLetterId");
+        });
+
+        modelBuilder.Entity<Resume>(entity =>
+        {
+            entity.HasKey(e => e.ResumeId);
+            entity.Property(e => e.ResumeId).HasColumnName("resume_id");
+            entity.Property(e => e.ApplicantId).IsRequired().HasColumnName("applicant_id");
+            entity.Property(e => e.ResumePath).IsRequired().HasMaxLength(1000).HasColumnName("resume_path");
+            entity.Property(e => e.ResumeText).IsRequired().HasColumnName("resume_text");
+            entity.Property(e => e.UploadedAt).IsRequired().HasColumnName("uploaded_at");
+
+            entity.HasOne<Applicant>()
+                    .WithMany()
+                    .HasForeignKey("ApplicantId")
+                    .OnDelete(DeleteBehavior.Cascade);
+
+            entity.HasIndex(e => e.ApplicantId);
+        });
+
+        // Configure Bookmark entity
+        modelBuilder.Entity<Bookmark>(entity =>
+        {
+            entity.HasKey(e => e.BookmarkId);
+            entity.Property(e => e.BookmarkId).HasColumnName("bookmark_id");
+            entity.Property(e => e.ApplicantId).IsRequired().HasColumnName("applicant_id");
+            entity.Property(e => e.JobsId).IsRequired().HasColumnName("jobs_id");
+            entity.Property(e => e.CreatedAt).HasColumnName("created_at");
+            entity.HasIndex(e => new { e.ApplicantId, e.JobsId }).IsUnique();
+        });
+
         // JobListing
         modelBuilder.Entity<JobListing>(entity =>
         {
@@ -271,7 +364,7 @@ public class ApplicationDbContext : DbContext
                 .HasColumnName("is_visible");
 
             entity.Property("RemunerationType")
-                .HasColumnName("renumeration_type");
+                .HasColumnName("remuneration_type");
 
             entity.Property("JobDuration")
                 .HasColumnName("job_duration");
@@ -311,6 +404,15 @@ public class ApplicationDbContext : DbContext
         {
             entity.HasKey("SkillId");
             entity.Property("skill").HasColumnName("skill");
+            
+            entity.HasData(
+                new Skill { SkillId = 1, skill = "NetSuite Proficency"},
+                new Skill { SkillId = 2, skill = "Java Proficency"},
+                new Skill { SkillId = 3, skill = "Auditing Proficiency"},
+                new Skill { SkillId = 4, skill = "Oracle Proficiency"},
+                new Skill { SkillId = 5, skill = "Microsoft Excel Proficiency"}
+                // add as necessary
+            );
         });
 
         // Programme entity
@@ -318,6 +420,49 @@ public class ApplicationDbContext : DbContext
         {
             entity.HasKey("ProgrammeId");
             entity.Property("ProgrammeName").HasColumnName("programme_name");
+            entity.HasData(
+                new Programme { ProgrammeId = 1, ProgrammeName = "Accountancy" },
+                new Programme { ProgrammeId = 2, ProgrammeName = "Aircraft Systems Engineering" },
+                new Programme { ProgrammeId = 3, ProgrammeName = "Applied Artificial Intelligence" },
+                new Programme { ProgrammeId = 4, ProgrammeName = "Applied Computing (Fintech)" },
+                new Programme { ProgrammeId = 5, ProgrammeName = "Applied Computing (Stackable Micro-credential Pathway)" },
+                new Programme { ProgrammeId = 6, ProgrammeName = "Aviation Management" },
+                new Programme { ProgrammeId = 7, ProgrammeName = "Business and Infocomm Technology" },
+                new Programme { ProgrammeId = 8, ProgrammeName = "Chemical Engineering" },
+                new Programme { ProgrammeId = 9, ProgrammeName = "Civil Engineering" },
+                new Programme { ProgrammeId = 10, ProgrammeName = "Communication and Digital Media" },
+                new Programme { ProgrammeId = 11, ProgrammeName = "Computer Engineering" },
+                new Programme { ProgrammeId = 12, ProgrammeName = "Computer Science in Interactive Media and Game Development" },
+                new Programme { ProgrammeId = 13, ProgrammeName = "Computer Science in Real-Time Interactive Simulation" },
+                new Programme { ProgrammeId = 14, ProgrammeName = "Computing Science" },
+                new Programme { ProgrammeId = 15, ProgrammeName = "Diagnostic Radiography" },
+                new Programme { ProgrammeId = 16, ProgrammeName = "Dietetics and Nutrition" },
+                new Programme { ProgrammeId = 17, ProgrammeName = "Digital Art and Animation" },
+                new Programme { ProgrammeId = 18, ProgrammeName = "Digital Supply Chain" },
+                new Programme { ProgrammeId = 19, ProgrammeName = "Electrical and Electronic Engineering" },
+                new Programme { ProgrammeId = 20, ProgrammeName = "Electrical and Electronic Engineering (Stackable Micro-credential Pathway)" },
+                new Programme { ProgrammeId = 21, ProgrammeName = "Electrical Power Engineering" },
+                new Programme { ProgrammeId = 22, ProgrammeName = "Electronics and Data Engineering" },
+                new Programme { ProgrammeId = 23, ProgrammeName = "Engineering Systems" },
+                new Programme { ProgrammeId = 24, ProgrammeName = "Food Business Management (Baking and Pastry Arts)" },
+                new Programme { ProgrammeId = 25, ProgrammeName = "Food Business Management (Culinary Arts)" },
+                new Programme { ProgrammeId = 26, ProgrammeName = "Food Technology" },    
+                new Programme { ProgrammeId = 27, ProgrammeName = "Hospitality and Tourism Management" },
+                new Programme { ProgrammeId = 28, ProgrammeName = "Information and Communications Technology (Information Security)" },
+                new Programme { ProgrammeId = 29, ProgrammeName = "Information and Communications Technology (Software Engineering)" },
+                new Programme { ProgrammeId = 30, ProgrammeName = "Infrastructure and Systems Engineering" },
+                new Programme { ProgrammeId = 31, ProgrammeName = "Infrastructure and Systems Engineering (Stackable Micro-credential Pathway)" },
+                new Programme { ProgrammeId = 32, ProgrammeName = "Mechanical Design and Manufacturing Engineering" },
+                new Programme { ProgrammeId = 33, ProgrammeName = "Mechanical Engineering" },
+                new Programme { ProgrammeId = 34, ProgrammeName = "Naval Architecture and Marine Engineering" },
+                new Programme { ProgrammeId = 35, ProgrammeName = "Nursing (Post-registration)" },
+                new Programme { ProgrammeId = 36, ProgrammeName = "Nursing (Pre-registration and Specialty Training)" },
+                new Programme { ProgrammeId = 37, ProgrammeName = "Occupational Therapy" },
+                new Programme { ProgrammeId = 38, ProgrammeName = "Pharmaceutical Engineering" },
+                new Programme { ProgrammeId = 39, ProgrammeName = "Physiotherapy" },
+                new Programme { ProgrammeId = 40, ProgrammeName = "Radiation Therapy" },
+                new Programme { ProgrammeId = 41, ProgrammeName = "Robotics Systems" }
+            );
         });
 
         // Job skills entity
@@ -386,8 +531,89 @@ public class ApplicationDbContext : DbContext
                 .HasColumnName("type");
 
             entity.HasIndex("Type").IsUnique();
+
+            // Prefilled static data
+            entity.HasData(
+                new RemunerationType { RemunerationId = 1, Type = "Hourly" },
+                new RemunerationType { RemunerationId = 2, Type = "Monthly" },
+                new RemunerationType { RemunerationId = 3, Type = "Project-based" },
+                new RemunerationType { RemunerationId = 4, Type = "Contract-based" }
+            );
         });
 
+        // StudentProfile entity configuration
+        modelBuilder.Entity<StudentProfile>(e =>
+        {
+            e.HasKey(p => p.Id);
+            e.Property(p => p.Id).HasColumnName("student_profile_id");
+            e.Property(p => p.NricFin).IsRequired().HasMaxLength(20).HasColumnName("nric_fin");
+            e.Property(p => p.StudentId).IsRequired().HasColumnName("student_id");
+            e.Property(p => p.Nationality).HasMaxLength(100).HasColumnName("nationality");
+            e.Property(p => p.AdmitYear).HasColumnName("admit_year");
+            e.Property(p => p.PrimaryContactNumber).HasMaxLength(20).HasColumnName("primary_contact_number");
+            e.Property(p => p.Gender).HasMaxLength(10).HasColumnName("gender");
+            e.Property(p => p.DegreeProgramme).HasMaxLength(200).HasColumnName("degree_programme");
+            e.Property(p => p.FullName)
+                .IsRequired()
+                .HasMaxLength(200)
+                .HasColumnName("full_name");
+            e.Property(p => p.Email)
+                .IsRequired()
+                .HasMaxLength(255)
+                .HasColumnName("email");
+            e.HasIndex(p => p.StudentId).IsUnique();
+            e.HasData(
+                new {
+                    Id = 1,
+                    NricFin = "T01234567",
+                    StudentId = 2941985,
+                    Nationality = "Singapore",
+                    AdmitYear = 2020,
+                    PrimaryContactNumber = "94304313",
+                    Gender = "Male",
+                    DegreeProgramme = "BA in User Experience and Game Design",
+                    FullName = "Alice Tan",
+                    Email = "2941985@sit.singaporetech.edu.sg"
+                },
+                new {
+                    Id = 2,
+                    NricFin = "T01654321",
+                    StudentId = 230230,
+                    Nationality = "Singapore",
+                    AdmitYear = 2021,
+                    PrimaryContactNumber = "91234567",
+                    Gender = "Female",
+                    DegreeProgramme = "BSc in Computer Science",
+                    FullName = "Bob Lim",
+                    Email = "230230@sit.singaporetech.edu.sg"
+                },
+                new {
+                    Id = 3,
+                    NricFin = "T0000000A",
+                    StudentId = 2301886,
+                    Nationality = "Singapore",
+                    AdmitYear = 2021,
+                    PrimaryContactNumber = "90737044",
+                    Gender = "Male",
+                    DegreeProgramme = "Information and Communications Technology (Software Engineering)",
+                    FullName = "Marcus Foo",
+                    Email = "2301886@sit.singaporetech.edu.sg"
+                },
+                new {
+                    Id = 4,
+                    NricFin = "T1111111B",
+                    StudentId = 2302221,
+                    Nationality = "Singapore",
+                    AdmitYear = 2021,
+                    PrimaryContactNumber = "99001344",
+                    Gender = "Male",
+                    DegreeProgramme = "Information and Communications Technology (Information Security)",
+                    FullName = "Hariz Darwisy Bin Adan",
+                    Email = "2302221@sit.singaporetech.edu.sg"
+                }
+               
+            );
+        });
 
     }
 }

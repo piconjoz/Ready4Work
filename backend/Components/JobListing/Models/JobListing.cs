@@ -6,63 +6,63 @@ public class JobListing
 {
     [Key]
     [Column("job_id")]
-    private int JobId { get; set; }
+    public int JobId { get; set; }
 
     [Required]
     [Column("recruiter_id")]
-    private int RecruiterId { get; set; }
+    public int RecruiterId { get; set; }
 
     [Column("job_requirements")]
-    private string JobRequirements { get; set; } = string.Empty;
+    public string JobRequirements { get; set; } = string.Empty;
 
     [Column("job_description")]
-    private string JobDescription { get; set; } = string.Empty;
+    public string JobDescription { get; set; } = string.Empty;
 
     [Column("listing_name")]
-    private string ListingName { get; set; } = string.Empty;
+    public string ListingName { get; set; } = string.Empty;
 
     [Column("deadline")]
-    private DateTime Deadline { get; set; }
+    public DateTime Deadline { get; set; }
 
     [Column("max_vacancies")]
-    private int MaxVacancies { get; set; }
+    public int MaxVacancies { get; set; }
 
     [Column("is_visible")]
-    private bool IsVisible { get; set; } = true;
+    public bool IsVisible { get; set; } = true;
 
-    [Column("renumeration_type")]
-    private string RenumerationType { get; set; } = string.Empty;
+    [Column("remumeration_type")]
+    public string RemunerationType { get; set; } = string.Empty;
 
     [Column("job_duration")]
-    private string JobDuration { get; set; } = string.Empty;
+    public string JobDuration { get; set; } = string.Empty;
 
     [Column("rate")]
-    private float Rate { get; set; }
+    public float Rate { get; set; }
 
     [Column("working_hours")]
-    private string WorkingHours { get; set; } = string.Empty;
+    public string WorkingHours { get; set; } = string.Empty;
 
     [Column("job_scheme")]
-    private string JobScheme { get; set; } = string.Empty;
+    public string JobScheme { get; set; } = string.Empty;
 
     [Column("permitted_qualifications")]
-    private int PermittedQualifications { get; set; }
+    public int PermittedQualifications { get; set; }
 
     [Column("skillsets")]
-    private int Skillsets { get; set; }
+    public int Skillsets { get; set; }
 
     [Column("job_status")]
-    private string JobStatus { get; set; } = string.Empty;
+    public string JobStatus { get; set; } = string.Empty;
 
     [Column("created_at")]
-    private DateTime CreatedAt { get; set; } = DateTime.UtcNow;
+    public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
 
     [Column("updated_at")]
-    private DateTime UpdatedAt { get; set; } = DateTime.UtcNow;
+    public DateTime UpdatedAt { get; set; } = DateTime.UtcNow;
 
-    private JobListing() { }
+    public JobListing() { }
 
-    internal JobListing(int recruiterId, string jobRequirements, string jobDesription, string listingName, DateTime deadline, int maxVacancies, bool isVisble, string renumerationType, string jobDuration, float rate, string workingHours, string jobScheme, int permittedQualifications, int skillsets, string jobStatus)
+    internal JobListing(int recruiterId, string jobRequirements, string jobDesription, string listingName, DateTime deadline, int maxVacancies, bool isVisble, string remunerationType, string jobDuration, float rate, string workingHours, string jobScheme, int permittedQualifications, int skillsets, string jobStatus)
     {
         RecruiterId = recruiterId;
         JobRequirements = jobRequirements;
@@ -71,7 +71,7 @@ public class JobListing
         Deadline = deadline;
         MaxVacancies = maxVacancies;
         IsVisible = isVisble;
-        RenumerationType = renumerationType;
+        RemunerationType = remunerationType;
         JobDuration = jobDuration;
         Rate = rate;
         WorkingHours = workingHours;
@@ -81,7 +81,6 @@ public class JobListing
         JobStatus = jobStatus;
         CreatedAt = DateTime.UtcNow;
         UpdatedAt = DateTime.UtcNow;
-
     }
 
     // getter
@@ -93,7 +92,7 @@ public class JobListing
     internal DateTime GetDeadline() => Deadline;
     internal int GetMaxVacancies() => MaxVacancies;
     internal bool GetIsVisible() => IsVisible;
-    internal string GetRenumerationType() => RenumerationType;
+    internal string GetRemunerationType() => RemunerationType;
     internal string GetJobDuration() => JobDuration;
     internal float GetRate() => Rate;
     internal string GetWorkingHours() => WorkingHours;
@@ -114,7 +113,7 @@ public class JobListing
     internal void SetDeadline(DateTime deadline) => Deadline = deadline;
     internal void SetMaxVacancies(int maxVacancies) => MaxVacancies = maxVacancies;
     internal void SetIsVisible(bool isVisble) => IsVisible = isVisble;
-    internal void SetRenumerationType(string renumerationType) => RenumerationType = renumerationType;
+    internal void SetRemunerationType(string remunerationType) => RemunerationType = remunerationType;
     internal void SetJobDuration(string jobDuration) => JobDuration = jobDuration;
     internal void SetRate(float rate) => Rate = rate;
     internal void SetWorkingHours(string workingHours) => WorkingHours = workingHours;

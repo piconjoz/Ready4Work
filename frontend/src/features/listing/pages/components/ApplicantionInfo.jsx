@@ -27,8 +27,8 @@ export default function ApplicationInfo() {
        <div className="bg-white border border-[#D3D3D3] rounded-2xl p-6 lg:col-span-1">
             <h2 className="text-lg font-semibold mb-4">Job Benefits</h2>
             <SelectField
-                label="Renumeration Type"
-                name="renumerationType"
+                label="Remuneration Type"
+                name="remunerationType"
                 value={selected}
                 onChange={(e) => setSelected(e.target.value)}
                 options={renumerationOptions}
@@ -50,9 +50,6 @@ export default function ApplicationInfo() {
                 onChange={(e) => setSelected(e.target.value)}
                 options={skillsetOptions}
             />
-            <button className="mt-4 w-full bg-black text-white rounded-lg py-3 hover:bg-gray-900 transition">
-            Save
-            </button>
        </div>
  
        {/* Job Summary (spans 2 cols on md+) */}

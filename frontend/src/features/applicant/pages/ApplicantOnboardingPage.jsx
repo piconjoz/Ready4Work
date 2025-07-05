@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import OnboardHeader from "../../../components/OnboardHeader";
 import ProgressIndicator from '../../../components/ProgressIndicator';
 import { MdCheck, MdPerson } from "react-icons/md";
@@ -22,9 +23,14 @@ export default function ApplicantOnboardingPage() {
   ];
 
   const [currentStep, setCurrentStep] = useState(0);
+  const navigate = useNavigate();
 
   const handleNext = () => {
-    if (currentStep < steps.length - 1) setCurrentStep(currentStep + 1);
+    if (currentStep < steps.length - 1) {
+      setCurrentStep(currentStep + 1);
+    } else {
+      navigate("/applicant/home");
+    }
   };
 
   const handleBack = () => {
@@ -52,8 +58,8 @@ export default function ApplicantOnboardingPage() {
           <button
             onClick={handleNext}
             className="bg-black text-white rounded-lg py-3 px-4 w-45 mx-2 disabled:opacity-50"
-            disabled={currentStep === steps.length - 1}>
-            Next
+            disabled={false}>
+            {currentStep === steps.length - 1 ? "Confirm" : "Next"}
           </button>
         </div>
       </div>

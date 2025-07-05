@@ -1,20 +1,26 @@
-# Stage 1: Build
-FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
+FROM mcr.microsoft.com/dotnet/aspnet:8.0 AS base
 WORKDIR /app
 
-# Copy and restore dependencies
-COPY *.csproj ./
-RUN dotnet restore
+# Install OS deps (incl. tesseract + english tessdata)
+RUN apt-get update \
+ && apt-get install -y --no-install-recommends \
+      tesseract-ocr \
+      tesseract-ocr-eng \
+      imagemagick \
+      poppler-utils \
+ && rm -rf /var/lib/apt/lists/*
 
-# Copy rest of the code
-COPY . ./
-RUN dotnet publish -c Release -o /app/publish
+# Copy tessdata if you have custom models
+# COPY tessdata /usr/share/tesseract-ocr/4.00/tessdata
 
+FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
+WORKDIR /src
+COPY ["backend.csproj", "./"]
+RUN dotnet restore "backend.csproj"
+COPY . .
+RUN dotnet publish "backend.csproj" -c Release -o /app/publish
 
-# Stage 2: Run
-FROM mcr.microsoft.com/dotnet/aspnet:8.0 AS runtime
-ENV ASPNETCORE_URLS=http://+:80
+FROM base AS final
 WORKDIR /app
 COPY --from=build /app/publish .
-
 ENTRYPOINT ["dotnet", "backend.dll"]

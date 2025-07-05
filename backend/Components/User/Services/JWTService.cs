@@ -21,18 +21,25 @@ public class JWTService : IJWTService
         _expirationMinutes = int.Parse(configuration["Jwt:ExpirationMinutes"] ?? "60");
     }
 
-    public string GenerateToken(int userId, int userType)
+    public string GenerateToken(int userId, int userType, int? applicantId = null)
     {
         var tokenHandler = new JwtSecurityTokenHandler();
         var key = Encoding.ASCII.GetBytes(_secretKey);
 
-        var claims = new[]
+        // build claims, include applicantId if provided
+        var claimsList = new List<Claim>
         {
             new Claim(ClaimTypes.NameIdentifier, userId.ToString()),
             new Claim("user_type", userType.ToString()),
             new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
             new Claim(JwtRegisteredClaimNames.Iat, DateTimeOffset.UtcNow.ToUnixTimeSeconds().ToString(), ClaimValueTypes.Integer64)
         };
+        if (applicantId.HasValue)
+        {
+            claimsList.Add(new Claim("applicantId", applicantId.Value.ToString()));
+        }
+
+        var claims = claimsList.ToArray();
 
         var tokenDescriptor = new SecurityTokenDescriptor
         {

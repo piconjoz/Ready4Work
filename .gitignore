@@ -79,3 +79,4 @@ _ReSharper*/
 *.DotSettings.user
 frontend/.env
 frontend/.env
+backend/.env

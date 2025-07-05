@@ -1,3 +1,9 @@
+import React from 'react';
+import { useState } from "react";
+// import { FaRegBookmark, FaBookmark } from "react-icons/fa";
+import { MdOutlineBookmark, MdOutlineBookmarkBorder } from "react-icons/md";
+
+
 export default function JobCard({
   logo,
   title,
@@ -9,6 +15,8 @@ export default function JobCard({
   onClick = () => {},
   secondaryActions = [],
 }) {
+  const [bookmarked, setBookmarked] = useState(false);
+  const toggleBookmark = () => setBookmarked(prev => !prev);
   return (
     <div className="bg-white border border-[#e5e7eb] rounded-2xl p-6  mx-auto my-4 flex flex-col w-full h-full">
       <div className="flex-grow flex flex-col">
@@ -19,10 +27,16 @@ export default function JobCard({
             alt="Company Logo"
             className="w-10 h-10 object-contain rounded"
           />
-          <div className="w-10 h-10 flex items-center justify-center rounded-full bg-gray-100">
-            <svg className="w-6 h-6 text-gray-600" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" d="M6 4v16l6-4 6 4V4z" />
-            </svg>
+          <div
+            className={`w-10 h-10 flex items-center justify-center rounded-full ${
+              !bookmarked ? "bg-gray-100" : ""
+            }`}
+          >
+            <button onClick={toggleBookmark} className="focus:outline-none">
+              {bookmarked
+                ? <MdOutlineBookmarkBorder className="w-6 h-6 text-gray-600" />
+                : <MdOutlineBookmark className="w-6 h-6 text-gray-600" />}
+            </button>
           </div>
         </div>
 
@@ -45,7 +59,7 @@ export default function JobCard({
           )}
           {status === "" && daysRemaining !== "" && daysRemaining < 7 && (
             <span className="inline-flex items-center rounded-full bg-orange-600 text-white px-4 py-1.5 text-xs font-medium">
-              Expiring
+              Expired
             </span>
           )}
           {/* {daysRemaining && (

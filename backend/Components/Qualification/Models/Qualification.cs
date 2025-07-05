@@ -7,17 +7,17 @@ namespace backend.Components.Qualification.Models
     {
         [Key]
         [Column("qualification_id")]
-        private int QualificationId { get; set; }
+        public int QualificationId { get; set; }
 
         [Required]
         [Column("programme_id")]
-        private int ProgrammeId { get; set; }
+        public int ProgrammeId { get; set; }
 
         [Required]
         [Column("job_id")]
-        private int JobId { get; set; }
+        public int JobId { get; set; }
 
-        private Qualification() { }
+        public Qualification() { }
 
         internal Qualification(int programmeId, int jobId)
         {

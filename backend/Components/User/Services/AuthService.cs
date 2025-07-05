@@ -64,18 +64,35 @@ public class AuthService : IAuthService
         // step 3: revoke any existing tokens (safety measure for new users)
         await _refreshTokenService.RevokeAllUserTokensAsync(user.GetUserId());
 
-        // step 4: generate both access and refresh tokens
-        var accessToken = _jwtService.GenerateToken(user.GetUserId(), user.GetUserType());
+        // step 4: generate tokens
+        var accessToken = _jwtService.GenerateToken(
+            user.GetUserId(),
+            user.GetUserType(),
+            applicant.GetApplicantId()
+        );
+
+        Console.WriteLine("DEBUG: Access token generated");
+
         var refreshToken = await _refreshTokenService.GenerateRefreshTokenAsync(user.GetUserId());
 
-        // step 5: return complete auth response
+        Console.WriteLine("DEBUG: Refresh token generated");
+
+
+        // step 5: attach applicantId
+        var userDto = _userService.ConvertToResponseDTO(user);
+        userDto.ApplicantId = applicant.GetApplicantId();
+
+        Console.WriteLine("DEBUG: User DTO created with ApplicantId");
+        
+        // step 6: return
         return new AuthResponseDTO
         {
             Token = accessToken,
-            ExpiresAt = DateTime.UtcNow.AddMinutes(15), // reduced to 15 minutes
-            User = _userService.ConvertToResponseDTO(user),
+            ExpiresAt = DateTime.UtcNow.AddMinutes(15),
+            User = userDto,
             RefreshToken = refreshToken
         };
+        
     }
 
     // handles complete recruiter signup flow
@@ -156,21 +173,36 @@ public class AuthService : IAuthService
     
         Console.WriteLine("DEBUG: Tokens revoked, generating new tokens");
     
-        // step 4: generate both access and refresh tokens
-        var accessToken = _jwtService.GenerateToken(user.GetUserId(), user.GetUserType());
-        Console.WriteLine("DEBUG: Access token generated");
-    
         var refreshToken = await _refreshTokenService.GenerateRefreshTokenAsync(user.GetUserId());
-        Console.WriteLine("DEBUG: Refresh token generated");
-    
+
         Console.WriteLine("DEBUG: Login completed successfully");
-    
-        // step 5: return auth response with both tokens
+
+        // step 5: build User DTO and attach applicantId if the user is an applicant
+        var userDto = _userService.ConvertToResponseDTO(user);
+
+        if (user.GetUserType() == 1) // 1 = applicant
+        {
+            var applicantEntity = await _applicantService.GetApplicantByUserIdAsync(user.GetUserId());
+            if (applicantEntity != null)
+            {
+                userDto.ApplicantId = applicantEntity.GetApplicantId();
+            }
+        }
+
+        // step 6: send response
+        // regenerate access token including applicantId if present
+        int? applicantId = userDto.ApplicantId;
+        var accessToken = _jwtService.GenerateToken(
+            user.GetUserId(),
+            user.GetUserType(),
+            applicantId
+        );
+
         return new AuthResponseDTO
         {
-            Token = accessToken,
-            ExpiresAt = DateTime.UtcNow.AddMinutes(15),
-            User = _userService.ConvertToResponseDTO(user),
+            Token        = accessToken,
+            ExpiresAt    = DateTime.UtcNow.AddMinutes(15),
+            User         = userDto,
             RefreshToken = refreshToken
         };
     }
