@@ -1,30 +1,18 @@
-name: Test and Deploy to Development Setting
+name: Build and Push Backend
 
 on:
   push:
     branches:
       - development
+    paths:
+      - 'backend/**'
 
 jobs:
-  CI-CD:
+  build-and-deploy-backend:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
-
-      - name: Set up Node.jobs
-        uses: actions/setup-node@v4
-        with:
-          node-version: "22"
-
-      # FRONTEND BUILD
-      - name: Install dependencies
-        run: 
-          npm install --prefix ./frontend
-      
-      - name: Building frontend
-        run:  
-          npm run build --prefix ./frontend
 
       # BACKEND BUILD
       - name: Build backend Docker image
@@ -41,11 +29,6 @@ jobs:
           echo "${{ secrets.CLOUD_KEY }}" > ~/.ssh/id_rsa
           chmod 600 ~/.ssh/id_rsa
           ssh-keyscan ${{ vars.CLOUD_HOST }} >> ~/.ssh/known_hosts
-
-      # DEPLOY TO CLOUD SERVER
-      - name: Upload frontend using RSYNC
-        run: |
-          rsync -avz -e "ssh -i ~/.ssh/id_rsa" ./frontend/dist ${{ vars.CLOUD_USER }}@${{ vars.CLOUD_HOST }}:/home/dev/ready4work/production/frontend/
 
       # Copy backend image to server using SCP
       - name: Copy backend image to server
